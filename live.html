@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Broadcast</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+        body { background:#0d0e15; color:#fff; padding:16px; }
+        h2 { color:#ff4757; font-size:16px; margin-bottom:16px; text-align:center; }
+
+        .card { background:#181a24; border-radius:12px; padding:16px; margin-bottom:16px; border:1px solid #2a2e3d; }
+        .card h3 { font-size:13px; color:#00f2fe; margin-bottom:10px; }
+
+        input, select { width:100%; padding:9px; background:#0d0e15; border:1px solid #333; color:#fff; border-radius:6px; font-size:13px; margin-bottom:8px; }
+        button { width:100%; padding:10px; border:none; border-radius:6px; font-weight:bold; font-size:13px; cursor:pointer; margin-bottom:6px; }
+        .btn-red   { background:#ff4757; color:#fff; }
+        .btn-green { background:#2ed573; color:#000; }
+        .btn-grey  { background:#444; color:#fff; }
+        .btn-cyan  { background:#00f2fe; color:#000; }
+        button:disabled { opacity:.5; cursor:not-allowed; }
+
+        /* Camera preview */
+        #previewWrap { width:100%; aspect-ratio:16/9; background:#000; border-radius:8px; overflow:hidden; position:relative; margin-bottom:10px; display:none; }
+        #preview { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); }
+        .preview-badge {
+            position:absolute; top:8px; left:8px;
+            background:#ff4757; color:#fff; padding:3px 8px; border-radius:4px;
+            font-size:10px; font-weight:bold; display:none; align-items:center; gap:4px;
+        }
+        .preview-badge .dot { width:6px; height:6px; background:#fff; border-radius:50%; animation:pulse 1s infinite; }
+        .preview-badge.show { display:flex; }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+        /* Peer ID share */
+        .peer-box { background:#0d0e15; border-radius:6px; padding:10px; font-size:11px; color:#aaa; word-break:break-all; margin-bottom:8px; }
+        .peer-box span { color:#00f2fe; font-weight:bold; }
+
+        /* Channel status */
+        .ch-status { font-size:11px; padding:8px; border-radius:6px; background:#0d0e15; min-height:30px; margin-top:6px; }
+
+        /* Active channels list */
+        .ch-item { background:#0d0e15; border-radius:6px; padding:8px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:12px; }
+        .ch-live-dot { width:8px; height:8px; background:#ff4757; border-radius:50%; animation:pulse 1s infinite; display:inline-block; margin-right:6px; }
+
+        .stat-row { display:flex; justify-content:space-between; font-size:11px; color:#aaa; padding:4px 0; border-bottom:1px solid #222; }
+        .stat-val { color:#00f2fe; font-weight:bold; }
+    </style>
+</head>
+<body>
+<h2>📡 Live Broadcast Panel</h2>
+
+<!-- Channel Info -->
+<div class="card">
+    <h3>📺 চ্যানেল তথ্য</h3>
+    <input type="text" id="chName" placeholder="চ্যানেলের নাম (যেমন: মাঠ থেকে লাইভ)">
+    <select id="chCategory">
+        <option value="main">মূল সম্প্রচার</option>
+        <option value="field">মাঠ থেকে লাইভ</option>
+        <option value="event">অনুষ্ঠান লাইভ</option>
+        <option value="interview">সাক্ষাৎকার</option>
+        <option value="other">অন্যান্য</option>
+    </select>
+</div>
+
+<!-- Camera Live (WebRTC via PeerJS) -->
+<div class="card">
+    <h3>📷 ক্যামেরা দিয়ে লাইভ (WebRTC)</h3>
+    <select id="camSelect">
+        <option value="user">সামনের ক্যামেরা</option>
+        <option value="environment">পিছনের ক্যামেরা</option>
+    </select>
+    <select id="qualitySelect">
+        <option value="720">720p (HD)</option>
+        <option value="480">480p (মাঝারি)</option>
+        <option value="360">360p (কম নেট)</option>
+    </select>
+
+    <div id="previewWrap">
+        <video id="preview" autoplay muted playsinline></video>
+        <div class="preview-badge" id="liveBadge"><span class="dot"></span> LIVE</div>
+    </div>
+
+    <button class="btn-cyan" id="startCamBtn" onclick="startCamera()">📷 ক্যামেরা চালু করুন</button>
+    <button class="btn-green" id="goLiveBtn" onclick="goLive()" disabled>🔴 লাইভ শুরু করুন</button>
+    <button class="btn-grey" id="stopLiveBtn" onclick="stopLive()" disabled>⏹ লাইভ বন্ধ করুন</button>
+
+    <div class="peer-box" id="peerInfo">ক্যামেরা চালু করলে Peer ID দেখাবে</div>
+    <div class="ch-status" id="camStatus">ক্যামেরা বন্ধ আছে</div>
+</div>
+
+<!-- External Link Live -->
+<div class="card">
+    <h3>🔗 লিংক দিয়ে লাইভ যোগ করুন</h3>
+    <select id="linkType">
+        <option value="youtube">YouTube Live</option>
+        <option value="facebook">Facebook Live</option>
+        <option value="cloudflare">Cloudflare Stream</option>
+        <option value="m3u8">IPTV / m3u8</option>
+        <option value="direct">Direct MP4</option>
+    </select>
+    <input type="text" id="linkUrl" placeholder="লাইভ লিংক পেস্ট করুন">
+    <button class="btn-red" onclick="addLinkChannel()">📡 চ্যানেল যোগ করুন</button>
+    <div class="ch-status" id="linkStatus"></div>
+</div>
+
+<!-- Active Channels -->
+<div class="card">
+    <h3>📋 সক্রিয় চ্যানেলসমূহ</h3>
+    <div id="activeChannels"><p style="font-size:11px;color:#888;">কোনো চ্যানেল নেই</p></div>
+</div>
+
+<!-- Stats -->
+<div class="card">
+    <h3>📊 লাইভ পরিসংখ্যান</h3>
+    <div class="stat-row"><span>মোট চ্যানেল</span><span class="stat-val" id="statTotal">0</span></div>
+    <div class="stat-row"><span>সক্রিয় চ্যানেল</span><span class="stat-val" id="statActive">0</span></div>
+    <div class="stat-row"><span>WebRTC চ্যানেল</span><span class="stat-val" id="statWebRTC">0</span></div>
+    <div class="stat-row"><span>লিংক চ্যানেল</span><span class="stat-val" id="statLink">0</span></div>
+</div>
+
+<!-- PeerJS CDN -->
+<script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js" defer></script>
+
+<script>
+    let localStream = null;
+    let peer        = null;
+    let myPeerId    = null;
+    let db          = null;
+    let myChannelId = null;
+    let connections = [];
+
+    window.addEventListener('load', () => {
+        const cfg = {
+            apiKey:"AIzaSyAjCANiMrT8zSF3s2pD0YqNSrnP0bsA4",
+            authDomain:"omkar-tv.firebaseapp.com",
+            databaseURL:"https://omkar-tv-default-rtdb.firebaseio.com",
+            projectId:"omkar-tv",
+            storageBucket:"omkar-tv.firebasestorage.app",
+            messagingSenderId:"925670348274",
+            appId:"1:925670348274:web:23e54c210640c72e59ede6"
+        };
+        firebase.initializeApp(cfg);
+        db = firebase.database();
+        loadActiveChannels();
+    });
+
+    // ── Camera ────────────────────────────────────────
+    async function startCamera() {
+        const facing  = document.getElementById('camSelect').value;
+        const quality = parseInt(document.getElementById('qualitySelect').value);
+        const status  = document.getElementById('camStatus');
+
+        const heightMap = { 720:{w:1280,h:720}, 480:{w:854,h:480}, 360:{w:640,h:360} };
+        const res = heightMap[quality] || heightMap[480];
+
+        status.style.color = '#ffd700';
+        status.textContent = 'ক্যামেরা চালু হচ্ছে...';
+
+        try {
+            if (localStream) { localStream.getTracks().forEach(t => t.stop()); }
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: facing, width:{ideal:res.w}, height:{ideal:res.h} },
+                audio: true
+            });
+            document.getElementById('preview').srcObject = localStream;
+            document.getElementById('previewWrap').style.display = 'block';
+            document.getElementById('goLiveBtn').disabled = false;
+            document.getElementById('startCamBtn').textContent = '🔄 ক্যামেরা বদলান';
+            status.style.color = '#2ed573';
+            status.textContent = '✅ ক্যামেরা চালু। এখন লাইভ শুরু করুন।';
+        } catch(e) {
+            status.style.color = '#ff4757';
+            status.textContent = '❌ ক্যামেরা অ্যাক্সেস দিন: ' + e.message;
+        }
+    }
+
+    // ── Go Live (PeerJS) ──────────────────────────────
+    function goLive() {
+        if (!localStream) return;
+        const name     = document.getElementById('chName').value || 'WebRTC লাইভ';
+        const category = document.getElementById('chCategory').value;
+        const status   = document.getElementById('camStatus');
+
+        status.style.color = '#ffd700';
+        status.textContent = 'PeerJS সার্ভারে সংযোগ হচ্ছে...';
+
+        // Unique peer ID
+        myPeerId = 'omkar-' + Date.now();
+        peer = new Peer(myPeerId, { debug: 0 });
+
+        peer.on('open', id => {
+            myPeerId = id;
+            document.getElementById('peerInfo').innerHTML =
+                `Peer ID: <span>${id}</span><br><small style="color:#888;">দর্শকরা এই ID দিয়ে সংযোগ করবে (অটো Firebase)</small>`;
+
+            // Firebase এ চ্যানেল save করো
+            myChannelId = db.ref('liveChannels').push().key;
+            db.ref('liveChannels/' + myChannelId).set({
+                id:       myChannelId,
+                name,
+                category,
+                type:     'webrtc',
+                peerId:   id,
+                active:   true,
+                startedAt: new Date().toISOString()
+            });
+
+            document.getElementById('liveBadge').classList.add('show');
+            document.getElementById('goLiveBtn').disabled   = true;
+            document.getElementById('stopLiveBtn').disabled = false;
+            status.style.color = '#2ed573';
+            status.textContent = '🔴 লাইভ চলছে! দর্শকরা দেখছে।';
+        });
+
+        // দর্শক call করলে stream পাঠাও
+        peer.on('call', call => {
+            call.answer(localStream);
+            connections.push(call);
+        });
+
+        peer.on('error', e => {
+            status.style.color = '#ff4757';
+            status.textContent = '❌ সমস্যা: ' + e.message;
+        });
+    }
+
+    function stopLive() {
+        if (peer) { peer.destroy(); peer = null; }
+        if (myChannelId) { db.ref('liveChannels/' + myChannelId).update({ active: false }); }
+        if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+        document.getElementById('preview').srcObject = null;
+        document.getElementById('previewWrap').style.display = 'none';
+        document.getElementById('liveBadge').classList.remove('show');
+        document.getElementById('goLiveBtn').disabled   = false;
+        document.getElementById('stopLiveBtn').disabled = true;
+        document.getElementById('peerInfo').innerHTML   = 'ক্যামেরা চালু করলে Peer ID দেখাবে';
+        document.getElementById('camStatus').style.color = '#aaa';
+        document.getElementById('camStatus').textContent = 'লাইভ বন্ধ হয়েছে।';
+        myChannelId = null; connections = [];
+    }
+
+    // ── Add Link Channel ──────────────────────────────
+    function addLinkChannel() {
+        const name     = document.getElementById('chName').value || 'লিংক চ্যানেল';
+        const category = document.getElementById('chCategory').value;
+        const type     = document.getElementById('linkType').value;
+        const url      = document.getElementById('linkUrl').value.trim();
+        const status   = document.getElementById('linkStatus');
+
+        if (!url) { status.style.color='#ff4757'; status.textContent='❌ লিংক দিন'; return; }
+        status.style.color = '#ffd700'; status.textContent = 'যোগ হচ্ছে...';
+
+        db.ref('liveChannels').push({
+            name, category, type, url,
+            active:    true,
+            startedAt: new Date().toISOString()
+        }).then(() => {
+            status.style.color = '#2ed573';
+            status.textContent = '✅ চ্যানেল যোগ হয়েছে!';
+            document.getElementById('linkUrl').value = '';
+        }).catch(e => {
+            status.style.color = '#ff4757';
+            status.textContent = '❌ সমস্যা: ' + e.message;
+        });
+    }
+
+    // ── Load Active Channels ──────────────────────────
+    function loadActiveChannels() {
+        db.ref('liveChannels').on('value', snap => {
+            const d   = snap.val();
+            const box = document.getElementById('activeChannels');
+            box.innerHTML = '';
+            if (!d) { box.innerHTML = '<p style="font-size:11px;color:#888;">কোনো চ্যানেল নেই</p>'; updateStats(0,0,0,0); return; }
+
+            let total=0, active=0, webrtc=0, link=0;
+            for (let id in d) {
+                const ch = d[id]; total++;
+                if (ch.active) { active++; ch.type==='webrtc' ? webrtc++ : link++; }
+                box.innerHTML += `
+                <div class="ch-item">
+                    <div>
+                        ${ch.active ? '<span class="ch-live-dot"></span>' : ''}
+                        <strong>${ch.name || 'চ্যানেল'}</strong>
+                        <span style="font-size:10px;color:#aaa;margin-left:4px;">[${ch.type || 'link'}]</span><br>
+                        <span style="font-size:10px;color:${ch.active?'#2ed573':'#888'};">${ch.active?'সক্রিয়':'বন্ধ'}</span>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <button onclick="toggleChannel('${id}',${!ch.active})"
+                            style="padding:4px 8px;font-size:10px;border:none;border-radius:4px;cursor:pointer;background:${ch.active?'#555':'#2ed573'};color:${ch.active?'#fff':'#000'};">
+                            ${ch.active ? '⏹ বন্ধ' : '▶ চালু'}
+                        </button>
+                        <button onclick="deleteChannel('${id}')"
+                            style="padding:4px 8px;font-size:10px;border:none;border-radius:4px;cursor:pointer;background:#ff4757;color:#fff;">
+                            🗑
+                        </button>
+                    </div>
+                </div>`;
+            }
+            if (!box.innerHTML) box.innerHTML = '<p style="font-size:11px;color:#888;">কোনো চ্যানেল নেই</p>';
+            updateStats(total, active, webrtc, link);
+        });
+    }
+
+    function toggleChannel(id, active) {
+        db.ref('liveChannels/' + id).update({ active });
+    }
+    function deleteChannel(id) {
+        if (confirm('এই চ্যানেল ডিলিট করবেন?')) db.ref('liveChannels/' + id).remove();
+    }
+    function updateStats(t,a,w,l) {
+        document.getElementById('statTotal').textContent  = t;
+        document.getElementById('statActive').textContent = a;
+        document.getElementById('statWebRTC').textContent = w;
+        document.getElementById('statLink').textContent   = l;
+    }
+</script>
+</body>
+</html>

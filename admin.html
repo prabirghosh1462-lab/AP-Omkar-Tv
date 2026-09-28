@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #0d0e15; color: #fff; padding: 20px; }
+        .admin-container { max-width: 650px; margin: 0 auto; }
+        h1 { color: #00f2fe; text-align: center; margin-bottom: 20px; font-size: 22px; }
+        .card { background: #181a24; padding: 18px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #2a2e3d; }
+        .card h2 { color: #ff4757; font-size: 15px; margin-bottom: 12px; border-bottom: 1px solid #2a2e3d; padding-bottom: 6px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 12px; color: #aaa; margin-bottom: 4px; }
+        input, select {
+            width: 100%; padding: 10px; background: #0d0e15; border: 1px solid #333; color: #fff; border-radius: 6px; font-size: 13px;
+        }
+        input[type="file"] { padding: 8px; }
+        button { background: #ff4757; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; }
+        button:hover { opacity: 0.9; }
+        .btn-gold { background: #ffd700; color: #000; }
+        .btn-cyan { background: #00f2fe; color: #000; }
+        .item-list { margin-top: 15px; }
+        .item-card { background: #11131b; padding: 10px; border-radius: 6px; border: 1px solid #333; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .item-info { font-size: 12px; }
+        .btn-del { background: #ff3344; width: auto; padding: 4px 10px; font-size: 11px; }
+        .upload-status { font-size: 11px; margin-top: 4px; min-height: 16px; }
+        .progress-bar-wrap { background: #0d0e15; border-radius: 4px; height: 6px; margin-top: 5px; display: none; }
+        .progress-bar { background: #00f2fe; height: 6px; border-radius: 4px; width: 0%; transition: width 0.3s; }
+
+        /* Icon navigation grid */
+        .icon-nav {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .icon-btn {
+            background: #181a24;
+            border: 1px solid #2a2e3d;
+            border-radius: 12px;
+            padding: 12px 6px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            color: #ccc;
+            user-select: none;
+        }
+        .icon-btn:hover { border-color: #00f2fe; color: #fff; transform: translateY(-2px); }
+        .icon-btn.active {
+            border-color: #00f2fe;
+            background: rgba(0,242,254,0.12);
+            color: #00f2fe;
+            box-shadow: 0 0 12px rgba(0,242,254,0.25);
+        }
+        .icon-btn .ico { font-size: 22px; display: block; margin-bottom: 4px; line-height: 1; }
+        .icon-btn .lbl { font-size: 10px; font-weight: 600; line-height: 1.2; }
+
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+
+        .section-back {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #2a2e3d; color: #00f2fe; border: none;
+            padding: 6px 12px; border-radius: 6px; font-size: 12px;
+            cursor: pointer; margin-bottom: 12px; font-weight: 600;
+        }
+        .section-back:hover { background: #333; }
+
+
+        /* Login screen */
+        #loginGate {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #0d0e15;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 24px;
+        }
+        #loginGate.hidden { display: none; }
+        .login-box {
+            background: #181a24; border: 1px solid #2a2e3d;
+            border-radius: 16px; padding: 28px 22px;
+            width: 100%; max-width: 340px; text-align: center;
+        }
+        .login-box h2 { color: #00f2fe; font-size: 18px; margin-bottom: 6px; }
+        .login-box p { color: #888; font-size: 12px; margin-bottom: 18px; }
+        .login-box input[type=password] {
+            width: 100%; padding: 12px; margin-bottom: 12px;
+            background: #0d0e15; border: 1px solid #333; border-radius: 8px;
+            color: #fff; font-size: 14px;
+        }
+        .login-btn {
+            width: 100%; padding: 12px; border: none; border-radius: 8px;
+            font-weight: 700; font-size: 14px; cursor: pointer; margin-bottom: 10px;
+        }
+        .login-btn.primary { background: #00f2fe; color: #000; }
+        .login-btn.bio {
+            background: linear-gradient(135deg,#2ed573,#00b894);
+            color: #000; display: none;
+        }
+        .login-btn.bio.show { display: block; }
+        .login-status { font-size: 12px; min-height: 20px; color: #ff4757; margin-top: 8px; }
+        .login-hint { font-size: 10px; color: #555; margin-top: 12px; line-height: 1.4; }
+
+        @media (max-width: 420px) {
+            .icon-nav { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .icon-btn .ico { font-size: 20px; }
+            .icon-btn .lbl { font-size: 9px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loginGate">
+    <div class="login-box">
+        <h2>📺 Admin Panel</h2>
+        <p>প্রবেশ করতে লগইন করুন</p>
+        <button type="button" class="login-btn bio" id="bioLoginBtn" onclick="loginWithBiometric()">
+            👆 ফিংগারপ্রিন্ট / Face ID
+        </button>
+        <div id="bioDivider" style="display:none;color:#555;font-size:11px;margin:8px 0;">— অথবা —</div>
+        <input type="password" id="loginPass" placeholder="পাসওয়ার্ড" autocomplete="current-password">
+        <button type="button" class="login-btn primary" onclick="loginWithPassword()">🔐 পাসওয়ার্ড দিয়ে ঢুকুন</button>
+        <div class="login-status" id="loginStatus"></div>
+        <div class="login-hint">বায়োমেট্রিক সেট করতে প্রথমে পাসওয়ার্ড দিয়ে ঢুকে<br>🔐 পাসওয়ার্ড সেকশন থেকে রেজিস্টার করুন<br>⚠️ HTTPS সাইটেই বায়োমেট্রিক কাজ করে</div>
+    </div>
+</div>
+
+<div class="admin-container" id="adminMain" style="display:none;">
+    <h1>📺 Live Stream Control Panel</h1>
+    <!-- ══ ON-AIR Screen Mode ══ -->
+    <div id="screenModeBar" style="background:#0d0e15;border:2px solid #ffd700;border-radius:12px;padding:12px;margin-bottom:14px;">
+        <div style="font-size:12px;color:#ffd700;font-weight:bold;margin-bottom:10px;text-align:center;">
+            📺 দর্শক স্ক্রিন মোড (একটিতে ক্লিক করুন)
+        </div>
+        <div style="display:flex;gap:8px;">
+            <button type="button" id="modeBtnLive" onclick="setScreenMode('live')"
+                style="flex:1;padding:14px 8px;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;background:#333;color:#aaa;">
+                🔴 লাইভ<br><span style="font-size:10px;font-weight:600;">ব্রডকাস্ট</span>
+            </button>
+            <button type="button" id="modeBtnNews" onclick="setScreenMode('news')"
+                style="flex:1;padding:14px 8px;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;background:#333;color:#aaa;">
+                📰 নিউজ<br><span style="font-size:10px;font-weight:600;">স্ক্রিন</span>
+            </button>
+            <button type="button" id="modeBtnElection" onclick="setScreenMode('election')"
+                style="flex:1;padding:14px 8px;border:none;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;background:#333;color:#aaa;">
+                🗳️ নির্বাচন<br><span style="font-size:10px;font-weight:600;">ফলাফল</span>
+            </button>
+        </div>
+        <div id="screenModeStatus" style="text-align:center;font-size:11px;color:#888;margin-top:8px;">মোড: —</div>
+    </div>
+
+    <div class="icon-nav" id="iconNav">
+        <div class="icon-btn" data-sec="sec-password" onclick="showAdminSection('sec-password')"><span class="ico">🔐</span><span class="lbl">পাসওয়ার্ড</span></div>
+        <div class="icon-btn" data-sec="sec-festival" onclick="showAdminSection('sec-festival')"><span class="ico">🎉</span><span class="lbl">উৎসব</span></div>
+        <div class="icon-btn" data-sec="sec-live" onclick="showAdminSection('sec-live')"><span class="ico">🔴</span><span class="lbl">লাইভ</span></div>
+        <div class="icon-btn" data-sec="sec-news" onclick="showAdminSection('sec-news')"><span class="ico">📰</span><span class="lbl">নিউজ ফ্রেম</span></div>
+        <div class="icon-btn" data-sec="sec-broadcast" onclick="showAdminSection('sec-broadcast')"><span class="ico">📡</span><span class="lbl">ব্রডকাস্ট</span></div>
+        <div class="icon-btn" data-sec="sec-playlist" onclick="showAdminSection('sec-playlist')"><span class="ico">🎥</span><span class="lbl">প্লেলিস্ট</span></div>
+        <div class="icon-btn" data-sec="sec-adbreak" onclick="showAdminSection('sec-adbreak')"><span class="ico">⏸️</span><span class="lbl">অ্যাড ব্রেক</span></div>
+        <div class="icon-btn" data-sec="sec-schedule" onclick="showAdminSection('sec-schedule')"><span class="ico">📅</span><span class="lbl">সূচি</span></div>
+        <div class="icon-btn" data-sec="sec-logo" onclick="showAdminSection('sec-logo')"><span class="ico">🖼️</span><span class="lbl">লোগো</span></div>
+        <div class="icon-btn" data-sec="sec-ticker" onclick="showAdminSection('sec-ticker')"><span class="ico">📢</span><span class="lbl">টিকর</span></div>
+        <div class="icon-btn" data-sec="sec-billboard" onclick="showAdminSection('sec-billboard')"><span class="ico">🪧</span><span class="lbl">বিলবোর্ড</span></div>
+        <div class="icon-btn" data-sec="sec-election" onclick="showAdminSection('sec-election')"><span class="ico">🗳️</span><span class="lbl">নির্বাচন</span></div>
+        <div class="icon-btn" data-sec="sec-flash" onclick="showAdminSection('sec-flash')"><span class="ico">⚡</span><span class="lbl">ফ্ল্যাশ অ্যাড</span></div>
+        <div class="icon-btn" data-sec="sec-topbar" onclick="showAdminSection('sec-topbar')"><span class="ico">📊</span><span class="lbl">টপ বার</span></div>
+        <div class="icon-btn" data-sec="sec-banner" onclick="showAdminSection('sec-banner')"><span class="ico">🎠</span><span class="lbl">ব্যানার</span></div>
+    </div>
+    <!-- Password Change -->
+    <div class="card admin-section" id="sec-password" style="border-color:#00f2fe;">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>🔐 Admin Password পরিবর্তন</h2>
+        <div class="form-group">
+            <label>বর্তমান Password:</label>
+            <input type="password" id="pwCurrent" placeholder="বর্তমান password দিন">
+        </div>
+        <div class="form-group">
+            <label>নতুন Password:</label>
+            <input type="password" id="pwNew" placeholder="নতুন password দিন (কমপক্ষে ৬ অক্ষর)">
+        </div>
+        <div class="form-group">
+            <label>নতুন Password নিশ্চিত করুন:</label>
+            <input type="password" id="pwConfirm" placeholder="আবার নতুন password দিন">
+        </div>
+        <button onclick="changePassword()"
+            style="background:#00f2fe;color:#000;border:none;padding:10px;border-radius:6px;
+                   font-weight:bold;width:100%;cursor:pointer;font-size:13px;">
+            🔐 Password পরিবর্তন করুন
+        </button>
+        <div id="pwStatus" style="font-size:12px;margin-top:8px;padding:8px;border-radius:6px;
+             background:#0d0e15;min-height:30px;text-align:center;"></div>
+
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid #2a2e3d;">
+            <h2 style="color:#2ed573;font-size:14px;margin-bottom:8px;">👆 বায়োমেট্রিক লগইন</h2>
+            <div style="font-size:11px;color:#888;margin-bottom:10px;">
+                এই ডিভাইসে ফিংগারপ্রিন্ট / Face ID দিয়ে লগইন চালু করুন। পাসওয়ার্ড ব্যাকআপ হিসেবে থাকবে।
+            </div>
+            <button type="button" onclick="registerBiometric()"
+                style="background:#2ed573;color:#000;border:none;padding:10px;border-radius:6px;
+                       font-weight:bold;width:100%;cursor:pointer;font-size:13px;margin-bottom:8px;">
+                👆 বায়োমেট্রিক রেজিস্টার করুন
+            </button>
+            <button type="button" onclick="removeBiometric()"
+                style="background:#333;color:#fff;border:none;padding:8px;border-radius:6px;
+                       font-weight:bold;width:100%;cursor:pointer;font-size:12px;">
+                ✕ এই ডিভাইসের বায়োমেট্রিক মুছুন
+            </button>
+            <div id="bioStatus" style="font-size:12px;margin-top:8px;padding:8px;border-radius:6px;
+                 background:#0d0e15;min-height:24px;text-align:center;"></div>
+        </div>
+    </div>
+
+    <a href="live.html" target="_blank"
+       style="display:block;text-align:center;background:#ff4757;color:#fff;padding:10px;border-radius:8px;font-weight:bold;font-size:13px;margin-bottom:16px;text-decoration:none;">
+       📡 নতুন লাইভ ব্রডকাস্ট শুরু করুন →
+    </a>
+
+    <!-- Festival Countdown Management -->
+    <div class="card admin-section" id="sec-festival" style="border-color:#ffd700;">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>🎉 উৎসব কাউন্টডাউন ম্যানেজমেন্ট</h2>
+        <div class="form-group">
+            <label>উৎসবের নাম:</label>
+            <input type="text" id="festName" placeholder="যেমন: দুর্গাপূজা / ঈদুল ফিতর / বড়দিন">
+        </div>
+        <div class="form-group">
+            <label>উৎসবের তারিখ:</label>
+            <input type="date" id="festDate">
+        </div>
+        <div class="form-group">
+            <label>উৎসবের ছবি URL:</label>
+            <input type="text" id="festImgUrl" placeholder="https://i.ibb.co/durga.jpg">
+        </div>
+        <div class="form-group">
+            <label>অথবা গ্যালারি থেকে ছবি আপলোড করুন:</label>
+            <input type="file" id="festImgFile" accept="image/*">
+        </div>
+        <div id="festImgUploadStatus" class="upload-status" style="color:#00f2fe;"></div>
+        <button onclick="addFestival()" class="btn-gold">উৎসব যুক্ত করুন</button>
+        <div class="item-list" id="festivalList"></div>
+    </div>
+
+    <!-- 0. Multi-Channel Live Control -->
+    <div class="card admin-section" id="sec-live" style="border-color:#ff4757;">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>🔴 লাইভ চ্যানেল ম্যানেজমেন্ট</h2>
+
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:12px;">
+            <div style="font-size:11px;color:#ffd700;margin-bottom:6px;font-weight:bold;">➕ নতুন লাইভ চ্যানেল যোগ করুন</div>
+            <div class="form-group">
+                <label>চ্যানেলের নাম:</label>
+                <input type="text" id="liveChName" placeholder="যেমন: মেইন ক্যামেরা / Channel 2">
+            </div>
+            <div class="form-group">
+                <label>লাইভ টাইপ:</label>
+                <select id="liveType">
+                    <option value="youtube">📺 YouTube Live</option>
+                    <option value="facebook">👤 Facebook Live</option>
+                    <option value="drive">📁 Google Drive</option>
+                    <option value="cloudflare">☁️ Cloudflare Stream</option>
+                    <option value="m3u8">📡 IPTV / m3u8</option>
+                    <option value="direct">🔗 Direct MP4</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>লাইভ URL:</label>
+                <input type="text" id="liveUrl" placeholder="লাইভ লিংক পেস্ট করুন">
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button onclick="addLiveChannel()" style="background:#ff4757;flex:1;">🔴 চ্যানেল যোগ করুন</button>
+            </div>
+        </div>
+
+        <div style="font-size:11px;color:#ffd700;margin-bottom:6px;font-weight:bold;">📋 সক্রিয় লাইভ চ্যানেলসমূহ:</div>
+        <div id="liveChannelList" style="font-size:12px;color:#888;">লোড হচ্ছে...</div>
+
+        <div style="margin-top:10px;padding:8px;background:#0d0e15;border-radius:6px;font-size:10px;color:#888;">
+            📡 <a href="broadcast.html" target="_blank" style="color:#00f2fe;">broadcast.html</a> — ক্যামেরা দিয়ে লাইভ করতে এই লিংক শেয়ার করুন
+        </div>
+    </div>
+
+
+    <!-- News Frame Control -->
+    <div class="card admin-section" id="sec-news" style="border-color:#cc0000;">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>📺 Breaking News Frame</h2>
+        <div style="font-size:11px;color:#888;margin-bottom:10px;">
+            একাধিক শিরোনাম, খবর ও বিজ্ঞাপন যোগ করুন — প্লেয়ারে ঘুরে ঘুরে দেখাবে।
+        </div>
+
+        <div class="form-group">
+            <label>ডান লোগো লেবেল:</label>
+            <input type="text" id="nfLabel" placeholder="NEWS" value="NEWS">
+        </div>
+        <div class="form-group">
+            <label>বাঁ প্যানেল শিরোনাম:</label>
+            <input type="text" id="nfLeftTitle" placeholder="আমাদের পরিষেবা">
+        </div>
+        <div class="form-group">
+            <label>বাঁ প্যানেল টেক্সট:</label>
+            <textarea id="nfLeftText" rows="2" placeholder="ICU বেড, ভেন্টিলেটর..."
+                style="width:100%;padding:8px;background:#0d0e15;border:1px solid #333;color:#fff;border-radius:6px;font-size:12px;"></textarea>
+        </div>
+
+        <!-- Multiple Headlines -->
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid #cc0000;">
+            <div style="font-size:12px;color:#ffd700;font-weight:bold;margin-bottom:8px;">📰 শিরোনাম (একাধিক)</div>
+            <div class="form-group">
+                <input type="text" id="nfHeadlineInput" placeholder="নতুন শিরোনাম লিখুন">
+            </div>
+            <button type="button" onclick="nfAddItem('headlines','nfHeadlineInput','nfHeadlineList')" class="btn-cyan" style="margin-bottom:8px;">+ শিরোনাম যোগ</button>
+            <div id="nfHeadlineList" style="font-size:12px;"></div>
+            <div class="form-group" style="margin-top:8px;">
+                <label>ঘোরানোর সময় (সেকেন্ড):</label>
+                <input type="number" id="nfHeadlineInterval" value="6" min="3" max="60">
+            </div>
+        </div>
+
+        <!-- Multiple Ticker news -->
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid #00f2fe;">
+            <div style="font-size:12px;color:#00f2fe;font-weight:bold;margin-bottom:8px;">📢 খবর / টিকর (একাধিক)</div>
+            <div class="form-group">
+                <input type="text" id="nfFlashInput" placeholder="নতুন খবর লিখুন">
+            </div>
+            <button type="button" onclick="nfAddItem('tickers','nfFlashInput','nfTickerList')" class="btn-cyan" style="margin-bottom:8px;">+ খবর যোগ</button>
+            <div id="nfTickerList" style="font-size:12px;"></div>
+            <div class="form-group" style="margin-top:8px;">
+                <label>ঘোরানোর সময় (সেকেন্ড):</label>
+                <input type="number" id="nfTickerInterval" value="8" min="3" max="60">
+            </div>
+        </div>
+
+        <!-- Multiple Ads -->
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid #ffd700;">
+            <div style="font-size:12px;color:#ffd700;font-weight:bold;margin-bottom:8px;">📢 বিজ্ঞাপন (একাধিক)</div>
+            <div class="form-group">
+                <label>নাম:</label>
+                <input type="text" id="nfAdTitle" placeholder="হাসি খুশি নার্সিং হোম">
+            </div>
+            <div class="form-group">
+                <label>বিবরণ:</label>
+                <input type="text" id="nfAdSub" placeholder="২৪ ঘণ্টা পরিষেবা">
+            </div>
+            <div class="form-group">
+                <label>ফোন:</label>
+                <input type="text" id="nfAdPhone" placeholder="9732842058">
+            </div>
+            <div class="form-group">
+                <label>লোগো URL:</label>
+                <input type="text" id="nfAdLogo" placeholder="https://i.ibb.co/logo.jpg">
+            </div>
+            <button type="button" onclick="nfAddAd()" class="btn-gold" style="margin-bottom:8px;">+ বিজ্ঞাপন যোগ</button>
+            <div id="nfAdList" style="font-size:12px;"></div>
+            <div class="form-group" style="margin-top:8px;">
+                <label>ঘোরানোর সময় (সেকেন্ড):</label>
+                <input type="number" id="nfAdInterval" value="7" min="3" max="60">
+            </div>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+            <button onclick="startNewsFrame()"
+                style="flex:1;background:#cc0000;color:#fff;border:none;padding:10px;
+                       border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;">
+                📺 Frame চালু করুন
+            </button>
+            <button onclick="stopNewsFrame()"
+                style="flex:1;background:#333;color:#fff;border:none;padding:10px;
+                       border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;">
+                ✕ Frame বন্ধ করুন
+            </button>
+        </div>
+
+        <div id="nfStatus" style="font-size:11px;margin-top:8px;padding:6px;border-radius:4px;
+             background:#0d0e15;min-height:24px;"></div>
+
+        <!-- Live preview -->
+        <div style="margin-top:12px;border-radius:6px;overflow:hidden;position:relative;
+             height:80px;background:#111;" id="nfPreview">
+            <div style="background:linear-gradient(90deg,#cc0000,#e60000);
+                 padding:3px 8px;font-size:10px;font-weight:900;color:#fff;
+                 font-style:italic;display:flex;align-items:center;gap:6px;">
+                <span style="animation:newsFlash .6s infinite alternate;">BREAKING NEWS</span>
+                <span style="margin-left:auto;background:#ffd700;color:#000;
+                      padding:1px 5px;border-radius:2px;font-size:8px;" id="nfLabelPreview">ENTERTAINMENT</span>
+            </div>
+            <div style="flex:1;background:#000;height:30px;display:flex;align-items:center;
+                 justify-content:center;font-size:9px;color:#aaa;">▶ ভিডিও চলবে এখানে</div>
+            <div style="background:rgba(200,0,0,.9);padding:3px 8px;font-size:9px;
+                 color:#fff;font-weight:bold;text-align:center;" id="nfHeadlinePreview">
+                Headline এখানে দেখাবে
+            </div>
+        </div>
+
+        <!-- Live update inputs -->
+        <script>
+            document.getElementById('nfHeadline').addEventListener('input', function() {
+                const el = document.getElementById('nfHeadlinePreview');
+                if (el) el.textContent = this.value || 'Headline এখানে দেখাবে';
+            });
+            document.getElementById('nfLabel').addEventListener('input', function() {
+                const el = document.getElementById('nfLabelPreview');
+                if (el) el.textContent = this.value || 'ENTERTAINMENT';
+            });
+        </script>
+    </div>
+
+    
+
+    <!-- Broadcast Control — Synchronized TV -->
+    <div class="card admin-section" id="sec-broadcast" style="border-color:#2ed573;">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>📡 Broadcast Control (TV Channel মোড)</h2>
+        <div style="font-size:11px;color:#888;margin-bottom:10px;">
+            সব দর্শক একই সময়ে একই ভিডিও দেখবে। Play/Pause/Seek করতে পারবে না।
+        </div>
+
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:10px;">
+            <div style="font-size:11px;color:#aaa;margin-bottom:6px;">এখন চলছে:</div>
+            <div id="bc-now" style="font-size:13px;color:#2ed573;font-weight:bold;">লোড হচ্ছে...</div>
+            <div id="bc-time" style="font-size:10px;color:#aaa;margin-top:3px;"></div>
+        </div>
+
+        <div class="form-group">
+            <label>ভিডিও সিলেক্ট করুন:</label>
+            <select id="bcSelect" style="width:100%;padding:9px;background:#0d0e15;border:1px solid #333;color:#fff;border-radius:6px;font-size:13px;">
+                <option value="">-- playlist লোড হচ্ছে --</option>
+            </select>
+        </div>
+
+        <button onclick="broadcastStart()" class="btn-green" style="background:#2ed573;color:#000;">
+            📡 এই ভিডিও সবার জন্য শুরু করুন
+        </button>
+
+        <div id="bcStatus" style="font-size:11px;margin-top:8px;padding:6px;border-radius:4px;background:#0d0e15;min-height:24px;"></div>
+
+        <div style="margin-top:10px;border-top:1px solid #222;padding-top:10px;">
+            <div style="font-size:11px;color:#888;margin-bottom:6px;">দ্রুত নিয়ন্ত্রণ:</div>
+            <div style="display:flex;gap:6px;">
+                <button onclick="broadcastPrev()" style="flex:1;background:#555;color:#fff;border:none;padding:8px;border-radius:6px;cursor:pointer;font-size:12px;">⏮ আগের</button>
+                <button onclick="broadcastNext()" style="flex:1;background:#ff4757;color:#fff;border:none;padding:8px;border-radius:6px;cursor:pointer;font-size:12px;">পরের ⏭</button>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <!-- 1. Playlist -->
+    <div class="card admin-section" id="sec-playlist">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>🎥 প্লেলিস্ট ভিডিও ম্যানেজমেন্ট (একটার পর একটা চলবে)</h2>
+        <div class="form-group">
+            <label>ভিডিওর টাইটেল / নাম:</label>
+            <input type="text" id="videoTitle" placeholder="যেমন: নাটক / গান / লাইভ শো">
+        </div>
+        <div class="form-group">
+            <label>ভিডিও সোর্স টাইপ:</label>
+            <select id="videoSourceType">
+                <option value="online">অনলাইন ডিরেক্ট লিংক (.mp4 / .m3u8 IPTV Stream)</option>
+                <option value="embed">ইউটিউব / এম্বেডেড লাইভ লিংক</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>ভিডিও URL পেস্ট করুন:</label>
+            <input type="text" id="videoUrl" placeholder="https://example.com/video.mp4">
+        </div>
+        <div class="form-group">
+            <label>অথবা গ্যালারি থেকে ভিডিও আপলোড করুন:</label>
+            <input type="file" id="videoFile" accept="video/mp4,video/webm,video/ogg,video/*">
+        </div>
+        <div id="videoUploadStatus" class="upload-status" style="color:#00f2fe;"></div>
+        <div class="progress-bar-wrap" id="videoProgressWrap"><div class="progress-bar" id="videoProgressBar"></div></div>
+        <div style="font-size:10px;color:#888;margin-top:5px;">MP4/WebM/OGG • সর্বোচ্চ 100MB • আপলোড চলাকালে পেজ বন্ধ করবেন না</div>
+        <button onclick="addPlaylistItem()" class="btn-cyan">প্লেলিস্টে যুক্ত করুন</button>
+        <div class="item-list" id="playlistItems"></div>
+    </div>
+
+    <!-- 2. Ad Break -->
+    <div class="card admin-section" id="sec-adbreak">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>📺 অ্যাড ব্রেক (Ad Break) সেটিং</h2>
+        <div class="form-group">
+            <label>অ্যাড ভিডিও URL:</label>
+            <input type="text" id="adVideoUrl" placeholder="https://example.com/ad.mp4">
+        </div>
+        <div class="form-group">
+            <label>অথবা গ্যালারি থেকে অ্যাড ভিডিও আপলোড করুন:</label>
+            <input type="file" id="adVideoFile" accept="video/mp4,video/webm,video/ogg,video/*">
+        </div>
+        <div id="adUploadStatus" class="upload-status" style="color:#00f2fe;"></div>
+        <div class="progress-bar-wrap" id="adProgressWrap"><div class="progress-bar" id="adProgressBar"></div></div>
+        <div class="form-group">
+            <label>কতক্ষণ পর পর অ্যাড আসবে (মিনিটে):</label>
+            <input type="number" id="adInterval" value="20">
+        </div>
+        <div class="form-group">
+            <label>অ্যাডের স্থায়িত্ব (সেকেন্ডে):</label>
+            <input type="number" id="adDuration" value="20">
+        </div>
+        <button onclick="saveAdSettings()" class="btn-gold">অ্যাড সেটিং সেভ করুন</button>
+    </div>
+
+    
+
+    <!-- 3. Schedule -->
+    <div class="card admin-section" id="sec-schedule">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>📅 অনুষ্ঠান সূচি (Program Schedule) কন্ট্রোল</h2>
+        <div class="form-group">
+            <label>অনুষ্ঠানের নাম:</label>
+            <input type="text" id="progName" placeholder="যেমন: বিশেষ সংবাদ / গান এর ভুবন">
+        </div>
+        <div class="form-group">
+            <label>অনুষ্ঠানের ছবির লিংক (Image URL):</label>
+            <input type="text" id="progImgUrl" placeholder="https://i.ibb.co/thumb.jpg">
+        </div>
+        <div class="form-group">
+            <label>অথবা গ্যালারি থেকে ছবি আপলোড করুন:</label>
+            <input type="file" id="progImgFile" accept="image/*">
+        </div>
+        <div id="progImgUploadStatus" class="upload-status" style="color:#00f2fe;"></div>
+        <div class="form-group">
+            <label>প্রদর্শনের সময়:</label>
+            <input type="text" id="progTimeDisp" placeholder="যেমন: সন্ধ্যা ৬:০০ - ৭:০০">
+        </div>
+        <div class="form-group">
+            <label>শুরুর সময় (Start Time):</label>
+            <input type="datetime-local" id="progStart">
+        </div>
+        <div class="form-group">
+            <label>শেষের সময় (End Time):</label>
+            <input type="datetime-local" id="progEnd">
+        </div>
+        <button onclick="addSchedule()" class="btn-gold">সূচিতে যুক্ত করুন</button>
+        <div class="item-list" id="scheduleList"></div>
+    </div>
+
+    <!-- 4. Logo -->
+    <div class="card admin-section" id="sec-logo">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>🖼️ লোগো ও চ্যানেলের নাম</h2>
+        <div class="form-group">
+            <label>লোগো ইমেজের লিংক (URL):</label>
+            <input type="text" id="logoUrl" placeholder="https://i.ibb.co/logo.png">
+        </div>
+        <div class="form-group">
+            <label>অথবা গ্যালারি থেকে লোগো ছবি আপলোড করুন:</label>
+            <input type="file" id="logoFile" accept="image/*">
+        </div>
+        <div id="logoUploadStatus" class="upload-status" style="color:#00f2fe;"></div>
+        <div class="form-group">
+            <label>চ্যানেলের নাম (লোগোর নিচে স্লাইড করবে):</label>
+            <input type="text" id="channelName" placeholder="ENTERTAINMENT">
+        </div>
+        <button onclick="saveBrandData()" class="btn-cyan">ব্র্যান্ডিং আপডেট করুন</button>
+    </div>
+
+    <!-- 5. Ticker -->
+    <div class="card admin-section" id="sec-ticker">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>📢 টিকর (চলন্ত বার্তা) ম্যানেজমেন্ট</h2>
+        <div class="form-group">
+            <label>বিজ্ঞাপন বা চলন্ত বার্তা:</label>
+            <input type="text" id="tickerText" placeholder="জরুরি বার্তা লিখুন">
+        </div>
+        <div class="form-group">
+            <label>স্পিড (সেকেন্ড):</label>
+            <input type="number" id="tickerSpeed" value="18">
+        </div>
+        <div class="form-group">
+            <label>স্টার্ট টাইম:</label>
+            <input type="datetime-local" id="tickerStart">
+        </div>
+        <div class="form-group">
+            <label>এন্ড টাইম:</label>
+            <input type="datetime-local" id="tickerEnd">
+        </div>
+        <button onclick="addTicker()" class="btn-cyan">নতুন টিকর যুক্ত করুন</button>
+        <div class="item-list" id="tickerList"></div>
+    </div>
+
+    <!-- 3D Flip Billboard -->
+    <div class="card admin-section" id="sec-billboard" style="border-color:#a55eea;">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>🪧 3D Flip Billboard</h2>
+        <div style="font-size:11px;color:#888;margin-bottom:10px;">
+            বাঁ দিকে Flip হয়ে বিজ্ঞাপন দেখাবে। একাধিক Ad যোগ করুন — পালা করে দেখাবে।
+        </div>
+
+        <!-- Config -->
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:12px;">
+            <div style="font-size:11px;color:#a55eea;font-weight:bold;margin-bottom:8px;">⚙️ Timer সেটিং</div>
+            <div class="form-group">
+                <label>কতক্ষণ দেখাবে (সেকেন্ড):</label>
+                <input type="number" id="bbShowSec" value="15" min="5" max="120">
+            </div>
+            <div class="form-group">
+                <label>কতক্ষণ লুকিয়ে থাকবে (সেকেন্ড):</label>
+                <input type="number" id="bbHideSec" value="30" min="5" max="300">
+            </div>
+            <button onclick="saveBillboardConfig()"
+                style="background:#a55eea;color:#fff;border:none;padding:8px;border-radius:6px;
+                       font-weight:bold;width:100%;cursor:pointer;font-size:12px;">
+                ⚙️ Timer সেভ করুন
+            </button>
+            <div id="bbConfigStatus" style="font-size:10px;color:#aaa;margin-top:4px;text-align:center;"></div>
+        </div>
+
+        <!-- Add Billboard -->
+        <div class="form-group">
+            <label>Billboard নাম / টাইটেল:</label>
+            <input type="text" id="bbTitle" placeholder="দোকান বা প্রতিষ্ঠানের নাম">
+        </div>
+        <div class="form-group">
+            <label>Subtitle / নম্বর:</label>
+            <input type="text" id="bbSub" placeholder="01XXXXXXXXX / ঠিকানা">
+        </div>
+        <div class="form-group">
+            <label>মিডিয়া টাইপ:</label>
+            <select id="bbMediaType" onchange="toggleBbMedia()">
+                <option value="image">ছবি</option>
+                <option value="video">ভিডিও (mute)</option>
+            </select>
+        </div>
+
+        <div id="bbImgSection">
+            <div class="form-group">
+                <label>ছবি URL:</label>
+                <input type="text" id="bbImgUrl" placeholder="https://i.ibb.co/ad.jpg">
+            </div>
+            <div class="form-group">
+                <label>অথবা আপলোড করুন:</label>
+                <input type="file" id="bbImgFile" accept="image/*">
+            </div>
+            <div id="bbImgStatus" class="upload-status" style="color:#00f2fe;"></div>
+        </div>
+
+        <div id="bbVidSection" style="display:none;">
+            <div class="form-group">
+                <label>ভিডিও URL:</label>
+                <input type="text" id="bbVidUrl" placeholder="https://cdn.com/ad.mp4">
+            </div>
+            <div class="form-group">
+                <label>অথবা আপলোড করুন:</label>
+                <input type="file" id="bbVidFile" accept="video/*">
+            </div>
+            <div id="bbVidStatus" class="upload-status" style="color:#00f2fe;"></div>
+            <div class="progress-bar-wrap" id="bbVidProgressWrap">
+                <div class="progress-bar" id="bbVidProgressBar"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>শুরু সময় (ঐচ্ছিক):</label>
+            <input type="datetime-local" id="bbStart">
+        </div>
+        <div class="form-group">
+            <label>শেষ সময় (ঐচ্ছিক):</label>
+            <input type="datetime-local" id="bbEnd">
+        </div>
+
+        <button onclick="addBillboard()"
+            style="background:#a55eea;color:#fff;border:none;padding:10px;border-radius:6px;
+                   font-weight:bold;width:100%;cursor:pointer;font-size:13px;margin-bottom:6px;">
+            🪧 Billboard যোগ করুন
+        </button>
+
+        <div class="item-list" id="billboardList" style="margin-top:10px;">
+            <p style="font-size:11px;color:#888;">কোনো Billboard নেই</p>
+        </div>
+    </div>
+
+    <!-- Election Result — News Channel Style (Republic style) -->
+    <div class="card admin-section" id="sec-election" style="border-color:#c41e3a;">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>📰 নির্বাচন ফলাফল (News Style)</h2>
+        <div style="font-size:11px;color:#888;margin-bottom:10px;">
+            Republic Bangla স্টাইল — VS তুলনা, পার্টি স্ট্রিপ, হেডলাইন ব্যানার সহ। Player-এ লাল-সোনালি ডিজাইনে দেখাবে।
+        </div>
+
+        <div class="form-group">
+            <label>আসন / এলাকার নাম:</label>
+            <input type="text" id="elTitle" placeholder="যেমন: দক্ষিণ দিনাজপুর / কৃষ্ণনগর দক্ষিণ">
+        </div>
+        <div class="form-group">
+            <label>সিট কাউন্ট (যেমন 6/6 বা 158/294):</label>
+            <input type="text" id="elSeat" placeholder="6/6">
+        </div>
+        <div class="form-group">
+            <label>হেডলাইন ব্যানার:</label>
+            <input type="text" id="elHeadline" placeholder="কৃষ্ণনগর দক্ষিণে এগিয়ে তৃণমূল">
+        </div>
+        <div class="form-group">
+            <label>নিচের লেবেল (রাজ্য মোট):</label>
+            <input type="text" id="elStateLabel" placeholder="পশ্চিমবঙ্গ 158/294">
+        </div>
+        <div class="form-group">
+            <label>টাইপ:</label>
+            <select id="elType">
+                <option value="live">🔴 LIVE</option>
+                <option value="final">✅ FINAL</option>
+            </select>
+        </div>
+
+        <!-- Add Candidate -->
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid #c41e3a;">
+            <div style="font-size:11px;color:#ffd700;font-weight:bold;margin-bottom:8px;">+ প্রার্থী যোগ করুন</div>
+            <div class="form-group">
+                <label>প্রার্থীর নাম:</label>
+                <input type="text" id="elCandName" placeholder="জাভেদ খান">
+            </div>
+            <div class="form-group">
+                <label>দল:</label>
+                <input type="text" id="elCandParty" placeholder="TMC / BJP / CONG">
+            </div>
+            <div class="form-group">
+                <label>প্রতীক (emoji):</label>
+                <input type="text" id="elCandSymbol" placeholder="🌸" style="font-size:18px;">
+            </div>
+            <div class="form-group">
+                <label>ছবি URL:</label>
+                <input type="text" id="elCandImg" placeholder="https://i.ibb.co/photo.jpg">
+            </div>
+            <div class="form-group">
+                <label>ভোট:</label>
+                <input type="number" id="elCandVotes" value="0" min="0">
+            </div>
+            <button onclick="elAddCandidate()" class="btn-cyan">+ প্রার্থী যোগ</button>
+        </div>
+
+        <div id="elCandidateList" style="margin-bottom:10px;">
+            <p style="font-size:11px;color:#888;">কোনো প্রার্থী নেই</p>
+        </div>
+
+        <!-- Optional party seat totals -->
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:10px;">
+            <div style="font-size:11px;color:#ffd700;font-weight:bold;margin-bottom:6px;">দলভিত্তিক সিট (ঐচ্ছিক — নিচের ফুটারের জন্য)</div>
+            <div style="font-size:10px;color:#888;margin-bottom:6px;">খালি রাখলে প্রার্থীর ভোট থেকে অটো হিসাব হবে</div>
+            <div id="elPartySeats" style="display:flex;flex-direction:column;gap:6px;"></div>
+            <button onclick="elAddPartyRow()" style="margin-top:6px;background:#555;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:11px;">+ দল যোগ</button>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+            <button onclick="startElection()"
+                style="flex:1;background:#c41e3a;color:#fff;border:none;padding:10px;
+                       border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;">
+                📺 News Result দেখাও
+            </button>
+            <button onclick="stopElection()"
+                style="flex:1;background:#333;color:#fff;border:none;padding:10px;
+                       border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;">
+                ✕ লুকাও
+            </button>
+        </div>
+        <div id="elStatus" style="font-size:11px;margin-top:8px;padding:6px;border-radius:4px;
+             background:#0d0e15;min-height:24px;"></div>
+    </div>
+
+    <!-- Flash Ad Control -->
+    <div class="card admin-section" id="sec-flash" style="border-color:#ffd700;">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>⚡ Flash Ad Control</h2>
+        <div style="font-size:11px;color:#888;margin-bottom:10px;">
+            স্ক্রিনের বাঁ দিকে হঠাৎ দেখাবে — ভিডিও mute, ছবিতে animation
+        </div>
+
+        <div class="form-group">
+            <label>Ad টাইপ:</label>
+            <select id="faType" onchange="toggleFaType()">
+                <option value="image">ছবি + টেক্সট</option>
+                <option value="video">ভিডিও (mute)</option>
+            </select>
+        </div>
+
+        <div id="faImgSection">
+            <div class="form-group">
+                <label>ছবি URL:</label>
+                <input type="text" id="faImgUrl" placeholder="https://i.ibb.co/ad.jpg">
+            </div>
+            <div class="form-group">
+                <label>অথবা গ্যালারি থেকে আপলোড:</label>
+                <input type="file" id="faImgFile" accept="image/*">
+            </div>
+            <div id="faImgStatus" class="upload-status" style="color:#00f2fe;"></div>
+        </div>
+
+        <div id="faVidSection" style="display:none;">
+            <div class="form-group">
+                <label>ভিডিও URL:</label>
+                <input type="text" id="faVidUrl" placeholder="https://your-cdn.com/ad.mp4">
+            </div>
+            <div class="form-group">
+                <label>অথবা গ্যালারি থেকে আপলোড:</label>
+                <input type="file" id="faVidFile" accept="video/*">
+            </div>
+            <div id="faVidStatus" class="upload-status" style="color:#00f2fe;"></div>
+            <div class="progress-bar-wrap" id="faVidProgressWrap"><div class="progress-bar" id="faVidProgressBar"></div></div>
+        </div>
+
+        <div class="form-group">
+            <label>টাইটেল (ঐচ্ছিক):</label>
+            <input type="text" id="faTitle" placeholder="বিজ্ঞাপনের নাম">
+        </div>
+        <div class="form-group">
+            <label>Subtitle / ঠিকানা (ঐচ্ছিক):</label>
+            <input type="text" id="faSub" placeholder="01XXXXXXXXX">
+        </div>
+        <div class="form-group">
+            <label>কতক্ষণ দেখাবে (সেকেন্ড):</label>
+            <input type="number" id="faDuration" value="10" min="3" max="60">
+        </div>
+
+        <div style="background:#0d0e15;border-radius:6px;padding:10px;margin-bottom:10px;">
+            <label style="font-size:12px;color:#aaa;display:block;margin-bottom:6px;">⏱ নির্দিষ্ট সময় পরে অটো দেখাও:</label>
+            <div style="display:flex;gap:6px;align-items:center;">
+                <input type="number" id="faInterval" value="20" min="1" style="flex:1;padding:8px;background:#181a24;border:1px solid #333;color:#fff;border-radius:6px;font-size:13px;">
+                <select id="faIntervalUnit" style="flex:1;padding:8px;background:#181a24;border:1px solid #333;color:#fff;border-radius:6px;font-size:13px;">
+                    <option value="60">মিনিট</option>
+                    <option value="1">সেকেন্ড</option>
+                    <option value="3600">ঘণ্টা</option>
+                </select>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:6px;">
+                <button onclick="startFlashAdInterval()" style="flex:1;background:#2ed573;color:#000;border:none;padding:7px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:bold;">
+                    ▶ অটো চালু
+                </button>
+                <button onclick="stopFlashAdInterval()" style="flex:1;background:#555;color:#fff;border:none;padding:7px;border-radius:6px;cursor:pointer;font-size:11px;">
+                    ⏹ অটো বন্ধ
+                </button>
+            </div>
+            <div id="faIntervalStatus" style="font-size:10px;color:#888;margin-top:4px;"></div>
+        </div>
+
+        <button onclick="triggerFlashAd()" style="background:#ffd700;color:#000;border:none;padding:10px;border-radius:6px;font-weight:bold;width:100%;cursor:pointer;font-size:13px;margin-bottom:6px;">
+            ⚡ এখনই Flash Ad দেখাও
+        </button>
+        <button onclick="stopFlashAd()" style="background:#444;color:#fff;border:none;padding:8px;border-radius:6px;font-weight:bold;width:100%;cursor:pointer;font-size:12px;">
+            ✕ Flash Ad বন্ধ করো
+        </button>
+
+        <div id="faStatus" style="font-size:11px;margin-top:8px;padding:6px;border-radius:4px;background:#0d0e15;min-height:24px;"></div>
+    </div>
+
+    <!-- Top Bar Ad Management -->
+    <div class="card admin-section" id="sec-topbar" style="border-color:#00f2fe;">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>📊 Top Bar বিজ্ঞাপন (Player উপরে ৩ Box)</h2>
+        <div style="font-size:11px;color:#888;margin-bottom:10px;">
+            শুধু উপরের ৩টি বক্সে দেখাবে (নিচের ব্যানার আলাদা)। সম্পূর্ণ নাম লিখুন — যেমন: হাসি খুশি নার্সিং।
+            ৩টার বেশি হলে প্লেয়ারে ঘুরে ঘুরে দেখাবে।
+        </div>
+
+        <div class="form-group">
+            <label>বিজ্ঞাপনের নাম / টাইটেল:</label>
+            <input type="text" id="tbTitle" placeholder="দোকান বা প্রতিষ্ঠানের নাম">
+        </div>
+        <div class="form-group">
+            <label>Subtitle / নম্বর:</label>
+            <input type="text" id="tbSub" placeholder="01XXXXXXXXX / ঠিকানা">
+        </div>
+        <div class="form-group">
+            <label>ছবি URL:</label>
+            <input type="text" id="tbImgUrl" placeholder="https://i.ibb.co/ad.jpg">
+        </div>
+        <div class="form-group">
+            <label>অথবা গ্যালারি থেকে ছবি আপলোড:</label>
+            <input type="file" id="tbImgFile" accept="image/*">
+        </div>
+        <div id="tbImgStatus" class="upload-status" style="color:#00f2fe;"></div>
+
+        <button onclick="addTopBarAd()" class="btn-cyan">📊 Top Bar এ Ad যোগ করুন</button>
+
+        <div class="item-list" id="topBarAdList" style="margin-top:10px;">
+            <p style="font-size:11px;color:#888;">কোনো Ad নেই</p>
+        </div>
+    </div>
+
+    <!-- 6. Banner -->
+    <div class="card admin-section" id="sec-banner">
+        <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
+
+        <h2>📺 স্লাইডার ব্যানার ম্যানেজমেন্ট</h2>
+        <div class="form-group">
+            <label>বাম পাশের মিডিয়া টাইপ:</label>
+            <select id="bannerLeftType">
+                <option value="image">ছবি (Image)</option>
+                <option value="video">ভিডিও (Video)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>বাম পাশের মিডিয়া URL:</label>
+            <input type="text" id="bannerLeft" placeholder="ছবি বা ভিডিও URL">
+        </div>
+        <div class="form-group">
+            <label>অথবা গ্যালারি থেকে আপলোড করুন (ছবি/ভিডিও):</label>
+            <input type="file" id="bannerLeftFile" accept="image/*,video/*">
+        </div>
+        <div id="bannerLeftUploadStatus" class="upload-status" style="color:#00f2fe;"></div>
+        <div class="progress-bar-wrap" id="bannerLeftProgressWrap"><div class="progress-bar" id="bannerLeftProgressBar"></div></div>
+
+        <div class="form-group">
+            <label>ডান পাশের মিডিয়া টাইপ:</label>
+            <select id="bannerRightType">
+                <option value="image">ছবি (Image)</option>
+                <option value="video">ভিডিও (Video)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>ডান পাশের মিডিয়া URL:</label>
+            <input type="text" id="bannerRight" placeholder="ছবি বা ভিডিও URL">
+        </div>
+        <div class="form-group">
+            <label>অথবা গ্যালারি থেকে আপলোড করুন (ছবি/ভিডিও):</label>
+            <input type="file" id="bannerRightFile" accept="image/*,video/*">
+        </div>
+        <div id="bannerRightUploadStatus" class="upload-status" style="color:#00f2fe;"></div>
+        <div class="progress-bar-wrap" id="bannerRightProgressWrap"><div class="progress-bar" id="bannerRightProgressBar"></div></div>
+
+        <div class="form-group">
+            <label>বিজ্ঞাপন শিরোনাম:</label>
+            <input type="text" id="bannerTitle" placeholder="প্রতিষ্ঠানের নাম">
+        </div>
+        <div class="form-group">
+            <label>বিবরণ:</label>
+            <input type="text" id="bannerDesc" placeholder="পণ্য বা সেবার বিবরণ">
+        </div>
+        <div class="form-group">
+            <label>মোবাইল/ঠিকানা:</label>
+            <input type="text" id="bannerSub" placeholder="01XXXXXXXXX / ঠিকানা">
+        </div>
+        <div class="form-group">
+            <label>স্টার্ট টাইম:</label>
+            <input type="datetime-local" id="bannerStart">
+        </div>
+        <div class="form-group">
+            <label>এন্ড টাইম:</label>
+            <input type="datetime-local" id="bannerEnd">
+        </div>
+        <button onclick="addBanner()" class="btn-gold">নতুন ব্যানার যুক্ত করুন</button>
+        <div class="item-list" id="bannerList"></div>
+    </div>
+</div>
+
+<!-- Firebase SDK (Database only — Storage বাদ) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+    // ── Upload Config: YouTube Embed + Bunny CDN ──────
+    // YouTube: ভিডিও URL দিলে embed ID বের করবে
+    // Bunny CDN: আপনার Bunny Pull Zone URL দিন
+    const BUNNY_CDN_BASE = ''; // যেমন: https://your-zone.b-cdn.net
+    // ──────────────────────────────────────────────────
+
+    function extractYouTubeId(url) {
+        try {
+            const u = new URL(url);
+            if (u.hostname === 'youtu.be') return u.pathname.slice(1);
+            if (u.hostname.includes('youtube.com')) return u.searchParams.get('v') || u.pathname.split('/').pop();
+        } catch {}
+        return null;
+    }
+
+    function getYouTubeEmbed(url) {
+        const id = extractYouTubeId(url);
+        return id ? `https://www.youtube.com/embed/${id}?autoplay=1&mute=1` : null;
+    }
+
+    const FIREBASE_CONFIG = {
+        apiKey: "AIzaSyAjCANiMrT8zSF3s2pD0YqNSrnP0bsA4",
+        authDomain: "omkar-tv.firebaseapp.com",
+        databaseURL: "https://omkar-tv-default-rtdb.firebaseio.com",
+        projectId: "omkar-tv",
+        storageBucket: "omkar-tv.firebasestorage.app",
+        messagingSenderId: "925670348274",
+        appId: "1:925670348274:web:23e54c210640c72e59ede6"
+    };
+
+    const BIO_STORAGE_KEY = 'omkar_admin_webauthn';
+    let db;
+
+    function bufToB64(buf) {
+        return btoa(String.fromCharCode(...new Uint8Array(buf)));
+    }
+    function b64ToBuf(b64) {
+        return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    }
+    function randomChallenge(len) {
+        const a = new Uint8Array(len || 32);
+        crypto.getRandomValues(a);
+        return a;
+    }
+    function isWebAuthnAvailable() {
+        return !!(window.PublicKeyCredential && navigator.credentials);
+    }
+    function getSavedCredentialId() {
+        try { return localStorage.getItem(BIO_STORAGE_KEY); } catch(e) { return null; }
+    }
+    function saveCredentialId(id) {
+        try { localStorage.setItem(BIO_STORAGE_KEY, id); } catch(e) {}
+    }
+    function clearCredentialId() {
+        try { localStorage.removeItem(BIO_STORAGE_KEY); } catch(e) {}
+    }
+
+    function ensureFirebase() {
+        try {
+            return firebase.database(firebase.app());
+        } catch(e) {
+            firebase.initializeApp(FIREBASE_CONFIG);
+            return firebase.database();
+        }
+    }
+
+    async function getSavedPassword() {
+        try {
+            const tdb = ensureFirebase();
+            const snap = await tdb.ref('adminConfig/password').once('value');
+            return snap.val() || 'admin123';
+        } catch(e) {
+            return 'admin123';
+        }
+    }
+
+    function unlockAdmin() {
+        const gate = document.getElementById('loginGate');
+        const main = document.getElementById('adminMain');
+        if (gate) gate.classList.add('hidden');
+        if (main) main.style.display = '';
+        initApp();
+    }
+
+    function setLoginStatus(msg, ok) {
+        const el = document.getElementById('loginStatus');
+        if (!el) return;
+        el.style.color = ok ? '#2ed573' : '#ff4757';
+        el.textContent = msg || '';
+    }
+
+    async function loginWithPassword() {
+        const input = document.getElementById('loginPass');
+        const pass = (input && input.value) || '';
+        if (!pass) {
+            setLoginStatus('❌ পাসওয়ার্ড দিন');
+            return;
+        }
+        setLoginStatus('যাচাই হচ্ছে...', true);
+        const saved = await getSavedPassword();
+        if (pass !== saved) {
+            setLoginStatus('❌ ভুল পাসওয়ার্ড!');
+            return;
+        }
+        setLoginStatus('✅ সফল', true);
+        unlockAdmin();
+    }
+
+    async function loginWithBiometric() {
+        if (!isWebAuthnAvailable()) {
+            setLoginStatus('❌ এই ডিভাইস/ব্রাউজারে বায়োমেট্রিক নেই');
+            return;
+        }
+        const credId = getSavedCredentialId();
+        if (!credId) {
+            setLoginStatus('❌ আগে বায়োমেট্রিক রেজিস্টার করুন');
+            return;
+        }
+        // Secure context required
+        if (!window.isSecureContext) {
+            setLoginStatus('❌ HTTPS লাগবে (বায়োমেট্রিকের জন্য)');
+            return;
+        }
+        setLoginStatus('বায়োমেট্রিক অপেক্ষা...', true);
+        try {
+            const assertion = await navigator.credentials.get({
+                publicKey: {
+                    challenge: randomChallenge(32),
+                    timeout: 60000,
+                    userVerification: 'required',
+                    allowCredentials: [{
+                        id: b64ToBuf(credId),
+                        type: 'public-key',
+                        transports: ['internal']
+                    }]
+                }
+            });
+            if (assertion) {
+                setLoginStatus('✅ বায়োমেট্রিক সফল', true);
+                unlockAdmin();
+            } else {
+                setLoginStatus('❌ বায়োমেট্রিক ব্যর্থ');
+            }
+        } catch (e) {
+            console.warn(e);
+            setLoginStatus('❌ বাতিল বা ব্যর্থ — পাসওয়ার্ড ব্যবহার করুন');
+        }
+    }
+
+    async function registerBiometric() {
+        const st = document.getElementById('bioStatus');
+        const set = (m, ok) => { if (st) { st.style.color = ok ? '#2ed573' : '#ff4757'; st.textContent = m; } };
+        if (!isWebAuthnAvailable()) {
+            set('❌ এই ডিভাইসে WebAuthn সাপোর্ট নেই');
+            return;
+        }
+        if (!window.isSecureContext) {
+            set('❌ HTTPS সাইটে খুলুন — http/file:// এ বায়োমেট্রিক কাজ করে না');
+            return;
+        }
+        set('রেজিস্টার হচ্ছে... আঙুল/Face দিন', true);
+        try {
+            const userId = randomChallenge(16);
+            const cred = await navigator.credentials.create({
+                publicKey: {
+                    challenge: randomChallenge(32),
+                    rp: { name: 'Omkar TV Admin', id: location.hostname || 'localhost' },
+                    user: {
+                        id: userId,
+                        name: 'admin@omkar-tv',
+                        displayName: 'Omkar Admin'
+                    },
+                    pubKeyCredParams: [
+                        { type: 'public-key', alg: -7 },
+                        { type: 'public-key', alg: -257 }
+                    ],
+                    authenticatorSelection: {
+                        authenticatorAttachment: 'platform',
+                        userVerification: 'required',
+                        residentKey: 'preferred'
+                    },
+                    timeout: 60000,
+                    attestation: 'none'
+                }
+            });
+            if (!cred) {
+                set('❌ রেজিস্টার ব্যর্থ');
+                return;
+            }
+            const id = bufToB64(cred.rawId);
+            saveCredentialId(id);
+            set('✅ এই ডিভাইসে বায়োমেট্রিক চালু হয়েছে!', true);
+            updateBioLoginButton();
+        } catch (e) {
+            console.warn(e);
+            set('❌ বাতিল বা সমস্যা: ' + (e.message || 'failed'));
+        }
+    }
+
+    function removeBiometric() {
+        clearCredentialId();
+        const st = document.getElementById('bioStatus');
+        if (st) { st.style.color = '#aaa'; st.textContent = '⏹ বায়োমেট্রিক মুছে ফেলা হয়েছে'; }
+        updateBioLoginButton();
+    }
+
+    function updateBioLoginButton() {
+        const btn = document.getElementById('bioLoginBtn');
+        const div = document.getElementById('bioDivider');
+        const has = !!getSavedCredentialId() && isWebAuthnAvailable() && window.isSecureContext;
+        if (btn) btn.classList.toggle('show', has);
+        if (div) div.style.display = has ? 'block' : 'none';
+    }
+
+    window.addEventListener('load', function () {
+        // Enter key on password
+        const inp = document.getElementById('loginPass');
+        if (inp) inp.addEventListener('keydown', e => {
+            if (e.key === 'Enter') loginWithPassword();
+        });
+        updateBioLoginButton();
+        // Pre-init firebase for faster password check
+        try { firebase.initializeApp(FIREBASE_CONFIG); } catch(e) {}
+    });
+
+    function initApp() {
+        try {
+            db = firebase.database(firebase.app());
+        } catch(e) {
+            firebase.initializeApp(FIREBASE_CONFIG);
+            db = firebase.database();
+        }
+        loadAllData();
+        loadLiveStatus();
+        if (typeof loadElectionData === 'function') loadElectionData();
+    }
+
+    // ── Multi-Channel Live Functions ──────────────────
+    function addLiveChannel() {
+        const name = document.getElementById('liveChName').value.trim();
+        const url  = document.getElementById('liveUrl').value.trim();
+        let type = document.getElementById('liveType').value;
+        if (!name) return alert('চ্যানেলের নাম দিন');
+        if (!url)  return alert('লাইভ URL দিন');
+        // Google Drive লিংক অটো-ডিটেক্ট
+        if (url.indexOf('drive.google.com') !== -1 || url.indexOf('docs.google.com') !== -1) {
+            type = 'drive';
+        }
+        const id = 'ch_' + Date.now();
+        db.ref('liveChannels/' + id).set({
+            name, type, url, active: true, primary: false,
+            startedAt: new Date().toISOString()
+        }).then(() => {
+            alert('✅ চ্যানেল যোগ হয়েছে!');
+            document.getElementById('liveChName').value = '';
+            document.getElementById('liveUrl').value = '';
+        }).catch(e => alert('সমস্যা: ' + e.message));
+    }
+
+    function toggleChannelActive(id, current) {
+        db.ref('liveChannels/' + id).update({ active: !current });
+    }
+
+    function setPrimary(id) {
+        // সব channel এর primary false করো, তারপর এটা true
+        db.ref('liveChannels').once('value', snap => {
+            const d = snap.val() || {};
+            const updates = {};
+            Object.keys(d).forEach(k => { updates[k + '/primary'] = k === id; });
+            db.ref('liveChannels').update(updates);
+        });
+    }
+
+    function deleteLiveChannel(id) {
+        if (!db) { alert('Firebase লোড হয়নি'); return; }
+        if (confirm('এই চ্যানেল ডিলিট করবেন?')) {
+            db.ref('liveChannels/' + id).remove()
+              .catch(e => alert('ডিলিট করা যায়নি: ' + e.message));
+        }
+    }
+
+    function loadLiveStatus() {
+        db.ref('liveChannels').on('value', snap => {
+            const d = snap.val();
+            const c = document.getElementById('liveChannelList');
+            if (!d) { c.innerHTML = '<span style="color:#888;">কোনো চ্যানেল নেই</span>'; return; }
+            c.innerHTML = '';
+            Object.entries(d).forEach(([id, ch]) => {
+                const div = document.createElement('div');
+                div.style.cssText = 'background:#0d0e15;border-radius:6px;padding:8px;margin-bottom:6px;border:1px solid '+(ch.active?'#ff4757':'#333')+';';
+                div.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                        <span style="font-weight:bold;font-size:12px;color:${ch.active?'#fff':'#888'};">
+                            ${ch.active?'<span style="color:#ff4757;">🔴</span>':'⚫'} ${ch.name}
+                        </span>
+                        ${ch.primary ? '<span style="background:#ffd700;color:#000;font-size:9px;padding:1px 5px;border-radius:3px;">PRIMARY</span>' : ''}
+                    </div>
+                    <div style="font-size:10px;color:#888;margin-bottom:6px;">${ch.type.toUpperCase()} — ${(ch.url||'camera').substring(0,40)}</div>
+                    <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                        <button onclick="toggleChannelActive('${id}',${ch.active})" style="font-size:10px;padding:3px 8px;border:none;border-radius:4px;cursor:pointer;background:${ch.active?'#555':'#2ed573'};color:${ch.active?'#fff':'#000'};">${ch.active?'⏸ বন্ধ':'▶ চালু'}</button>
+                        <button onclick="setPrimary('${id}')" style="font-size:10px;padding:3px 8px;border:none;border-radius:4px;cursor:pointer;background:#ffd700;color:#000;">⭐ Primary</button>
+                        <button onclick="deleteLiveChannel('${id}')" style="font-size:10px;padding:3px 8px;border:none;border-radius:4px;cursor:pointer;background:#ff3344;color:#fff;">🗑 ডিলিট</button>
+                    </div>`;
+                c.appendChild(div);
+            });
+        });
+    }
+
+    // ── Media Upload: ImgBB (ছবি) + Bunny CDN (ভিডিও) ──
+    // ভিডিও: Bunny CDN Storage API দিয়ে আপলোড
+    // ছবি:   ImgBB (free, no account needed for URL)
+    // YouTube URL দিলে সরাসরি embed করা হবে — আপলোড লাগবে না
+
+    // ImgBB API Key (https://api.imgbb.com থেকে free নিন)
+    const IMGBB_API_KEY = 'YOUR_IMGBB_KEY'; // এখানে আপনার key দিন
+
+    // Bunny CDN Storage (https://bunny.net থেকে Storage Zone বানান)
+    const BUNNY_STORAGE_HOST   = 'storage.bunnycdn.com';
+    const BUNNY_STORAGE_ZONE   = 'YOUR_ZONE_NAME';   // Storage Zone Name
+    const BUNNY_STORAGE_KEY    = 'YOUR_STORAGE_KEY'; // FTP Password / API Key
+    const BUNNY_PULL_ZONE_URL  = 'https://YOUR_PULLZONE.b-cdn.net'; // Pull Zone URL
+
+    function uploadToCloudinary(file, statusId, progressBarWrapId, progressBarId) {
+        // Cloudinary এর বদলে ImgBB/Bunny ব্যবহার করছি
+        return uploadMedia(file, statusId, progressBarWrapId, progressBarId);
+    }
+
+    function uploadMedia(file, statusId, progressBarWrapId, progressBarId) {
+        return new Promise((resolve, reject) => {
+            if (!file) return resolve('');
+
+            const statusEl = document.getElementById(statusId);
+            const wrapEl   = progressBarWrapId ? document.getElementById(progressBarWrapId) : null;
+            const barEl    = progressBarId     ? document.getElementById(progressBarId)     : null;
+
+            const setStatus = (msg, color) => {
+                if (statusEl) { statusEl.textContent = msg; statusEl.style.color = color || '#00f2fe'; }
+            };
+
+            const isVideo = file.type.startsWith('video/');
+            const isImage = file.type.startsWith('image/');
+            if (!isVideo && !isImage) {
+                setStatus('❌ শুধু ছবি বা ভিডিও ফাইল দিন।', '#ff4757');
+                return reject(new Error('Invalid file type'));
+            }
+
+            if (isImage) {
+                // ── ছবি → ImgBB ──
+                const maxBytes = 32 * 1024 * 1024; // 32MB
+                if (file.size > maxBytes) {
+                    setStatus('❌ ছবি 32MB এর বেশি।', '#ff4757');
+                    return reject(new Error('Image too large'));
+                }
+                setStatus('🚀 ছবি আপলোড হচ্ছে (ImgBB)...', '#ffd700');
+                if (wrapEl) wrapEl.style.display = 'block';
+
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    const base64 = reader.result.split(',')[1];
+                    const fd = new FormData();
+                    fd.append('key', IMGBB_API_KEY);
+                    fd.append('image', base64);
+                    try {
+                        const res = await fetch('https://api.imgbb.com/1/upload', { method:'POST', body:fd });
+                        const json = await res.json();
+                        if (json.success) {
+                            setStatus('✅ ছবি আপলোড সম্পন্ন!', '#2ed573');
+                            if (barEl) barEl.style.width = '100%';
+                            resolve(json.data.url);
+                        } else {
+                            setStatus('❌ ImgBB সমস্যা: ' + (json.error?.message||''), '#ff4757');
+                            reject(new Error('ImgBB failed'));
+                        }
+                    } catch(e) {
+                        setStatus('❌ নেটওয়ার্ক সমস্যা।', '#ff4757');
+                        reject(e);
+                    }
+                };
+                reader.readAsDataURL(file);
+
+            } else {
+                // ── ভিডিও → Bunny CDN Storage ──
+                const maxBytes = 2 * 1024 * 1024 * 1024; // 2GB
+                if (file.size > maxBytes) {
+                    setStatus('❌ ভিডিও 2GB এর বেশি।', '#ff4757');
+                    return reject(new Error('Video too large'));
+                }
+                if (!BUNNY_STORAGE_KEY || BUNNY_STORAGE_KEY === 'YOUR_STORAGE_KEY') {
+                    setStatus('⚠️ Bunny CDN key সেট করুন। এখন URL দিয়ে যোগ করুন।', '#ffa502');
+                    return reject(new Error('Bunny not configured'));
+                }
+
+                const safeName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+                const uploadUrl = `https://${BUNNY_STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${safeName}`;
+
+                setStatus('🚀 ভিডিও আপলোড হচ্ছে (Bunny CDN)...', '#ffd700');
+                if (wrapEl) wrapEl.style.display = 'block';
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('PUT', uploadUrl, true);
+                xhr.setRequestHeader('AccessKey', BUNNY_STORAGE_KEY);
+                xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const pct = Math.round((e.loaded/e.total)*100);
+                        setStatus(`📤 আপলোড হচ্ছে... ${pct}% (${formatBytes(e.loaded)}/${formatBytes(e.total)})`, '#00f2fe');
+                        if (barEl) barEl.style.width = pct + '%';
+                    }
+                };
+                xhr.onload = () => {
+                    if (xhr.status === 201 || xhr.status === 200) {
+                        const cdnUrl = `${BUNNY_PULL_ZONE_URL}/${safeName}`;
+                        setStatus('✅ ভিডিও আপলোড সম্পন্ন!', '#2ed573');
+                        if (barEl) barEl.style.width = '100%';
+                        resolve(cdnUrl);
+                    } else {
+                        setStatus('❌ Bunny CDN সমস্যা: ' + xhr.status, '#ff4757');
+                        if (wrapEl) wrapEl.style.display = 'none';
+                        reject(new Error('Bunny upload failed: ' + xhr.status));
+                    }
+                };
+                xhr.onerror = () => {
+                    setStatus('❌ নেটওয়ার্ক সমস্যা।', '#ff4757');
+                    if (wrapEl) wrapEl.style.display = 'none';
+                    reject(new Error('Network error'));
+                };
+                xhr.send(file);
+            }
+        });
+    }
+
+    function formatBytes(bytes) {
+        if (!bytes) return '0 B';
+        const units = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+        return (bytes / Math.pow(1024, i)).toFixed(i ? 1 : 0) + ' ' + units[i];
+    }
+    // ──────────────────────────────────────────────────
+
+    async function addPlaylistItem() {
+        const title = document.getElementById('videoTitle').value;
+        let url = document.getElementById('videoUrl').value;
+        const file = document.getElementById('videoFile').files[0];
+        if (file) url = await uploadMedia(file, 'videoUploadStatus', 'videoProgressWrap', 'videoProgressBar');
+
+        // YouTube URL auto-detect
+        let type = document.getElementById('videoSourceType').value;
+        if (url && extractYouTubeId(url)) {
+            type = 'youtube';
+            const statusEl = document.getElementById('videoUploadStatus');
+            if (statusEl) { statusEl.style.color='#2ed573'; statusEl.textContent='✅ YouTube URL শনাক্ত হয়েছে'; }
+        }
+
+        if (!title || !url) return alert('শিরোনাম এবং URL অথবা গ্যালারি থেকে ভিডিও দিন');
+        db.ref('playlist').push({
+            title, url, type
+        }).then(() => {
+            alert('প্লেলিস্টে ভিডিও যুক্ত হয়েছে!');
+            document.getElementById('videoTitle').value = '';
+            document.getElementById('videoUrl').value = '';
+            document.getElementById('videoFile').value = '';
+            document.getElementById('videoUploadStatus').textContent = '';
+            document.getElementById('videoProgressWrap').style.display = 'none';
+            document.getElementById('videoProgressBar').style.width = '0%';
+        }).catch(e => alert('সেভ করা যায়নি: ' + e.message));
+    }
+
+    async function saveAdSettings() {
+        let adUrl = document.getElementById('adVideoUrl').value;
+        const file = document.getElementById('adVideoFile').files[0];
+        if (file) adUrl = await uploadToCloudinary(file, 'adUploadStatus', 'adProgressWrap', 'adProgressBar');
+        db.ref('adSettings').set({
+            adUrl,
+            interval: parseInt(document.getElementById('adInterval').value) || 20,
+            duration: parseInt(document.getElementById('adDuration').value) || 20
+        }).then(() => alert('অ্যাড সেটিং আপডেট হয়েছে!')).catch(e => alert('সেভ করা যায়নি: ' + e.message));
+    }
+
+    async function saveBrandData() {
+        let logoUrl = document.getElementById('logoUrl').value;
+        const file = document.getElementById('logoFile').files[0];
+        if (file) logoUrl = await uploadToCloudinary(file, 'logoUploadStatus', null, null);
+        db.ref('settings').update({
+            logoUrl,
+            channelName: document.getElementById('channelName').value
+        }).then(() => alert('ব্র্যান্ডিং আপডেট হয়েছে!')).catch(e => alert('সেভ করা যায়নি: ' + e.message));
+    }
+
+    async function addFestival() {
+        const name = document.getElementById('festName').value.trim();
+        const date = document.getElementById('festDate').value;
+        if (!name) return alert('উৎসবের নাম দিন');
+        let imgUrl = document.getElementById('festImgUrl').value.trim();
+        const file = document.getElementById('festImgFile').files[0];
+        if (file) { try { imgUrl = await uploadMedia(file, 'festImgUploadStatus', null, null); } catch(e) {} }
+        db.ref('festivals').push({ name, date, imgUrl })
+            .then(() => {
+                alert('উৎসব যোগ হয়েছে!');
+                document.getElementById('festName').value = '';
+                document.getElementById('festDate').value = '';
+                document.getElementById('festImgUrl').value = '';
+                document.getElementById('festImgFile').value = '';
+                document.getElementById('festImgUploadStatus').textContent = '';
+            })
+            .catch(e => alert('সমস্যা: ' + e.message));
+    }
+
+    async function addSchedule() {
+        const name = document.getElementById('progName').value;
+        if (!name) return alert('অনুষ্ঠানের নাম দিন');
+        let imgUrl = document.getElementById('progImgUrl').value;
+        const file = document.getElementById('progImgFile').files[0];
+        if (file) imgUrl = await uploadToCloudinary(file, 'progImgUploadStatus', null, null);
+        db.ref('schedules').push({
+            name, imgUrl,
+            timeDisplay: document.getElementById('progTimeDisp').value,
+            startTime:   document.getElementById('progStart').value,
+            endTime:     document.getElementById('progEnd').value
+        }).then(() => alert('অনুষ্ঠান যুক্ত হয়েছে!')).catch(e => alert('সেভ করা যায়নি: ' + e.message));
+    }
+
+    function addTicker() {
+        const text = document.getElementById('tickerText').value;
+        if (!text) return alert('মেসেজ লিখুন');
+        db.ref('tickers').push({
+            text,
+            speed:     document.getElementById('tickerSpeed').value,
+            startTime: document.getElementById('tickerStart').value,
+            endTime:   document.getElementById('tickerEnd').value
+        }).then(() => alert('টিকর যুক্ত হয়েছে!'));
+    }
+
+    async function addBanner() {
+        const title = document.getElementById('bannerTitle').value.trim();
+        if (!title) return alert('বিজ্ঞাপন শিরোনাম দিন');
+
+        const statusEl = document.createElement('div');
+        const setGlobalStatus = (msg, color) => {
+            const s = document.getElementById('bannerLeftUploadStatus');
+            if (s) { s.textContent = msg; s.style.color = color || '#00f2fe'; }
+        };
+
+        setGlobalStatus('⏳ সেভ হচ্ছে...', '#ffd700');
+
+        let leftUrl  = document.getElementById('bannerLeft').value.trim();
+        let rightUrl = document.getElementById('bannerRight').value.trim();
+        const leftFile  = document.getElementById('bannerLeftFile').files[0];
+        const rightFile = document.getElementById('bannerRightFile').files[0];
+        const leftType  = document.getElementById('bannerLeftType').value;
+        const rightType = document.getElementById('bannerRightType').value;
+
+        // File আপলোড — fail হলে URL হিসেবে ব্যবহার করো
+        if (leftFile) {
+            try {
+                leftUrl = await uploadMedia(leftFile, 'bannerLeftUploadStatus', 'bannerLeftProgressWrap', 'bannerLeftProgressBar');
+            } catch(e) {
+                setGlobalStatus('⚠️ ফাইল আপলোড হয়নি, URL দিলে সেটা ব্যবহার হবে।', '#ffa502');
+            }
+        }
+        if (rightFile) {
+            try {
+                rightUrl = await uploadMedia(rightFile, 'bannerRightUploadStatus', 'bannerRightProgressWrap', 'bannerRightProgressBar');
+            } catch(e) {}
+        }
+
+        const data = {
+            title,
+            desc:      document.getElementById('bannerDesc').value.trim(),
+            sub:       document.getElementById('bannerSub').value.trim(),
+            startTime: document.getElementById('bannerStart').value,
+            endTime:   document.getElementById('bannerEnd').value,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        if (leftType  === 'video') data.leftVideo  = leftUrl;
+        else                       data.leftImg     = leftUrl;
+        if (rightType === 'video') data.rightVideo  = rightUrl;
+        else                       data.rightImg    = rightUrl;
+
+        db.ref('banners').push(data)
+          .then(() => {
+              setGlobalStatus('✅ ব্যানার যুক্ত হয়েছে!', '#2ed573');
+              setTimeout(() => setGlobalStatus('', ''), 3000);
+              ['bannerLeft','bannerTitle','bannerDesc','bannerSub','bannerRight'].forEach(id => {
+                  const el = document.getElementById(id); if (el) el.value='';
+              });
+              ['bannerLeftFile','bannerRightFile'].forEach(id => {
+                  const el = document.getElementById(id); if (el) el.value='';
+              });
+          })
+          .catch(e => {
+              setGlobalStatus('❌ সেভ হয়নি: ' + e.message, '#ff4757');
+          });
+    }
+
+    function deleteItem(path, id) {
+        if (!db) { alert('Firebase এখনো লোড হয়নি। একটু পরে চেষ্টা করুন।'); return; }
+        if (!path || !id) { alert('ID সমস্যা — আবার চেষ্টা করুন।'); return; }
+        if (confirm('ডিলিট করবেন?')) {
+            db.ref(path + '/' + id).remove()
+              .then(() => console.log('Deleted:', path, id))
+              .catch(e => alert('ডিলিট করা যায়নি: ' + e.message));
+        }
+    }
+
+
+    // ── Festival Functions ────────────────────────────
+    async function addFestival() {
+        const name = document.getElementById('festName').value.trim();
+        const date = document.getElementById('festDate').value;
+        if (!name || !date) return alert('উৎসবের নাম ও তারিখ দিন');
+        let imgUrl = document.getElementById('festImgUrl').value.trim();
+        const file = document.getElementById('festImgFile').files[0];
+        if (file) { try { imgUrl = await uploadMedia(file, 'festImgUploadStatus', null, null); } catch(e) {} }
+        db.ref('festivals').push({ name, date, imgUrl })
+          .then(() => {
+              alert('উৎসব যুক্ত হয়েছে!');
+              document.getElementById('festName').value = '';
+              document.getElementById('festDate').value = '';
+              document.getElementById('festImgUrl').value = '';
+              document.getElementById('festImgFile').value = '';
+              document.getElementById('festImgUploadStatus').textContent = '';
+          })
+          .catch(e => alert('সমস্যা: ' + e.message));
+    }
+
+
+    // ── Broadcast Control Functions ──────────────────
+    function broadcastStart() {
+        const select = document.getElementById('bcSelect');
+        const idx    = parseInt(select.value);
+        const status = document.getElementById('bcStatus');
+        if (isNaN(idx)) { status.style.color='#ff4757'; status.textContent='ভিডিও সিলেক্ট করুন'; return; }
+        status.style.color='#ffd700'; status.textContent='সম্প্রচার শুরু হচ্ছে...';
+
+        // Firebase server timestamp দিয়ে শুরুর সময় save করো
+        db.ref('broadcastState').set({
+            currentIdx: idx,
+            startedAt:  firebase.database.ServerValue.TIMESTAMP,
+            startedBy:  'admin'
+        }).then(() => {
+            status.style.color='#2ed573';
+            status.textContent='✅ সম্প্রচার শুরু! সব দর্শক এখন এই ভিডিও দেখছে।';
+        }).catch(e => {
+            status.style.color='#ff4757';
+            status.textContent='❌ সমস্যা: ' + e.message;
+        });
+    }
+
+    function broadcastNext() {
+        db.ref('broadcastState').once('value').then(snap => {
+            const bc  = snap.val();
+            db.ref('playlist').once('value').then(pSnap => {
+                const pl  = pSnap.val();
+                const len = pl ? Object.keys(pl).length : 0;
+                if (!len) return;
+                const cur  = bc ? (bc.currentIdx || 0) : 0;
+                const next = (cur + 1) % len;
+                document.getElementById('bcSelect').value = next;
+                broadcastStart();
+            });
+        });
+    }
+
+    function broadcastPrev() {
+        db.ref('broadcastState').once('value').then(snap => {
+            const bc  = snap.val();
+            db.ref('playlist').once('value').then(pSnap => {
+                const pl  = pSnap.val();
+                const len = pl ? Object.keys(pl).length : 0;
+                if (!len) return;
+                const cur  = bc ? (bc.currentIdx || 0) : 0;
+                const prev = (cur - 1 + len) % len;
+                document.getElementById('bcSelect').value = prev;
+                broadcastStart();
+            });
+        });
+    }
+
+    // BroadcastState monitor
+    function watchBroadcastState() {
+        db.ref('broadcastState').on('value', snap => {
+            const bc  = snap.val();
+            const now = document.getElementById('bc-now');
+            const tm  = document.getElementById('bc-time');
+            if (!bc) { now.textContent='কোনো সম্প্রচার নেই'; return; }
+
+            db.ref('playlist').once('value').then(pSnap => {
+                const pl  = pSnap.val();
+                if (!pl) return;
+                const items = Object.values(pl);
+                const item  = items[bc.currentIdx];
+                now.textContent = item ? (item.title || 'ভিডিও ' + (bc.currentIdx+1)) : 'অজানা';
+
+                if (bc.startedAt) {
+                    const elapsed = Math.floor((Date.now() - bc.startedAt) / 1000);
+                    const m = Math.floor(elapsed/60), s = elapsed%60;
+                    tm.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} চলছে`;
+                }
+                // Select box sync
+                const sel = document.getElementById('bcSelect');
+                if (sel) sel.value = bc.currentIdx;
+            });
+        });
+
+        // Timer — elapsed time update
+        setInterval(() => {
+            db.ref('broadcastState').once('value').then(snap => {
+                const bc = snap.val(); if (!bc || !bc.startedAt) return;
+                const elapsed = Math.floor((Date.now() - bc.startedAt) / 1000);
+                const m=Math.floor(elapsed/60), s=elapsed%60;
+                const tm = document.getElementById('bc-time');
+                if (tm) tm.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} চলছে`;
+            });
+        }, 1000);
+    }
+
+
+    // ── Flash Ad Functions ────────────────────────────
+    function toggleFaType() {
+        const t = document.getElementById('faType').value;
+        document.getElementById('faImgSection').style.display = t==='image' ? '' : 'none';
+        document.getElementById('faVidSection').style.display = t==='video' ? '' : 'none';
+    }
+
+    async function triggerFlashAd() {
+        const type     = document.getElementById('faType').value;
+        const title    = document.getElementById('faTitle').value;
+        const sub      = document.getElementById('faSub').value;
+        const duration = parseInt(document.getElementById('faDuration').value) || 10;
+        const status   = document.getElementById('faStatus');
+
+        status.style.color = '#ffd700'; status.textContent = 'প্রস্তুত হচ্ছে...';
+
+        let imgUrl = '', videoUrl = '';
+
+        if (type === 'image') {
+            imgUrl = document.getElementById('faImgUrl').value.trim();
+            const file = document.getElementById('faImgFile').files[0];
+            if (file) imgUrl = await uploadMedia(file, 'faImgStatus', null, null);
+            if (!imgUrl && !title) { status.style.color='#ff4757'; status.textContent='❌ ছবি URL বা টাইটেল দিন'; return; }
+        } else {
+            videoUrl = document.getElementById('faVidUrl').value.trim();
+            const file = document.getElementById('faVidFile').files[0];
+            if (file) videoUrl = await uploadMedia(file, 'faVidStatus', 'faVidProgressWrap', 'faVidProgressBar');
+            if (!videoUrl) { status.style.color='#ff4757'; status.textContent='❌ ভিডিও URL দিন'; return; }
+        }
+
+        db.ref('flashAd').set({
+            active:   true,
+            type,
+            imgUrl,
+            videoUrl,
+            title,
+            sub,
+            duration,
+            triggeredAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            status.style.color = '#2ed573';
+            status.textContent = `✅ Flash Ad চলছে! ${duration} সেকেন্ড পরে বন্ধ হবে।`;
+        }).catch(e => {
+            status.style.color = '#ff4757';
+            status.textContent = '❌ সমস্যা: ' + e.message;
+        });
+    }
+
+    function stopFlashAd() {
+        db.ref('flashAd').update({ active: false }).then(() => {
+            const s = document.getElementById('faStatus');
+            if (s) { s.style.color='#aaa'; s.textContent='⏹ Flash Ad বন্ধ হয়েছে।'; }
+        });
+    }
+
+    let faIntervalTimer = null;
+    let faIntervalCount = 0;
+
+    function startFlashAdInterval() {
+        if (faIntervalTimer) clearInterval(faIntervalTimer);
+        const interval  = parseInt(document.getElementById('faInterval').value) || 20;
+        const unit      = parseInt(document.getElementById('faIntervalUnit').value) || 60;
+        const ms        = interval * unit * 1000;
+        const statusEl  = document.getElementById('faIntervalStatus');
+        faIntervalCount = 0;
+
+        statusEl.style.color = '#2ed573';
+        statusEl.textContent = `✅ প্রতি ${interval} ${unit===60?'মিনিট':unit===1?'সেকেন্ড':'ঘণ্টা'} পরে চলবে`;
+
+        // প্রথমবার সাথে সাথে
+        triggerFlashAd();
+
+        faIntervalTimer = setInterval(() => {
+            faIntervalCount++;
+            triggerFlashAd();
+            statusEl.textContent = `✅ ${faIntervalCount} বার দেখানো হয়েছে`;
+        }, ms);
+    }
+
+    function stopFlashAdInterval() {
+        if (faIntervalTimer) { clearInterval(faIntervalTimer); faIntervalTimer=null; }
+        const s = document.getElementById('faIntervalStatus');
+        if (s) { s.style.color='#aaa'; s.textContent='⏹ অটো Flash Ad বন্ধ।'; }
+    }
+
+
+
+    // ── Breaking News Functions ──────────────────────
+    function showBreakingNews() {
+        const text    = document.getElementById('bnText').value.trim();
+        const channel = document.getElementById('bnChannel').value.trim();
+        const status  = document.getElementById('newsStatus');
+        if (!text) { status.style.color='#ff4757'; status.textContent='❌ টেক্সট লিখুন'; return; }
+        db.ref('breakingNews').set({
+            active: true, text, channel,
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => { status.style.color='#2ed573'; status.textContent='✅ Breaking News চলছে!'; })
+          .catch(e => { status.style.color='#ff4757'; status.textContent='❌ '+e.message; });
+    }
+
+    function hideBreakingNews() {
+        db.ref('breakingNews').update({ active: false }).then(() => {
+            document.getElementById('newsStatus').textContent = 'Breaking News বন্ধ।';
+        });
+    }
+
+    function showNewsFlash() {
+        const text   = document.getElementById('nfText').value.trim();
+        const status = document.getElementById('newsStatus');
+        if (!text) { status.style.color='#ff4757'; status.textContent='❌ টেক্সট লিখুন'; return; }
+        db.ref('newsFlash').set({
+            active: true, text,
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => { status.style.color='#2ed573'; status.textContent='✅ News Flash চলছে!'; })
+          .catch(e => { status.style.color='#ff4757'; status.textContent='❌ '+e.message; });
+    }
+
+    function hideNewsFlash() {
+        db.ref('newsFlash').update({ active: false }).then(() => {
+            document.getElementById('newsStatus').textContent = 'News Flash বন্ধ।';
+        });
+    }
+
+
+    // ── News Frame Functions ─────────────────────────
+    // News multi-item state (admin session)
+    window._nfHeadlines = window._nfHeadlines || [];
+    window._nfTickers = window._nfTickers || [];
+    window._nfAds = window._nfAds || [];
+
+    function nfAddItem(kind, inputId, listId) {
+        const input = document.getElementById(inputId);
+        const v = (input && input.value || '').trim();
+        if (!v) return alert('টেক্সট লিখুন');
+        if (kind === 'headlines') window._nfHeadlines.push(v);
+        else window._nfTickers.push(v);
+        if (input) input.value = '';
+        nfRenderLists();
+    }
+
+    function nfAddAd() {
+        const title = (document.getElementById('nfAdTitle')||{}).value || '';
+        const sub = (document.getElementById('nfAdSub')||{}).value || '';
+        const phone = (document.getElementById('nfAdPhone')||{}).value || '';
+        const logo = (document.getElementById('nfAdLogo')||{}).value || '';
+        if (!title.trim()) return alert('বিজ্ঞাপনের নাম লিখুন');
+        window._nfAds.push({ title: title.trim(), sub: sub.trim(), phone: phone.trim(), logo: logo.trim() });
+        ['nfAdTitle','nfAdSub','nfAdPhone','nfAdLogo'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.value = '';
+        });
+        nfRenderLists();
+    }
+
+    function nfRemoveItem(kind, idx) {
+        if (kind === 'headlines') window._nfHeadlines.splice(idx, 1);
+        else if (kind === 'tickers') window._nfTickers.splice(idx, 1);
+        else if (kind === 'ads') window._nfAds.splice(idx, 1);
+        nfRenderLists();
+    }
+
+    function nfRenderLists() {
+        const hl = document.getElementById('nfHeadlineList');
+        const tl = document.getElementById('nfTickerList');
+        const al = document.getElementById('nfAdList');
+        if (hl) {
+            hl.innerHTML = window._nfHeadlines.length
+                ? window._nfHeadlines.map((t,i) =>
+                    `<div style="display:flex;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid #222;">
+                        <span style="flex:1;color:#fff;">${i+1}. ${t}</span>
+                        <button type="button" onclick="nfRemoveItem('headlines',${i})" style="background:#c00;border:none;color:#fff;padding:2px 8px;border-radius:4px;cursor:pointer;">×</button>
+                    </div>`).join('')
+                : '<p style="color:#666;font-size:11px;">এখনো কোনো শিরোনাম নেই</p>';
+        }
+        if (tl) {
+            tl.innerHTML = window._nfTickers.length
+                ? window._nfTickers.map((t,i) =>
+                    `<div style="display:flex;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid #222;">
+                        <span style="flex:1;color:#fff;">${i+1}. ${t}</span>
+                        <button type="button" onclick="nfRemoveItem('tickers',${i})" style="background:#c00;border:none;color:#fff;padding:2px 8px;border-radius:4px;cursor:pointer;">×</button>
+                    </div>`).join('')
+                : '<p style="color:#666;font-size:11px;">এখনো কোনো খবর নেই</p>';
+        }
+        if (al) {
+            al.innerHTML = window._nfAds.length
+                ? window._nfAds.map((a,i) =>
+                    `<div style="display:flex;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid #222;">
+                        <span style="flex:1;color:#ffd700;">${i+1}. ${a.title}${a.phone ? ' · '+a.phone : ''}</span>
+                        <button type="button" onclick="nfRemoveItem('ads',${i})" style="background:#c00;border:none;color:#fff;padding:2px 8px;border-radius:4px;cursor:pointer;">×</button>
+                    </div>`).join('')
+                : '<p style="color:#666;font-size:11px;">এখনো কোনো বিজ্ঞাপন নেই</p>';
+        }
+    }
+
+    function startNewsFrame() {
+        const label = (document.getElementById('nfLabel')||{}).value || 'NEWS';
+        const leftTitle = (document.getElementById('nfLeftTitle')||{}).value || '';
+        const leftText = (document.getElementById('nfLeftText')||{}).value || '';
+        const status = document.getElementById('nfStatus');
+
+        const headlines = window._nfHeadlines.slice();
+        const tickers = window._nfTickers.slice();
+        const ads = window._nfAds.slice();
+
+        // single-field fallback if lists empty but someone typed in legacy fields
+        const hi = document.getElementById('nfHeadlineInput');
+        const fi = document.getElementById('nfFlashInput');
+        if (!headlines.length && hi && hi.value.trim()) headlines.push(hi.value.trim());
+        if (!tickers.length && fi && fi.value.trim()) tickers.push(fi.value.trim());
+
+        if (!headlines.length && !tickers.length) {
+            if (status) { status.style.color='#ff4757'; status.textContent='❌ কমপক্ষে একটি শিরোনাম বা খবর যোগ করুন'; }
+            return;
+        }
+        if (status) { status.style.color='#ffd700'; status.textContent='চালু হচ্ছে...'; }
+
+        const payload = {
+            active: true,
+            channelLabel: (label||'').trim() || 'NEWS',
+            leftTitle: leftTitle || 'আমাদের পরিষেবা',
+            leftText: leftText || '',
+            headlines: headlines,
+            tickers: tickers,
+            ads: ads,
+            headlineInterval: parseInt((document.getElementById('nfHeadlineInterval')||{}).value, 10) || 6,
+            tickerInterval: parseInt((document.getElementById('nfTickerInterval')||{}).value, 10) || 8,
+            adInterval: parseInt((document.getElementById('nfAdInterval')||{}).value, 10) || 7,
+            // legacy single fields for old players
+            headline: headlines[0] || '',
+            flashText: tickers[0] || headlines[0] || '',
+            adTitle: (ads[0]&&ads[0].title) || '',
+            adSub: (ads[0]&&ads[0].sub) || '',
+            adPhone: (ads[0]&&ads[0].phone) || '',
+            adLogo: (ads[0]&&ads[0].logo) || '',
+            startedAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        db.ref('newsFrame').set(payload).then(() => {
+            if (status) {
+                status.style.color='#2ed573';
+                status.textContent='✅ চালু! শিরোনাম '+headlines.length+' · খবর '+tickers.length+' · বিজ্ঞাপন '+ads.length;
+            if (typeof setScreenMode === 'function') setScreenMode('news');
+            }
+        }).catch(e => {
+            if (status) { status.style.color='#ff4757'; status.textContent='❌ '+e.message; }
+        });
+    }
+
+    // Load existing lists when opening news data
+    db.ref('newsFrame').on('value', function(snap) {
+        const d = snap.val();
+        if (!d) return;
+        if (Array.isArray(d.headlines)) window._nfHeadlines = d.headlines.slice();
+        else if (d.headline) window._nfHeadlines = [d.headline];
+        if (Array.isArray(d.tickers)) window._nfTickers = d.tickers.slice();
+        else if (d.flashText) window._nfTickers = [d.flashText];
+        if (Array.isArray(d.ads)) window._nfAds = d.ads.slice();
+        else if (d.adTitle) window._nfAds = [{ title:d.adTitle, sub:d.adSub||'', phone:d.adPhone||'', logo:d.adLogo||'' }];
+        if (typeof nfRenderLists === 'function') nfRenderLists();
+    });
+
+
+    function stopNewsFrame() {
+        db.ref('newsFrame').update({ active: false }).then(() => {
+            const s = document.getElementById('nfStatus');
+            if (s) { s.style.color='#aaa'; s.textContent='⏹ Frame বন্ধ হয়েছে।'; }
+            if (typeof setScreenMode === 'function') setScreenMode('live');
+        });
+    }
+
+
+
+    // ── Icon section navigation ───────────────────────
+    
+    // ══ Viewer Screen Mode ═══════════════════════════
+    function setScreenMode(mode) {
+        mode = mode || 'live';
+        const status = document.getElementById('screenModeStatus');
+        if (status) { status.style.color = '#ffd700'; status.textContent = 'সেট হচ্ছে...'; }
+
+        const updates = {
+            'screenMode': mode
+        };
+        // turn news/election on-off together with mode
+        if (mode === 'news') {
+            updates['newsFrame/active'] = true;
+            updates['election/active'] = false;
+        } else if (mode === 'election') {
+            updates['newsFrame/active'] = false;
+            updates['election/active'] = true;
+        } else {
+            updates['newsFrame/active'] = false;
+            updates['election/active'] = false;
+        }
+
+        db.ref().update(updates).then(() => {
+            highlightModeBtn(mode);
+            if (status) {
+                status.style.color = '#2ed573';
+                const labels = { live: '🔴 লাইভ ব্রডকাস্ট', news: '📰 নিউজ স্ক্রিন', election: '🗳️ নির্বাচন' };
+                status.textContent = 'এখন চালু: ' + (labels[mode] || mode);
+            }
+        }).catch(e => {
+            if (status) { status.style.color = '#ff4757'; status.textContent = '❌ ' + e.message; }
+        });
+    }
+
+    function highlightModeBtn(mode) {
+        const map = {
+            live: 'modeBtnLive',
+            news: 'modeBtnNews',
+            election: 'modeBtnElection'
+        };
+        Object.keys(map).forEach(k => {
+            const btn = document.getElementById(map[k]);
+            if (!btn) return;
+            if (k === mode) {
+                btn.style.background = k === 'live' ? '#ff4757' : (k === 'news' ? '#cc0000' : '#6c5ce7');
+                btn.style.color = '#fff';
+                btn.style.boxShadow = '0 0 12px rgba(255,215,0,0.4)';
+            } else {
+                btn.style.background = '#333';
+                btn.style.color = '#aaa';
+                btn.style.boxShadow = 'none';
+            }
+        });
+    }
+
+    db.ref('screenMode').on('value', snap => {
+        const m = snap.val() || 'live';
+        highlightModeBtn(m);
+        const status = document.getElementById('screenModeStatus');
+        if (status) {
+            const labels = { live: '🔴 লাইভ ব্রডকাস্ট', news: '📰 নিউজ স্ক্রিন', election: '🗳️ নির্বাচন' };
+            status.style.color = '#2ed573';
+            status.textContent = 'এখন চালু: ' + (labels[m] || m);
+        }
+    });
+
+
+    
+    function isDriveUrl(u) {
+        return u && (String(u).includes('drive.google.com') || String(u).includes('docs.google.com'));
+    }
+
+    function showAdminSection(secId) {
+        document.querySelectorAll('.admin-section').forEach(el => {
+            el.classList.remove('active');
+        });
+        document.querySelectorAll('.icon-btn').forEach(el => {
+            el.classList.remove('active');
+        });
+        const nav = document.getElementById('iconNav');
+        if (!secId) {
+            if (nav) nav.style.display = 'grid';
+            return;
+        }
+        const panel = document.getElementById(secId);
+        if (panel) {
+            panel.classList.add('active');
+            if (nav) nav.style.display = 'grid';
+            const btn = document.querySelector('.icon-btn[data-sec="' + secId + '"]');
+            if (btn) btn.classList.add('active');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    // ── Billboard Functions ──────────────────────────
+    function toggleBbMedia() {
+        const t = document.getElementById('bbMediaType').value;
+        document.getElementById('bbImgSection').style.display = t==='image' ? '' : 'none';
+        document.getElementById('bbVidSection').style.display = t==='video' ? '' : 'none';
+    }
+
+    function saveBillboardConfig() {
+        const showSec = parseInt(document.getElementById('bbShowSec').value) || 15;
+        const hideSec = parseInt(document.getElementById('bbHideSec').value) || 30;
+        const s = document.getElementById('bbConfigStatus');
+        db.ref('billboardConfig').set({ showSec, hideSec })
+          .then(() => { s.style.color='#2ed573'; s.textContent=`✅ ${showSec}s দেখাবে, ${hideSec}s লুকাবে`; })
+          .catch(e => { s.style.color='#ff4757'; s.textContent='❌ '+e.message; });
+    }
+
+    async function addBillboard() {
+        const title = document.getElementById('bbTitle').value.trim();
+        const sub   = document.getElementById('bbSub').value.trim();
+        const type  = document.getElementById('bbMediaType').value;
+
+        let imgUrl='', videoUrl='';
+
+        if (type==='image') {
+            imgUrl = document.getElementById('bbImgUrl').value.trim();
+            const f = document.getElementById('bbImgFile').files[0];
+            if (f) imgUrl = await uploadMedia(f, 'bbImgStatus', null, null);
+        } else {
+            videoUrl = document.getElementById('bbVidUrl').value.trim();
+            const f  = document.getElementById('bbVidFile').files[0];
+            if (f) videoUrl = await uploadMedia(f, 'bbVidStatus', 'bbVidProgressWrap', 'bbVidProgressBar');
+        }
+
+        if (!title && !imgUrl && !videoUrl) return alert('টাইটেল বা ছবি/ভিডিও দিন');
+
+        db.ref('billboards').push({
+            title, sub, imgUrl, videoUrl,
+            active:    true,
+            startTime: document.getElementById('bbStart').value || null,
+            endTime:   document.getElementById('bbEnd').value   || null,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            alert('Billboard যোগ হয়েছে!');
+            ['bbTitle','bbSub','bbImgUrl','bbVidUrl'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+            ['bbImgFile','bbVidFile'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+            ['bbImgStatus','bbVidStatus','bbConfigStatus'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=''; });
+            document.getElementById('bbStart').value='';
+            document.getElementById('bbEnd').value='';
+        }).catch(e => alert('সমস্যা: '+e.message));
+    }
+
+
+    // ── Election Functions (News Style) ────────────────
+    let elCandidates = {};  // id -> candidate
+    let elPartyRowCount = 0;
+
+    function elAddCandidate() {
+        const name   = document.getElementById('elCandName').value.trim();
+        const party  = document.getElementById('elCandParty').value.trim();
+        const symbol = document.getElementById('elCandSymbol').value.trim();
+        const img    = document.getElementById('elCandImg').value.trim();
+        const votes  = parseInt(document.getElementById('elCandVotes').value) || 0;
+        if (!name) return alert('প্রার্থীর নাম দিন');
+
+        const id = 'c_' + Date.now();
+        elCandidates[id] = { name, party, symbol, imgUrl: img, votes };
+        elRenderCandidates();
+
+        ['elCandName','elCandParty','elCandSymbol','elCandImg'].forEach(i => {
+            const el = document.getElementById(i); if (el) el.value = '';
+        });
+        document.getElementById('elCandVotes').value = '0';
+    }
+
+    function elRenderCandidates() {
+        const box = document.getElementById('elCandidateList');
+        if (!box) return;
+        if (!Object.keys(elCandidates).length) {
+            box.innerHTML = '<p style="font-size:11px;color:#888;">কোনো প্রার্থী নেই</p>';
+            return;
+        }
+        box.innerHTML = '';
+        Object.entries(elCandidates).forEach(([id, c]) => {
+            const div = document.createElement('div');
+            div.className = 'item-card';
+            div.style.flexDirection = 'column';
+            div.style.gap = '6px';
+            div.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <strong style="font-size:12px;">${c.symbol||'👤'} ${c.name}</strong>
+                        <span style="font-size:10px;color:#aaa;margin-left:6px;">${c.party||''}</span>
+                    </div>
+                    <button class="btn-del" onclick="elRemoveCandidate('${id}')">✕</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <label style="font-size:11px;color:#aaa;flex-shrink:0;">ভোট:</label>
+                    <input type="number" value="${c.votes||0}" min="0"
+                        onchange="elUpdateVotes('${id}', this.value)"
+                        style="width:100%;padding:5px;background:#0d0e15;border:1px solid #333;
+                               color:#fff;border-radius:4px;font-size:12px;">
+                </div>`;
+            box.appendChild(div);
+        });
+    }
+
+    function elUpdateVotes(id, val) {
+        if (elCandidates[id]) {
+            elCandidates[id].votes = parseInt(val) || 0;
+            if (db) db.ref('election/candidates/' + id + '/votes').set(parseInt(val)||0);
+        }
+    }
+
+    function elRemoveCandidate(id) {
+        delete elCandidates[id];
+        if (db) db.ref('election/candidates/' + id).remove();
+        elRenderCandidates();
+    }
+
+    function elAddPartyRow() {
+        elPartyRowCount++;
+        const id = elPartyRowCount;
+        const wrap = document.getElementById('elPartySeats');
+        if (!wrap) return;
+        const row = document.createElement('div');
+        row.id = 'el-party-row-' + id;
+        row.style.cssText = 'display:flex;gap:6px;align-items:center;';
+        row.innerHTML = `
+            <input type="text" id="elPName-${id}" placeholder="দল (TMC)"
+                style="flex:2;padding:6px;background:#181a24;border:1px solid #333;color:#fff;border-radius:4px;font-size:12px;">
+            <input type="number" id="elPSeats-${id}" placeholder="সিট" value="0" min="0"
+                style="flex:1;padding:6px;background:#181a24;border:1px solid #333;color:#fff;border-radius:4px;font-size:12px;">
+            <input type="text" id="elPImg-${id}" placeholder="ছবি URL"
+                style="flex:2;padding:6px;background:#181a24;border:1px solid #333;color:#fff;border-radius:4px;font-size:12px;">
+            <button onclick="document.getElementById('el-party-row-${id}').remove()"
+                style="background:#ff4757;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px;">✕</button>`;
+        wrap.appendChild(row);
+    }
+
+    function startElection() {
+        if (!db) { alert('Firebase লোড হয়নি'); return; }
+        const title    = document.getElementById('elTitle').value.trim() || 'নির্বাচন ফলাফল';
+        const seat     = document.getElementById('elSeat').value.trim();
+        const headline = document.getElementById('elHeadline').value.trim();
+        const stateLabel = document.getElementById('elStateLabel').value.trim();
+        const isFinal  = document.getElementById('elType').value === 'final';
+        const statusEl = document.getElementById('elStatus');
+
+        if (!Object.keys(elCandidates).length) {
+            statusEl.style.color = '#ff4757';
+            statusEl.textContent = '❌ কমপক্ষে একজন প্রার্থী যোগ করুন';
+            return;
+        }
+
+        // Collect optional party seats
+        const parties = {};
+        for (let i = 1; i <= elPartyRowCount; i++) {
+            const nameEl = document.getElementById('elPName-' + i);
+            if (!nameEl) continue;
+            const name = nameEl.value.trim();
+            if (!name) continue;
+            parties['p' + i] = {
+                name,
+                seats: parseInt((document.getElementById('elPSeats-' + i)||{}).value) || 0,
+                imgUrl: (document.getElementById('elPImg-' + i)||{}).value || ''
+            };
+        }
+
+        statusEl.style.color = '#ffd700';
+        statusEl.textContent = 'সেভ হচ্ছে...';
+
+        const payload = {
+            active: true,
+            title,
+            seat,
+            headline,
+            stateLabel,
+            isFinal,
+            candidates: elCandidates,
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
+        };
+        if (Object.keys(parties).length) payload.parties = parties;
+
+        db.ref('election').set(payload).then(() => {
+            statusEl.style.color = '#2ed573';
+            statusEl.textContent = '✅ News Result চালু! সব দর্শক দেখছে।';
+        }).catch(e => {
+            statusEl.style.color = '#ff4757';
+            statusEl.textContent = '❌ ' + e.message;
+        });
+    }
+
+    function stopElection() {
+        if (!db) return;
+        db.ref('election').update({ active: false }).then(() => {
+            const s = document.getElementById('elStatus');
+            if (s) { s.style.color = '#aaa'; s.textContent = '⏹ ফলাফল বন্ধ হয়েছে।'; }
+        });
+    }
+
+    function loadElectionData() {
+        if (!db) return;
+        db.ref('election').once('value').then(snap => {
+            const d = snap.val();
+            if (!d) return;
+            if (d.title) document.getElementById('elTitle').value = d.title || '';
+            if (d.seat) document.getElementById('elSeat').value = d.seat || '';
+            if (d.headline) document.getElementById('elHeadline').value = d.headline || '';
+            if (d.stateLabel) document.getElementById('elStateLabel').value = d.stateLabel || '';
+            if (d.isFinal) document.getElementById('elType').value = 'final';
+            if (d.candidates) {
+                elCandidates = d.candidates;
+                elRenderCandidates();
+            }
+        });
+    }
+
+    // ── Top Bar Ad Functions ─────────────────────────
+    async function addTopBarAd() {
+        const title = document.getElementById('tbTitle').value.trim();
+        const sub   = document.getElementById('tbSub').value.trim();
+        if (!title) return alert('টাইটেল দিন');
+
+        let imgUrl = document.getElementById('tbImgUrl').value.trim();
+        const file = document.getElementById('tbImgFile').files[0];
+        if (file) imgUrl = await uploadMedia(file, 'tbImgStatus', null, null);
+
+        db.ref('topBarAds').push({
+            title, sub, leftImg: imgUrl,
+            active: true,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            alert('Top Bar Ad যোগ হয়েছে!');
+            document.getElementById('tbTitle').value = '';
+            document.getElementById('tbSub').value   = '';
+            document.getElementById('tbImgUrl').value= '';
+            document.getElementById('tbImgFile').value = '';
+            document.getElementById('tbImgStatus').textContent = '';
+        }).catch(e => alert('সমস্যা: ' + e.message));
+    }
+
+    // ── Flash Ad Timer ────────────────────────────────
+    // faIntervalTimer already declared above
+
+    function saveFlashAdTimer() {
+        const interval  = parseInt(document.getElementById('faInterval').value) || 0;
+        const statusEl  = document.getElementById('faTimerStatus');
+
+        if (faIntervalTimer) clearInterval(faIntervalTimer);
+
+        if (interval <= 0) {
+            statusEl.textContent = 'অটো Timer বন্ধ।';
+            db.ref('flashAdTimer').set({ interval: 0 });
+            return;
+        }
+
+        db.ref('flashAdTimer').set({
+            interval,
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            statusEl.textContent = `✅ প্রতি ${interval} মিনিট পর Flash Ad চলবে।`;
+            // এই admin device এ interval চালাও
+            faIntervalTimer = setInterval(() => {
+                db.ref('flashAd').once('value').then(snap => {
+                    const fa = snap.val();
+                    if (fa && fa.imgUrl || fa && fa.videoUrl) {
+                        db.ref('flashAd').update({
+                            active: true,
+                            triggeredAt: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    }
+                });
+            }, interval * 60000);
+        });
+    }
+
+
+    // ── Password Change ───────────────────────────────
+    function changePassword() {
+        if (!db) { alert('Firebase লোড হয়নি। একটু পরে চেষ্টা করুন।'); return; }
+
+        const current  = document.getElementById('pwCurrent').value;
+        const newPass  = document.getElementById('pwNew').value;
+        const confirm  = document.getElementById('pwConfirm').value;
+        const statusEl = document.getElementById('pwStatus');
+
+        // Validation
+        if (!current) { statusEl.style.color='#ff4757'; statusEl.textContent='❌ বর্তমান password দিন'; return; }
+        if (!newPass)  { statusEl.style.color='#ff4757'; statusEl.textContent='❌ নতুন password দিন'; return; }
+        if (newPass.length < 6) { statusEl.style.color='#ff4757'; statusEl.textContent='❌ Password কমপক্ষে ৬ অক্ষর হতে হবে'; return; }
+        if (newPass !== confirm) { statusEl.style.color='#ff4757'; statusEl.textContent='❌ নতুন password দুটো মিলছে না'; return; }
+
+        statusEl.style.color = '#ffd700';
+        statusEl.textContent = '⏳ যাচাই করা হচ্ছে...';
+
+        // বর্তমান password যাচাই করো
+        db.ref('adminConfig/password').once('value').then(snap => {
+            const savedPass = snap.val() || 'admin123';
+            if (current !== savedPass) {
+                statusEl.style.color = '#ff4757';
+                statusEl.textContent = '❌ বর্তমান password ভুল!';
+                return;
+            }
+            // নতুন password সেভ করো
+            db.ref('adminConfig/password').set(newPass).then(() => {
+                statusEl.style.color = '#2ed573';
+                statusEl.textContent = '✅ Password সফলভাবে পরিবর্তন হয়েছে!';
+                document.getElementById('pwCurrent').value = '';
+                document.getElementById('pwNew').value     = '';
+                document.getElementById('pwConfirm').value = '';
+            }).catch(e => {
+                statusEl.style.color = '#ff4757';
+                statusEl.textContent = '❌ সমস্যা: ' + e.message;
+            });
+        }).catch(e => {
+            statusEl.style.color = '#ff4757';
+            statusEl.textContent = '❌ Firebase সমস্যা: ' + e.message;
+        });
+    }
+
+    function loadAllData() {
+        // Firebase connection test
+        db.ref('.info/connected').on('value', snap => {
+            const connected = snap.val();
+            console.log('[Firebase] Connected:', connected);
+            if (!connected) console.warn('[Firebase] Offline — check internet');
+        });
+
+
+        db.ref('festivals').on('value', (snap) => {
+            const c = document.getElementById('festivalList');
+            c.innerHTML = '<h3 style="font-size:13px;color:#ffd700;margin-bottom:6px;">উৎসবের তালিকা:</h3>';
+            const d = snap.val();
+            if (!d) { c.innerHTML += '<p style="font-size:11px;color:#888;">কোনো উৎসব নেই</p>'; return; }
+            for (let id in d) {
+                const days = Math.ceil((new Date(d[id].date) - new Date()) / 86400000);
+                const daysText = days >= 0 ? `${days} দিন বাকি` : 'শেষ হয়েছে';
+                c.innerHTML += `<div class="item-card">
+                    <div class="item-info">
+                        <strong>${d[id].name}</strong><br>
+                        <span style="font-size:10px;color:#aaa;">${d[id].date} — ${daysText}</span>
+                    </div>
+                    <button class="btn-del" onclick="deleteItem('festivals','${id}')">ডিলিট</button>
+                </div>`;
+            }
+        });
+
+
+        // liveChannels list is handled by loadLiveStatus() → liveChannelList
+
+        db.ref('playlist').on('value', (snap) => {
+            const c = document.getElementById('playlistItems');
+            c.innerHTML = '<h3 style="font-size:13px;color:#ffd700;margin-bottom:6px;">প্লেলিস্টের ভিডিওসমূহ:</h3>';
+            const d = snap.val();
+            // Broadcast select populate
+            const bcSel = document.getElementById('bcSelect');
+            if (bcSel) { bcSel.innerHTML = ''; }
+            let i = 0;
+            for (let id in d) {
+                c.innerHTML += `<div class="item-card">
+                    <div class="item-info"><strong>${d[id].title}</strong></div>
+                    <button class="btn-del" onclick="deleteItem('playlist','${id}')">ডিলিট</button>
+                </div>`;
+                if (bcSel) {
+                    const opt = document.createElement('option');
+                    opt.value = i; opt.textContent = (i+1) + '. ' + (d[id].title || 'ভিডিও '+(i+1));
+                    bcSel.appendChild(opt);
+                }
+                i++;
+            }
+        });
+        watchBroadcastState();
+
+        db.ref('adSettings').on('value', (snap) => {
+            const d = snap.val();
+            if (d) {
+                if (d.adUrl)    document.getElementById('adVideoUrl').value  = d.adUrl;
+                if (d.interval) document.getElementById('adInterval').value  = d.interval;
+                if (d.duration) document.getElementById('adDuration').value  = d.duration;
+            }
+        });
+
+        db.ref('schedules').on('value', (snap) => {
+            const c = document.getElementById('scheduleList');
+            c.innerHTML = '<h3 style="font-size:13px;color:#ffd700;margin-bottom:6px;">অনুষ্ঠান সূচির তালিকা:</h3>';
+            const d = snap.val();
+            for (let id in d) {
+                c.innerHTML += `<div class="item-card">
+                    <div class="item-info"><strong>${d[id].name}</strong></div>
+                    <button class="btn-del" onclick="deleteItem('schedules','${id}')">ডিলিট</button>
+                </div>`;
+            }
+        });
+
+        db.ref('tickers').on('value', (snap) => {
+            const c = document.getElementById('tickerList');
+            c.innerHTML = '<h3 style="font-size:13px;color:#ffd700;margin-bottom:6px;">সক্রিয় টিকর:</h3>';
+            const d = snap.val();
+            for (let id in d) {
+                c.innerHTML += `<div class="item-card">
+                    <div class="item-info"><strong>${d[id].text}</strong></div>
+                    <button class="btn-del" onclick="deleteItem('tickers','${id}')">ডিলিট</button>
+                </div>`;
+            }
+        });
+
+        // Billboard list
+        db.ref('billboards').on('value', snap => {
+            const c = document.getElementById('billboardList');
+            if (!c) return;
+            c.innerHTML = '';
+            const d = snap.val();
+            if (!d) { c.innerHTML = '<p style="font-size:11px;color:#888;">কোনো Billboard নেই</p>'; return; }
+            for (let id in d) {
+                const b = d[id];
+                c.innerHTML += `<div class="item-card">
+                    <div class="item-info">
+                        <strong>${b.title||'Billboard'}</strong>
+                        ${b.sub ? `<br><span style="font-size:10px;color:#aaa;">${b.sub}</span>` : ''}
+                        <br><span style="font-size:9px;color:${b.active!==false?'#2ed573':'#888'};">
+                            ${b.active!==false?'🟢 সক্রিয়':'⚫ বন্ধ'}
+                        </span>
+                    </div>
+                    <div style="display:flex;gap:5px;">
+                        <button onclick="db.ref('billboards/${id}').update({active:${b.active===false}})"
+                            style="background:${b.active!==false?'#555':'#2ed573'};color:${b.active!==false?'#fff':'#000'};
+                                   border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px;">
+                            ${b.active!==false?'⏹ বন্ধ':'▶ চালু'}
+                        </button>
+                        <button class="btn-del" onclick="deleteItem('billboards','${id}')">ডিলিট</button>
+                    </div>
+                </div>`;
+            }
+
+            // config load করো এবং show করো
+            db.ref('billboardConfig').once('value').then(cfg => {
+                const c2 = cfg.val() || {};
+                const ss = document.getElementById('bbShowSec');
+                const hs = document.getElementById('bbHideSec');
+                if (ss && c2.showSec) ss.value = c2.showSec;
+                if (hs && c2.hideSec) hs.value = c2.hideSec;
+            });
+        });
+
+        // Top Bar Ads list
+        db.ref('topBarAds').on('value', (snap) => {
+            const c = document.getElementById('topBarAdList');
+            if (!c) return;
+            c.innerHTML = '';
+            const d = snap.val();
+            if (!d) { c.innerHTML = '<p style="font-size:11px;color:#888;">কোনো Ad নেই</p>'; return; }
+            for (let id in d) {
+                const ad = d[id];
+                c.innerHTML += `<div class="item-card">
+                    <div class="item-info">
+                        <strong>${ad.title||''}</strong>
+                        ${ad.sub ? `<br><span style="font-size:10px;color:#aaa;">${ad.sub}</span>` : ''}
+                    </div>
+                    <div style="display:flex;gap:5px;">
+                        <button onclick="db.ref('topBarAds/${id}').update({active:${!ad.active}})"
+                            style="background:${ad.active?'#555':'#2ed573'};color:${ad.active?'#fff':'#000'};border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px;">
+                            ${ad.active?'⏹ বন্ধ':'▶ চালু'}
+                        </button>
+                        <button class="btn-del" onclick="deleteItem('topBarAds','${id}')">ডিলিট</button>
+                    </div>
+                </div>`;
+            }
+        });
+
+        db.ref('banners').on('value', (snap) => {
+            const c = document.getElementById('bannerList');
+            c.innerHTML = '<h3 style="font-size:13px;color:#ffd700;margin-bottom:6px;">সক্রিয় ব্যানার:</h3>';
+            const d = snap.val();
+            for (let id in d) {
+                c.innerHTML += `<div class="item-card">
+                    <div class="item-info"><strong>${d[id].title}</strong></div>
+                    <button class="btn-del" onclick="deleteItem('banners','${id}')">ডিলিট</button>
+                </div>`;
+            }
+        });
+    }
+</script>
+</body>
+</html>

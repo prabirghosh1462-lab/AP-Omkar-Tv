@@ -1,0 +1,3669 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Omkar TV - Entertainment Channel</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="Omkar TV">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Omkar TV">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#ff4757">
+    <meta name="description" content="আপনার প্রিয় বাংলা বিনোদন চ্যানেল — সরাসরি লাইভ সম্প্রচার">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192x192/ff4757/ffffff?text=OTV">
+
+    <!-- Splash Screen (iOS) -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',Arial,sans-serif; }
+        body { background:#0d0e15; color:#fff; overflow-x:hidden; }
+
+        /* ── Player ── */
+        .player-container {
+            width:100%; height:56vw; max-height:340px; min-height:200px;
+            position:relative; background:#000; overflow:hidden;
+        }
+
+        /* ══ Player Top Bar ══ */
+        .player-top-bar {
+            position:absolute; top:0; left:0; right:0; z-index:60;
+            display:flex; align-items:stretch;
+            height:52px;
+            background:rgba(0,0,0,0.72);
+            backdrop-filter:blur(6px);
+            pointer-events:none;
+        }
+
+        /* বাঁ: উৎসব */
+        .ptb-fest {
+            display:flex; align-items:center; gap:4px;
+            padding:4px 6px; flex-shrink:0; min-width:60px;
+        }
+        .ptb-fest-img  { width:30px; height:30px; object-fit:cover; border-radius:4px; display:none; }
+        .ptb-fest-text { display:flex; flex-direction:column; }
+        .ptb-fest-name { font-size:7px; font-weight:bold; color:#ffd700; line-height:1.2; white-space:nowrap; }
+        .ptb-fest-sub  { font-size:6px; color:#ccc; }
+        .ptb-fest-days-row { display:flex; align-items:baseline; gap:2px; }
+        .ptb-fest-days { font-family:'Orbitron',sans-serif; font-size:14px; font-weight:700; color:#ff4757; }
+        .ptb-fest-unit { font-size:6px; color:#aaa; }
+
+        /* মাঝে: ৩ Ad Box */
+        .ptb-ads {
+            flex:1; display:flex; align-items:stretch; gap:3px;
+            overflow:hidden; min-width:0; padding:2px 0;
+        }
+        .ptb-ad-box {
+            flex:1; display:flex; flex-direction:row;
+            align-items:center; gap:5px;
+            padding:3px 6px; overflow:hidden; min-width:0;
+            position:relative;
+            background:rgba(255,255,255,0.06);
+            border:1px solid rgba(255,215,0,0.2);
+            border-radius:6px;
+            animation:ptbFadeIn .5s ease;
+        }
+        @keyframes ptbFadeIn { from{opacity:0;transform:translateY(-4px);} to{opacity:1;transform:translateY(0);} }
+        .ptb-ad-media-wrap {
+            width:36px; height:36px; flex-shrink:0; border-radius:5px; overflow:hidden;
+            background:#222; border:1px solid rgba(255,255,255,0.1);
+        }
+        .ptb-ad-media-wrap img,
+        .ptb-ad-media-wrap video {
+            width:100%; height:100%; object-fit:cover;
+        }
+        .ptb-ad-text {
+            flex:1; overflow:hidden; min-width:0;
+            display:flex; flex-direction:column; justify-content:center; gap:1px;
+        }
+        .ptb-ad-title {
+            font-size:10px; font-weight:700; color:#ffd700;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+            line-height:1.15; max-width:100%;
+            letter-spacing:0.2px;
+        }
+        .ptb-ad-sub {
+            font-size:8px; color:#7ec8ff;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+            line-height:1.15; max-width:100%;
+        }
+        .ptb-ad-box.empty-ad {
+            opacity:0; pointer-events:none; border:none; background:transparent;
+            padding:0; flex:0.15;
+        }
+        .ptb-ad-box.no-media .ptb-ad-media-wrap { display:none; }
+
+        /* ডান: Logo */
+        .ptb-logo {
+            display:flex; flex-direction:column; align-items:center;
+            justify-content:center; padding:3px 6px; flex-shrink:0;
+            min-width:48px;
+        }
+        .ptb-logo {
+            perspective: 400px;
+            transform-style: preserve-3d;
+        }
+        .ptb-logo-img {
+            width:40px; height:28px; object-fit:contain;
+            filter:drop-shadow(0 0 6px rgba(0,242,254,0.8));
+            transform-origin: center center;
+            /* স্থির অবস্থান — শুধু ডান → বাঁ (rotateY) */
+            animation: logoRightToLeft 4s linear infinite, logoGlow 3s ease-in-out infinite alternate;
+        }
+        /* ডান → বাঁ পুরো ৩৬০° ঘূর্ণন (Y অক্ষ) */
+        @keyframes logoRightToLeft {
+            0%   { transform: rotateY(0deg); }
+            100% { transform: rotateY(-360deg); }
+        }
+        @keyframes logoGlow {
+            0% { filter: drop-shadow(0 0 4px rgba(0,242,254,0.5)); }
+            100% { filter: drop-shadow(0 0 12px rgba(255,215,0,0.9)) drop-shadow(0 0 6px rgba(0,242,254,0.8)); }
+        }
+        .ptb-ch-name {
+            font-size:6px; font-weight:bold; color:#ffd700;
+            white-space:nowrap; margin-top:1px;
+            display:inline-flex; gap:0;
+            overflow:hidden;
+            max-width:72px;
+        }
+        .ptb-ch-name .ltr,
+        .news-top-logo .ltr {
+            display:inline-block;
+            opacity:0;
+            transform: translateY(8px);
+            animation: letterSlideIn 0.35s ease forwards;
+        }
+        .news-top-logo { display:inline-flex; overflow:hidden; }
+        @keyframes letterSlideIn {
+            from { opacity:0; transform: translateY(10px) scale(0.8); }
+            to   { opacity:1; transform: translateY(0) scale(1); }
+        }
+        .ptb-ch-name .ltr.glow {
+            animation: letterSlideIn 0.35s ease forwards, ptbGlow 2s ease-in-out infinite alternate;
+            animation-delay: var(--d, 0s), calc(var(--d, 0s) + 0.4s);
+        }
+        @keyframes slideChanName { 0%{opacity:.7;} 100%{opacity:1;} }
+        .channel-name-ticker { display:none; } /* legacy — hide */
+        video, iframe { width:100%; height:100%; object-fit:cover; background:#000; border:none; }
+
+        /* ── LIVE Badge ── */
+        .live-badge {
+            position:absolute; top:8px; left:8px; z-index:50;
+            background:#ff4757; color:#fff; padding:3px 8px;
+            border-radius:4px; font-size:10px; font-weight:bold;
+            display:none; align-items:center; gap:4px;
+        }
+        .live-badge .dot { width:6px; height:6px; background:#fff; border-radius:50%; animation:pulse 1s infinite; }
+        .live-badge.show { display:flex; }
+
+        /* ── Ad Overlay ── */
+        .ad-overlay {
+            position:absolute; top:8px; left:8px; z-index:50;
+            background:rgba(255,71,87,0.9); color:#fff; padding:3px 10px;
+            border-radius:4px; font-size:10px; font-weight:bold; display:none;
+        }
+
+        /* ── Controls — কোনো বর্ডার নেই ── */
+        .player-controls {
+            position:absolute; bottom:10px; right:10px; z-index:50;
+            display:flex; gap:8px; align-items:center;
+        }
+        .ctrl-btn {
+            background:rgba(0,0,0,0.55); border:none; border-radius:50%;
+            width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+            cursor:pointer; font-size:18px; color:#fff;
+            -webkit-tap-highlight-color:transparent; user-select:none;
+        }
+        .ctrl-btn:active { background:rgba(255,255,255,0.15); }
+        /* ── Fullscreen: player সম্পূর্ণ স্ক্রিন নেয় ── */
+        .player-container:-webkit-full-screen { width:100vw!important; height:100vh!important; }
+        .player-container:-moz-full-screen    { width:100vw!important; height:100vh!important; }
+        .player-container:fullscreen           { width:100vw!important; height:100vh!important; }
+
+        /* Fullscreen বাটন উপরে সরে যাবে */
+        :fullscreen .player-controls,
+        :-webkit-full-screen .player-controls,
+        :-moz-full-screen .player-controls { top:10px; bottom:auto; right:10px; }
+
+
+        /* Fullscreen — top bar readable, consistent */
+        .player-container:fullscreen .player-top-bar,
+        .player-container:-webkit-full-screen .player-top-bar,
+        .player-container:-moz-full-screen .player-top-bar {
+            height:56px;
+            background:rgba(0,0,0,0.78);
+        }
+        .player-container:fullscreen .ptb-ad-title,
+        .player-container:-webkit-full-screen .ptb-ad-title {
+            font-size:11px;
+        }
+        .player-container:fullscreen .ptb-ad-sub,
+        .player-container:-webkit-full-screen .ptb-ad-sub {
+            font-size:9px;
+        }
+        .player-container:fullscreen .ptb-logo-img,
+        .player-container:-webkit-full-screen .ptb-logo-img {
+            width:48px; height:34px;
+        }
+        .player-container:fullscreen .ptb-ch-name,
+        .player-container:-webkit-full-screen .ptb-ch-name {
+            font-size:8px; max-width:90px;
+        }
+        .player-container:fullscreen #fsOverlay,
+        .player-container:-webkit-full-screen #fsOverlay {
+            z-index:120;
+        }
+
+        /* ── Fullscreen Overlay ──
+           player এর ভেতরে position:absolute, নিচে আটকে থাকবে ── */
+        #fsOverlay {
+            position:absolute; left:0; right:0; bottom:0; z-index:100;
+            display:none; flex-direction:column;
+        }
+        #fsOverlay.show { display:flex; }
+
+        /* Fullscreen Schedule */
+        #fsOverlay .fs-schedule {
+            width:100%; height:26px; background:rgba(24,26,36,0.95);
+            display:flex; align-items:center; padding:0 10px; gap:8px;
+        }
+        .fs-sch-badge { background:#00f2fe; color:#000; font-weight:bold; padding:1px 6px; border-radius:3px; font-size:9px; flex-shrink:0; }
+        .fs-sch-text  { flex:1; min-width:0; font-size:10px; color:#ffd700; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+        /* Fullscreen Ticker */
+        #fsOverlay .fs-ticker {
+            width:100%; height:24px; background:rgba(180,0,20,0.95);
+            display:flex; align-items:center; overflow:hidden;
+        }
+        .fs-ticker-label { background:rgba(100,0,10,0.95); padding:0 8px; font-size:10px; font-weight:bold; color:#fff; height:100%; display:flex; align-items:center; flex-shrink:0; }
+        .fs-ticker-text  { white-space:nowrap; display:inline-block; padding-left:100%; animation:tickerAnim 18s linear infinite; font-size:11px; font-weight:bold; color:#fff; }
+
+        /* Fullscreen DateTime */
+        #fsOverlay .fs-datetime { display:none !important; }
+        .fs-schedule-dt .fs-dt-date { font-size:9px; color:#ffd700; font-weight:600; }
+        .fs-schedule-dt .fs-dt-sep { font-size:9px; color:#555; }
+        .fs-schedule-dt .fs-dt-time { font-size:9px; color:#00f2fe; font-family:'Orbitron',sans-serif; font-weight:700; }
+        .fs-schedule-dt {
+            margin-left:auto; flex-shrink:0;
+            display:flex; align-items:center; gap:4px; white-space:nowrap;
+        }
+        #fsOverlay .fs-schedule {
+            width:100%; height:28px; background:rgba(24,26,36,0.95);
+            display:flex; align-items:center; padding:0 10px; gap:8px;
+        }
+        /* placeholder avoid dup - 
+        .fs-dt-date { font-size:9px; color:#ffd700; font-weight:600; }
+        .fs-dt-sep  { font-size:9px; color:#555; }
+        .fs-dt-time { font-size:9px; color:#00f2fe; font-family:'Orbitron',sans-serif; font-weight:700; }
+
+        /* Fullscreen Ad Banner — নিচের ব্যানার FS এ */
+        #fsOverlay .fs-banner {
+            width:100%; min-height:64px; background:linear-gradient(90deg,#0d0e15,#1a1a2e,#0d0e15);
+            display:none; align-items:center; gap:10px; padding:6px 12px;
+            border-top:2px solid #ffd700; box-sizing:border-box;
+        }
+        #fsOverlay .fs-banner.show { display:flex !important; }
+        .fs-banner-media {
+            width:56px; height:52px; object-fit:cover; border-radius:6px;
+            flex-shrink:0; border:1px solid rgba(255,215,0,0.35); background:#111;
+        }
+        .fs-banner-mid { flex:1; text-align:center; min-width:0; overflow:hidden; }
+        .fs-banner-title {
+            font-size:13px; font-weight:800; color:#ffd700;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .fs-banner-desc {
+            font-size:10px; color:#ddd; margin-top:2px;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .fs-banner-sub {
+            font-size:10px; color:#00f2fe; margin-top:2px; font-weight:600;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+
+
+
+        /* ── No Signal ── */
+        .no-signal { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#000; }
+        .no-signal .icon { font-size:36px; margin-bottom:8px; }
+        .no-signal .msg  { font-size:13px; color:#aaa; }
+        .spinner {
+            width:36px; height:36px; margin-bottom:10px;
+            border:3px solid rgba(255,255,255,0.15);
+            border-top-color:#00f2fe; border-radius:50%;
+            animation:spin 0.8s linear infinite;
+        }
+
+        /* ── Loading Screen ── */
+        .loading-screen {
+            width:100%; height:100%; display:flex; flex-direction:column;
+            align-items:center; justify-content:center; background:#000; gap:12px;
+        }
+        .loading-spinner {
+            width:36px; height:36px; border:3px solid #333;
+            border-top-color:#ff4757; border-radius:50%;
+            animation:spin .8s linear infinite;
+        }
+        @keyframes spin { to{transform:rotate(360deg);} }
+        .loading-msg { font-size:12px; color:#888; }
+        .loading-dots::after {
+            content:''; animation:dots 1.2s steps(3,end) infinite;
+        }
+        @keyframes dots { 0%{content:'';} 33%{content:'.';} 66%{content:'..';} 100%{content:'...';} }
+
+        /* ── Channel Bar ── */
+        .channel-bar {
+            width:100%; background:#181a24; padding:5px 8px;
+            display:none; flex-wrap:wrap; gap:5px;
+        }
+        .channel-bar.show { display:flex; }
+        .ch-btn {
+            padding:4px 10px; border-radius:4px; font-size:10px; font-weight:bold;
+            cursor:pointer; background:#0d0e15; color:#aaa; border:1px solid #333;
+            display:flex; align-items:center; gap:4px;
+        }
+        .ch-btn.active { background:#ff4757; color:#fff; border-color:#ff4757; }
+        .ch-dot { width:5px; height:5px; background:#ff4757; border-radius:50%; animation:pulse 1s infinite; }
+
+        /* ── View Toggle ── */
+        .view-toggle {
+            width:100%; background:#0d0e15; padding:4px 8px;
+            display:none; gap:6px; align-items:center;
+        }
+        .vt-btn {
+            padding:3px 10px; border:1px solid #333; border-radius:4px;
+            background:#0d0e15; color:#aaa; font-size:10px; cursor:pointer;
+        }
+        .vt-btn.active { background:#00f2fe; color:#000; border-color:#00f2fe; font-weight:bold; }
+
+        /* ── Split Screen — player এর ভিতরে পুরো এরিয়া ── */
+        .split-wrap {
+            display:none;
+            position:absolute; inset:0; z-index:2;
+            background:#000;
+            padding:4px; gap:4px;
+            box-sizing:border-box;
+            grid-template-columns:1fr 1fr;
+            grid-auto-rows:1fr;
+            overflow:hidden;
+        }
+        .split-wrap.show { display:grid; }
+        .split-cell {
+            background:#111; border-radius:6px; overflow:hidden;
+            position:relative; cursor:pointer;
+            border:1px solid #222;
+            min-height:0; min-width:0;
+        }
+        .split-cell video, .split-cell iframe {
+            width:100%; height:100%; object-fit:cover; border:none;
+            position:absolute; inset:0;
+        }
+        .split-label {
+            position:absolute; bottom:0; left:0; right:0; z-index:3;
+            background:rgba(0,0,0,.75); font-size:10px; color:#fff;
+            padding:3px 6px; text-align:center; font-weight:600;
+        }
+        .split-cell.sel { outline:2px solid #ff4757; outline-offset:-2px; }
+        #player-view.split-hidden { visibility:hidden; pointer-events:none; }
+
+        /* ── Schedule Bar ── */
+        .schedule-bar {
+            width:100%; height:30px; background:#181a24;
+            display:flex; align-items:center; padding:0 10px;
+            font-size:11px; overflow:hidden; gap:8px;
+        }
+        .schedule-badge { background:#00f2fe; color:#000; font-weight:bold; padding:2px 6px; border-radius:4px; font-size:10px; flex-shrink:0; }
+        .schedule-thumb { width:24px; height:20px; object-fit:cover; border-radius:3px; flex-shrink:0; display:none; }
+        .schedule-content {
+            flex:1; min-width:0;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+            color:#ffd700; font-weight:600;
+        }
+        .schedule-time { color:#fff; font-size:10px; margin-left:6px; }
+        .schedule-dt {
+            flex-shrink:0; margin-left:auto;
+            display:flex; align-items:center; gap:5px;
+            white-space:nowrap; padding-left:8px;
+        }
+        .schedule-dt .dt-date { font-size:10px; color:#ffd700; font-weight:600; }
+        .schedule-dt .dt-sep  { font-size:10px; color:#555; }
+        .schedule-dt .dt-time {
+            font-size:10px; color:#00f2fe;
+            font-family:'Orbitron',sans-serif; font-weight:700;
+        }
+
+        /* ── Ticker ── */
+        .ticker-wrap { width:100%; height:26px; background:#ff4757; display:flex; align-items:center; overflow:hidden; }
+        .ticker-label { background:#b31e2e; padding:0 8px; font-size:11px; font-weight:bold; height:100%; display:flex; align-items:center; flex-shrink:0; }
+        .ticker-text { white-space:nowrap; display:inline-block; padding-left:100%; animation:tickerAnim 18s linear infinite; font-size:12px; font-weight:bold; }
+        @keyframes tickerAnim { 0%{transform:translate3d(0,0,0);} 100%{transform:translate3d(-100%,0,0);} }
+
+        /* ── Date-Time Bar ── */
+                .datetime-bar { display:none !important; }
+
+        /* ── Ad Banner ── */
+        .ad-banner-area {
+            width:100%; overflow:hidden;
+            display:flex; justify-content:center;
+            background:#0d0e15;
+        }
+        .ad-banner-area.empty { display:none; }
+
+        /* slide wrapper — max width দিয়ে সরু করো */
+        .ad-banner-slide {
+            display:flex; align-items:stretch;
+            width:100%; max-width:480px;
+            min-height:72px; background:#0d0e15; overflow:hidden;
+            animation:adBannerIn .6s cubic-bezier(.22,1,.36,1);
+        }
+        @keyframes adBannerIn  { from{opacity:0;transform:translateX(60px) scale(0.96);} to{opacity:1;transform:translateX(0) scale(1);} }
+        @keyframes adBannerOut { from{opacity:1;transform:translateX(0);} to{opacity:0;transform:translateX(-60px);} }
+        .ad-banner-area:not(.empty) {
+            animation: adAreaPulse 4s ease-in-out infinite;
+        }
+        @keyframes adAreaPulse {
+            0%,100% { box-shadow: 0 0 0 rgba(0,242,254,0); }
+            50% { box-shadow: 0 0 12px rgba(0,242,254,0.25); }
+        }
+        .ad-banner-slide.hiding { animation:adBannerOut .4s ease forwards; }
+
+        /* left/right media box */
+        .ad-media-box {
+            width:68px; flex-shrink:0; overflow:hidden; position:relative;
+        }
+        .ad-media-box img,
+        .ad-media-box video {
+            width:100%; height:100%; object-fit:cover;
+        }
+        /* shimmer overlay on media */
+        .ad-media-box::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,0.08) 50%,transparent 70%);
+            animation:shimmer 2.5s infinite;
+        }
+        @keyframes shimmer { 0%{transform:translateX(-100%);} 100%{transform:translateX(100%);} }
+
+        /* middle text */
+        .ad-mid {
+            flex:1; display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            padding:8px 6px; text-align:center; gap:3px;
+            background:linear-gradient(180deg,#0d0e15 0%,#181a24 100%);
+        }
+        .ad-title {
+            font-size:13px; font-weight:bold; color:#ffd700;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+            max-width:100%; line-height:1.2;
+            animation:titlePulse 2.5s ease-in-out infinite alternate;
+        }
+        .ad-desc {
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+        }
+        .ad-sub {
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+        }
+        @keyframes titlePulse {
+            0%  {text-shadow:0 0 4px rgba(255,215,0,0.4);}
+            100%{text-shadow:0 0 14px rgba(255,215,0,0.9), 0 0 28px rgba(255,150,0,0.4);}
+        }
+        .ad-desc { font-size:10px; color:#ddd; }
+        .ad-sub  { font-size:9px;  color:#00f2fe; }
+
+        /* progress bar at bottom */
+        .ad-progress {
+            height:2px; background:#333; width:100%; position:relative; overflow:hidden;
+        }
+        .ad-progress-bar {
+            height:100%; background:linear-gradient(90deg,#ff4757,#ffd700);
+            width:0%; transition:width linear;
+        }
+
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+        /* ══ Vote Result Overlay ══ */
+        #voteOverlay {
+            position:absolute; inset:0; z-index:80;
+            display:none; flex-direction:column;
+            background:rgba(0,0,0,0.88);
+            overflow-y:auto; padding:8px;
+        }
+        #voteOverlay.show { display:flex; }
+
+        /* Header */
+        .vote-header {
+            text-align:center; padding:6px 0; margin-bottom:6px; flex-shrink:0;
+        }
+        .vote-header-title {
+            font-size:14px; font-weight:900; color:#ffd700;
+            text-transform:uppercase; letter-spacing:1px;
+            text-shadow:0 0 10px rgba(255,215,0,0.6);
+            animation:voteTitleGlow 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes voteTitleGlow {
+            0%  { text-shadow:0 0 6px rgba(255,215,0,0.4); }
+            100%{ text-shadow:0 0 18px rgba(255,215,0,1), 0 0 30px rgba(255,150,0,0.5); }
+        }
+        .vote-header-sub {
+            font-size:9px; color:#aaa; margin-top:2px;
+        }
+        .vote-live-badge {
+            display:inline-flex; align-items:center; gap:4px;
+            background:#ff4757; color:#fff; padding:2px 8px;
+            border-radius:10px; font-size:9px; font-weight:bold;
+            margin-top:4px;
+        }
+        .vote-live-badge .dot {
+            width:5px; height:5px; background:#fff;
+            border-radius:50%; animation:pulse 1s infinite;
+        }
+
+        /* Candidate Card */
+        .vote-card {
+            background:rgba(255,255,255,0.05);
+            border-radius:8px; padding:7px 8px;
+            margin-bottom:6px; flex-shrink:0;
+            animation:voteCardIn .5s ease both;
+            border:1px solid rgba(255,255,255,0.08);
+        }
+        @keyframes voteCardIn {
+            from{opacity:0;transform:translateX(-20px);}
+            to  {opacity:1;transform:translateX(0);}
+        }
+        .vote-card.winner {
+            border-color:rgba(255,215,0,0.5);
+            background:rgba(255,215,0,0.08);
+        }
+        .vote-card-top {
+            display:flex; align-items:center; gap:8px; margin-bottom:5px;
+        }
+        .vote-candidate-img {
+            width:36px; height:36px; border-radius:50%;
+            object-fit:cover; flex-shrink:0;
+            border:2px solid rgba(255,255,255,0.3);
+        }
+        .vote-candidate-img.winner-img { border-color:#ffd700; }
+        .vote-img-placeholder {
+            width:36px; height:36px; border-radius:50%;
+            background:rgba(255,255,255,0.15);
+            display:flex; align-items:center; justify-content:center;
+            font-size:14px; flex-shrink:0;
+        }
+        .vote-info { flex:1; overflow:hidden; }
+        .vote-name {
+            font-size:11px; font-weight:bold; color:#fff;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .vote-party {
+            font-size:9px; color:#aaa; margin-top:1px;
+        }
+        .vote-count {
+            font-family:'Orbitron',sans-serif;
+            font-size:13px; font-weight:700; color:#00f2fe;
+            flex-shrink:0; text-align:right;
+        }
+        .vote-count.winner-count { color:#ffd700; }
+        .vote-pct {
+            font-size:8px; color:#aaa; text-align:right;
+        }
+
+        /* Progress Bar */
+        .vote-bar-bg {
+            height:6px; background:rgba(255,255,255,0.1);
+            border-radius:3px; overflow:hidden; margin-top:2px;
+        }
+        .vote-bar-fill {
+            height:100%; border-radius:3px;
+            background:linear-gradient(90deg,#00b4d8,#00f2fe);
+            transition:width 1s cubic-bezier(.4,0,.2,1);
+            position:relative; overflow:hidden;
+        }
+        .vote-bar-fill.winner-bar {
+            background:linear-gradient(90deg,#f4a261,#ffd700);
+        }
+        .vote-bar-fill::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+            animation:barShine 2s linear infinite;
+        }
+        @keyframes barShine {
+            0%{transform:translateX(-100%);} 100%{transform:translateX(100%);}
+        }
+
+        /* Winner badge */
+        .vote-winner-label {
+            font-size:8px; font-weight:bold; color:#000;
+            background:#ffd700; padding:1px 6px; border-radius:8px;
+            margin-left:4px; vertical-align:middle;
+        }
+
+        /* Total votes */
+        .vote-total {
+            text-align:center; font-size:9px; color:#888;
+            padding:4px 0; flex-shrink:0;
+        }
+
+        /* ══ Election Overlay — DD/News TV Format ══ */
+        #electionOverlay {
+            position:absolute; inset:0; z-index:80;
+            display:none; flex-direction:column;
+            background:transparent;
+            overflow:hidden; pointer-events:none;
+        }
+        #electionOverlay.show { display:flex; }
+
+        /* TOP: Party seat totals */
+        .el-top-parties {
+            display:flex; align-items:stretch; gap:3px;
+            padding:4px 4px 4px 4px; flex-shrink:0;
+            background:linear-gradient(180deg,#8b0000,#5a0000);
+            border-bottom:2px solid #ffd700;
+        }
+        .el-tp-box {
+            flex:1; text-align:center; padding:3px 2px;
+            background:rgba(0,0,0,0.35); border-radius:3px;
+            min-width:0; border:1px solid rgba(255,255,255,0.1);
+        }
+        .el-tp-box.lead { border-color:#ffd700; background:rgba(255,215,0,0.15); }
+        .el-tp-name { font-size:8px; font-weight:900; color:#ffd700; letter-spacing:0.3px; }
+        .el-tp-seats {
+            font-family:'Orbitron',sans-serif;
+            font-size:15px; font-weight:700; color:#fff; line-height:1.2;
+        }
+        .el-tp-change { font-size:7px; font-weight:bold; }
+        .el-tp-change.up { color:#2ed573; }
+        .el-tp-change.down { color:#ff6b6b; }
+
+        /* MIDDLE ROW: left panel | video space | right candidate */
+        .el-mid-row {
+            display:flex; flex:1; min-height:0; gap:0;
+        }
+        .el-left-panel {
+            width:32%; max-width:130px; flex-shrink:0;
+            background:rgba(100,0,0,0.92);
+            display:flex; flex-direction:column;
+            border-right:2px solid #ffd700;
+            overflow:hidden;
+        }
+        .el-left-title {
+            background:#c41e3a; color:#fff; font-size:10px; font-weight:900;
+            padding:4px 6px; text-align:center;
+        }
+        .el-left-declared {
+            background:#1a3a6b; color:#fff; font-size:11px; font-weight:bold;
+            padding:3px 6px; text-align:center;
+            font-family:'Orbitron',sans-serif;
+        }
+        .el-left-parties {
+            flex:1; overflow-y:auto; padding:3px;
+        }
+        .el-lp-row {
+            display:flex; justify-content:space-between; align-items:center;
+            padding:3px 5px; margin-bottom:2px;
+            background:rgba(0,0,0,0.3); border-radius:3px;
+            font-size:9px;
+        }
+        .el-lp-name { color:#ffd700; font-weight:bold; }
+        .el-lp-seats {
+            font-family:'Orbitron',sans-serif;
+            font-size:12px; font-weight:700; color:#fff;
+        }
+
+        .el-center-space { flex:1; min-width:0; }
+
+        .el-right-panel {
+            width:34%; max-width:140px; flex-shrink:0;
+            background:rgba(100,0,0,0.92);
+            display:flex; flex-direction:column; align-items:center;
+            border-left:2px solid #ffd700;
+            padding:6px 5px; gap:4px;
+        }
+        .el-right-name {
+            font-size:10px; font-weight:900; color:#ffd700;
+            text-align:center; line-height:1.2;
+        }
+        .el-right-photo {
+            width:56px; height:56px; border-radius:6px;
+            object-fit:cover; border:2px solid #ffd700;
+        }
+        .el-right-photo-ph {
+            width:56px; height:56px; border-radius:6px;
+            background:#333; display:flex; align-items:center;
+            justify-content:center; font-size:24px;
+            border:2px solid #ffd700;
+        }
+        .el-right-party {
+            font-size:9px; font-weight:bold; color:#fff;
+            background:#1a3a6b; padding:2px 8px; border-radius:3px;
+        }
+        .el-right-seat {
+            font-size:8px; color:#ccc; text-align:center;
+        }
+        .el-right-status {
+            font-size:10px; font-weight:900; color:#000;
+            background:#2ed573; padding:2px 10px; border-radius:3px;
+            margin-top:2px;
+        }
+        .el-right-status.down { background:#ff4757; color:#fff; }
+
+        /* BOTTOM: state totals */
+        .el-bottom-bar {
+            display:flex; align-items:center; gap:4px;
+            padding:4px 6px; flex-shrink:0;
+            background:linear-gradient(90deg,#5a0000,#8b0000,#5a0000);
+            border-top:2px solid #ffd700;
+        }
+        .el-bt-declared {
+            background:#fff; color:#8b0000; font-weight:900;
+            font-size:11px; padding:4px 8px; border-radius:3px;
+            font-family:'Orbitron',sans-serif; flex-shrink:0;
+            text-align:center; line-height:1.15;
+        }
+        .el-bt-declared small { display:block; font-size:7px; font-weight:bold; color:#666; }
+        .el-bt-parties {
+            flex:1; display:flex; gap:3px; overflow:hidden;
+        }
+        .el-bt-party {
+            flex:1; text-align:center; padding:2px 3px;
+            background:rgba(0,0,0,0.35); border-radius:3px; min-width:0;
+        }
+        .el-bt-party .bp-name { font-size:8px; font-weight:900; color:#ffd700; }
+        .el-bt-party .bp-seats {
+            font-family:'Orbitron',sans-serif;
+            font-size:14px; font-weight:700; color:#fff;
+        }
+
+        /* Ticker */
+        .el-ticker {
+            display:flex; align-items:center; height:22px; flex-shrink:0;
+            background:#1a1a1a;
+        }
+        .el-ticker-label {
+            background:#c41e3a; color:#fff; font-size:8px; font-weight:900;
+            padding:0 6px; height:100%; display:flex; align-items:center;
+            flex-shrink:0; letter-spacing:0.5px;
+        }
+        .el-ticker-text {
+            flex:1; overflow:hidden; white-space:nowrap;
+            font-size:10px; font-weight:bold; color:#ffd700; padding:0 8px;
+        }
+        .el-ticker-time {
+            font-size:9px; color:#aaa; padding:0 6px; flex-shrink:0;
+            font-family:'Orbitron',sans-serif;
+        }
+
+        @keyframes elOverlayIn {
+            from{opacity:0;} to{opacity:1;}
+        }
+        #electionOverlay.show { animation:elOverlayIn .4s ease; }
+        @keyframes pwaSlideUp { from{transform:translateY(100%);} to{transform:translateY(0);} }
+        @keyframes pwaSlideUp { from{transform:translateY(100%);} to{transform:translateY(0);} }
+
+
+        /* ══ Professional News Channel ══ */
+        .news-frame {
+            position:absolute; inset:0; z-index:80;
+            display:flex; flex-direction:column;
+            pointer-events:none;
+            background: transparent;
+        }
+        .news-frame.hidden { display:none !important; }
+
+        body.news-mode .view-toggle,
+        body.news-mode #viewToggle,
+        body.news-mode .channel-bar,
+        body.news-mode #channelBar,
+        body.news-mode .schedule-bar,
+        body.news-mode .ticker-wrap,
+        body.news-mode .ad-banner-area,
+        body.news-mode #adBannerArea,
+        body.news-mode .datetime-bar,
+        body.news-mode .player-top-bar,
+        body.news-mode .live-badge,
+        body.news-mode .player-controls {
+            display:none !important; height:0 !important; overflow:hidden !important;
+            margin:0 !important; padding:0 !important; border:none !important;
+        }
+        body.news-mode .player-container {
+            width:100% !important; max-width:100% !important;
+            min-height:70vw; aspect-ratio:16/9; border-radius:0;
+        }
+        body.news-mode .app-container { padding-bottom:0; }
+        body.election-mode .view-toggle,
+        body.election-mode #viewToggle,
+        body.election-mode .channel-bar,
+        body.election-mode .schedule-bar,
+        body.election-mode .ticker-wrap,
+        body.election-mode .ad-banner-area,
+        body.election-mode .player-top-bar {
+            display:none !important;
+        }
+
+        /* ── TOP: single compact bar ── */
+        .nf-brand {
+            display:flex; align-items:stretch; flex-shrink:0; height:32px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.5); z-index:4;
+        }
+        .nf-breaking {
+            display:flex; align-items:center; justify-content:center; gap:5px;
+            background:linear-gradient(180deg,#ffd54a,#f5a623);
+            background-size:200% 100%;
+            font-size:13px; font-weight:900; color:#111; font-style:italic;
+            letter-spacing:1px;
+            animation:nfBreakPulse 1s ease-in-out infinite alternate,
+                      nfBarShine 2.5s linear infinite;
+            overflow:hidden;
+        }
+        .nf-breaking .live-pip {
+            width:7px; height:7px; border-radius:50%; background:#c00;
+            box-shadow:0 0 5px #f00; animation:pulse 1s infinite;
+            flex-shrink:0;
+        }
+        .nf-breaking-text {
+            display:inline-flex; gap:0; overflow:hidden;
+        }
+        .nf-breaking-text .ltr {
+            display:inline-block;
+            opacity:0;
+            transform:translateY(10px) scale(0.85);
+            animation:letterSlideIn 0.35s ease forwards, nfLetterGlow 1.5s ease-in-out infinite alternate;
+        }
+        .nf-news-label {
+            display:flex; align-items:center; justify-content:center;
+            background:linear-gradient(180deg,#e60000,#8b0000);
+            background-size:200% 100%;
+            font-size:13px; font-weight:900; color:#fff; font-style:italic;
+            letter-spacing:1.5px;
+            animation:nfBarShine 3s linear infinite;
+            overflow:hidden;
+        }
+        .nf-news-label-text {
+            display:inline-flex; gap:0; overflow:hidden;
+        }
+        .nf-news-label-text .ltr {
+            display:inline-block;
+            opacity:0;
+            transform:translateY(10px) scale(0.85);
+            animation:letterSlideIn 0.35s ease forwards, nfNewsGlow 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes nfBarShine {
+            0% { background-position:0% 0%; }
+            100% { background-position:200% 0%; }
+        }
+        @keyframes nfLetterGlow {
+            0% { text-shadow:none; }
+            100% { text-shadow:0 0 6px rgba(180,0,0,0.5); }
+        }
+        @keyframes nfNewsGlow {
+            0% { text-shadow:0 0 2px rgba(255,255,255,0.3); }
+            100% { text-shadow:0 0 8px rgba(255,255,150,0.8); }
+        }
+        .nf-brand-right {
+            flex:1; display:flex; align-items:center; justify-content:flex-end; gap:6px;
+            background:#0a0a0a; padding:0 6px; border-left:2px solid #ffd700;
+        }
+        .nf-logo-img {
+            width:26px; height:26px; border-radius:50%; object-fit:cover;
+            border:1.5px solid #ffd700;
+            animation:logoRightToLeft 4s linear infinite, logoGlow 3s ease-in-out infinite alternate;
+        }
+        .nf-logo-img[src=""] { display:none; }
+        .nf-brand-meta { display:flex; flex-direction:column; align-items:flex-end; line-height:1.05; }
+        .nf-logo-name {
+            font-size:7px; font-weight:900; color:#ffd700;
+            display:inline-flex; max-width:48px; overflow:hidden; white-space:nowrap;
+        }
+        .nf-logo-name .ltr {
+            display:inline-block; opacity:0; transform:translateY(5px);
+            animation:letterSlideIn 0.35s ease forwards;
+        }
+        .nf-clock { font-size:9px; color:#00f2fe; font-weight:700; font-family:Orbitron,monospace; }
+        @keyframes nfBreakPulse {
+            0% { filter:brightness(1); }
+            100% { filter:brightness(1.1); }
+        }
+
+        /* ── MAIN row: left | video | ── */
+        .nf-mid {
+            flex:1; display:flex; min-height:0; position:relative;
+        }
+        .nf-left {
+            width:22%; max-width:100px; min-width:72px;
+            background:linear-gradient(180deg,#0a4d8c,#042f55);
+            border-right:2px solid #ffd700;
+            display:flex; flex-direction:column; overflow:hidden;
+        }
+        .nf-left-head {
+            background:#b71c1c; color:#fff; font-size:8px; font-weight:900;
+            padding:4px 3px; text-align:center; line-height:1.25; flex-shrink:0;
+        }
+        .nf-left-scroll { flex:1; overflow:hidden; padding:4px 3px; }
+        .nf-left-text {
+            font-size:7.5px; color:#e3f2fd; line-height:1.5;
+            animation:nfLeftScroll 28s linear infinite;
+        }
+        @keyframes nfLeftScroll {
+            0% { transform:translateY(0); }
+            100% { transform:translateY(-45%); }
+        }
+        .nf-center { flex:1; min-width:0; position:relative; }
+
+        /* overlays on video */
+        .nf-live-tag {
+            position:absolute; top:6px; right:6px; z-index:3;
+            background:rgba(180,0,0,0.9); color:#fff;
+            font-size:9px; font-weight:900; padding:2px 7px; border-radius:3px;
+            display:flex; align-items:center; gap:4px; letter-spacing:0.5px;
+        }
+        .nf-live-tag .dot {
+            width:6px; height:6px; border-radius:50%; background:#fff;
+            animation:pulse 1s infinite;
+        }
+        /* উৎসব — টপ বারের বাঁ স্লট (BREAKING এর সাথে মিশবে না) */
+        .nf-fest {
+            display:none; align-items:center; gap:4px; flex-shrink:0;
+            height:100%; padding:0 6px 0 4px;
+            background:linear-gradient(180deg,#2a1450,#1a0a30);
+            border-right:2px solid #ffd700;
+            max-width:42%;
+            box-sizing:border-box;
+        }
+        .nf-fest.show { display:flex; }
+        .nf-fest-img {
+            width:24px; height:24px; border-radius:4px; object-fit:cover;
+            border:1px solid #ffd700; flex-shrink:0;
+        }
+        .nf-fest-body { min-width:0; overflow:hidden; }
+        .nf-fest-name {
+            font-size:8px; font-weight:800; color:#ffd700;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+            max-width:72px;
+        }
+        .nf-fest-sub { font-size:6px; color:#bbb; }
+        .nf-fest-days {
+            font-family:Orbitron,monospace; font-size:14px; font-weight:700;
+            color:#ff4757; flex-shrink:0; line-height:1;
+        }
+        .nf-fest-unit { font-size:7px; color:#999; }
+        .nf-breaking { flex:1; min-width:0; }
+        .nf-news-label { flex:0.85; min-width:0; }
+
+        .nf-right-edge {
+            width:4px; flex-shrink:0;
+            background:linear-gradient(180deg,#e60000,#8b0000);
+        }
+
+        /* ── HEADLINE over bottom of video ── */
+        .nf-headline-bar {
+            flex-shrink:0; height:26px;
+            background:linear-gradient(90deg,#7a0000,#c40000,#7a0000);
+            display:flex; align-items:center; overflow:hidden;
+        }
+        .nf-hl-badge {
+            background:#ffd700; color:#000; font-size:8px; font-weight:900;
+            padding:0 6px; height:100%; display:flex; align-items:center; flex-shrink:0;
+        }
+        .nf-hl-text {
+            color:#fff; font-size:11px; font-weight:700; padding:0 8px;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+
+        /* ── Ticker ── */
+        .nf-ticker {
+            display:flex; align-items:center; height:22px; flex-shrink:0;
+            background:#111;
+        }
+        .nf-ticker-label {
+            background:#b71c1c; color:#fff; font-size:8px; font-weight:900;
+            padding:0 6px; height:100%; display:flex; align-items:center; flex-shrink:0;
+        }
+        .nf-ticker-wrap { flex:1; overflow:hidden; height:100%; display:flex; align-items:center; }
+        .nf-ticker-text {
+            white-space:nowrap; font-size:10px; font-weight:600; color:#ffd700;
+            display:inline-block; padding-left:100%;
+            animation:nfTickerMove 16s linear infinite;
+        }
+        @keyframes nfTickerMove {
+            0% { transform:translateX(0); }
+            100% { transform:translateX(-100%); }
+        }
+
+        /* ── Ad ── */
+        .nf-ad {
+            display:flex; align-items:center; gap:6px;
+            padding:4px 8px; flex-shrink:0; min-height:36px;
+            background:linear-gradient(90deg,#fff8e1,#ffe082,#fff8e1);
+            border-top:2px solid #b71c1c;
+        }
+        .nf-ad.hidden-ad { display:none; }
+        .nf-ad-logo {
+            width:28px; height:28px; border-radius:50%; object-fit:cover;
+            flex-shrink:0; border:1px solid #b71c1c; background:#fff;
+        }
+        .nf-ad-body { flex:1; min-width:0; }
+        .nf-ad-title {
+            font-size:11px; font-weight:900; color:#8b0000;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .nf-ad-sub {
+            font-size:9px; color:#333; font-weight:600;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .nf-ad-phone {
+            font-size:11px; font-weight:900; color:#0d47a1;
+            flex-shrink:0; white-space:nowrap;
+        }
+
+
+        /* ── Breaking News Bar ── */
+        .breaking-news-bar {
+            position:absolute; top:52px; left:0; right:0; z-index:55;
+            display:flex; align-items:center; height:36px;
+            background:linear-gradient(90deg,#cc0000,#ff2200,#cc0000);
+            box-shadow:0 2px 8px rgba(0,0,0,0.5);
+        }
+        .bn-label {
+            background:#fff; color:#cc0000;
+            font-size:11px; font-weight:900;
+            padding:0 10px; height:100%;
+            display:flex; align-items:center;
+            letter-spacing:0.5px; flex-shrink:0;
+            font-family:'Orbitron',sans-serif;
+        }
+        .bn-text {
+            flex:1; color:#fff; font-size:13px; font-weight:bold;
+            padding:0 10px; white-space:nowrap;
+            overflow:hidden; text-overflow:ellipsis;
+        }
+        .bn-logo {
+            font-size:9px; color:#fff; padding:0 8px;
+            flex-shrink:0; font-weight:bold; opacity:.85;
+        }
+
+        /* ── News Flash Bar (নিচে) ── */
+        .news-flash-bar {
+            position:absolute; bottom:0; left:0; right:0; z-index:55;
+            display:flex; align-items:center; height:28px;
+            background:rgba(0,0,0,0.8);
+        }
+        .nf-label {
+            background:#ffd700; color:#000;
+            font-size:9px; font-weight:900;
+            padding:0 8px; height:100%;
+            display:flex; align-items:center;
+            letter-spacing:0.5px; flex-shrink:0;
+            font-family:'Orbitron',sans-serif;
+        }
+        .nf-scroll-wrap { flex:1; overflow:hidden; }
+        .nf-text {
+            display:inline-block; white-space:nowrap;
+            color:#fff; font-size:11px; font-weight:500;
+            padding-left:100%;
+            animation:nfScroll 20s linear infinite;
+        }
+        @keyframes nfScroll { 0%{transform:translateX(0);} 100%{transform:translateX(-100%);} }
+
+        /* ══ 3D Flip Billboard ══ */
+        #billboard {
+            position:fixed; left:0; top:50%;
+            transform:translateY(-50%);
+            width:110px; z-index:9998;
+            perspective:600px;
+            display:none; pointer-events:none;
+        }
+        #billboard.show { display:block; }
+
+        /* entry/exit animation */
+        #billboard.entering { animation:bbSlideIn .6s cubic-bezier(.22,1,.36,1) forwards; }
+        #billboard.leaving  { animation:bbSlideOut .5s ease forwards; }
+        @keyframes bbSlideIn  { from{transform:translateY(-50%) translateX(-120px);opacity:0;} to{transform:translateY(-50%) translateX(0);opacity:1;} }
+        @keyframes bbSlideOut { from{transform:translateY(-50%) translateX(0);opacity:1;} to{transform:translateY(-50%) translateX(-120px);opacity:0;} }
+
+        .bb-card {
+            width:110px; min-height:160px;
+            position:relative; transform-style:preserve-3d;
+            transition:transform .8s cubic-bezier(.4,0,.2,1);
+        }
+        .bb-card.flipped { transform:rotateY(180deg); }
+
+        .bb-face {
+            position:absolute; inset:0; width:110px; min-height:160px;
+            backface-visibility:hidden; -webkit-backface-visibility:hidden;
+            display:flex; flex-direction:column;
+            align-items:center; gap:6px; padding:8px 6px;
+        }
+        .bb-front { /* সামনে */ }
+        .bb-back  { transform:rotateY(180deg); }
+
+        /* media */
+        .bb-media {
+            width:98px; height:90px; object-fit:cover;
+            border-radius:6px; display:none;
+            filter:drop-shadow(0 4px 12px rgba(0,0,0,.7));
+        }
+        .bb-media.show { display:block; }
+
+        /* text */
+        .bb-title {
+            font-size:11px; font-weight:bold; color:#ffd700;
+            text-align:center; width:100%;
+            text-shadow:0 2px 8px rgba(0,0,0,.9);
+            display:none;
+            animation:bbTitleIn .5s ease .3s both;
+        }
+        .bb-title.show { display:block; }
+        @keyframes bbTitleIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+        .bb-sub {
+            font-size:9px; color:#fff;
+            text-align:center; width:100%;
+            text-shadow:0 2px 6px rgba(0,0,0,.9);
+            display:none;
+            animation:bbTitleIn .5s ease .45s both;
+        }
+        .bb-sub.show { display:block; }
+
+        /* shimmer on image */
+        .bb-img-wrap {
+            position:relative; width:98px; height:90px;
+            border-radius:6px; overflow:hidden; display:none;
+        }
+        .bb-img-wrap.show { display:block; }
+        .bb-img-wrap img { width:100%; height:100%; object-fit:cover; }
+        .bb-img-wrap::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.15) 50%,transparent 70%);
+            animation:bbShimmer 2s infinite;
+        }
+        @keyframes bbShimmer { 0%{transform:translateX(-100%);} 100%{transform:translateX(100%);} }
+
+        /* progress dot row */
+        .bb-dots {
+            display:flex; gap:4px; justify-content:center;
+        }
+        .bb-dot {
+            width:5px; height:5px; border-radius:50%;
+            background:rgba(255,255,255,.3);
+        }
+        .bb-dot.active { background:#ffd700; }
+
+        /* ══════════════════════════════════════
+           3D Billboard — বাঁ দিকে slide
+        ══════════════════════════════════════ */
+        #billboardOverlay {
+            position:fixed;
+            top:50%; left:0;
+            transform:translateY(-50%) translateX(-100%) perspective(600px) rotateY(8deg);
+            width:130px;
+            z-index:9998;
+            pointer-events:none;
+            transition:transform .6s cubic-bezier(.22,1,.36,1);
+            transform-style:preserve-3d;
+            filter:drop-shadow(6px 0 18px rgba(0,0,0,0.7));
+        }
+        #billboardOverlay.slide-in {
+            transform:translateY(-50%) translateX(0) perspective(600px) rotateY(4deg);
+        }
+        #billboardOverlay.slide-out {
+            transform:translateY(-50%) translateX(-110%) perspective(600px) rotateY(12deg);
+        }
+
+        /* Billboard inner — subtle 3D face */
+        .bb-inner {
+            width:100%;
+            display:flex; flex-direction:column;
+            align-items:center; gap:0;
+            animation:bbFloat 4s ease-in-out infinite;
+        }
+        @keyframes bbFloat {
+            0%,100% { transform:translateY(0) rotateX(0deg); }
+            50%      { transform:translateY(-6px) rotateX(2deg); }
+        }
+
+        /* top pole */
+        .bb-pole-top {
+            width:4px; height:20px;
+            background:linear-gradient(180deg,#888,#555);
+            border-radius:2px 2px 0 0;
+            margin:0 auto;
+        }
+        /* board */
+        .bb-board {
+            width:120px;
+            background:linear-gradient(160deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);
+            border-radius:6px;
+            overflow:hidden;
+            position:relative;
+            box-shadow:
+                4px 4px 0 rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        /* image */
+        .bb-img {
+            width:100%; aspect-ratio:3/4;
+            object-fit:cover; display:none;
+        }
+        .bb-img.show { display:block; }
+
+        /* video */
+        .bb-vid {
+            width:100%; aspect-ratio:3/4;
+            object-fit:cover; display:none;
+        }
+        .bb-vid.show { display:block; }
+
+        /* text block */
+        .bb-text {
+            padding:6px 7px 8px;
+            background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.85) 100%);
+            position:absolute; bottom:0; left:0; right:0;
+            display:none;
+        }
+        .bb-text.show { display:block; }
+        .bb-title {
+            font-size:9px; font-weight:700; color:#ffd700;
+            text-shadow:0 1px 6px rgba(0,0,0,0.9);
+            margin-bottom:2px;
+            animation:bbTitleGlow 2s ease-in-out infinite alternate;
+        }
+        @keyframes bbTitleGlow {
+            0%  { text-shadow:0 0 4px rgba(255,215,0,.4); }
+            100%{ text-shadow:0 0 12px rgba(255,215,0,.9), 0 0 24px rgba(255,150,0,.4); }
+        }
+        .bb-sub {
+            font-size:7px; color:#00f2fe;
+            text-shadow:0 1px 4px rgba(0,0,0,0.9);
+        }
+
+        /* text-only mode (no image/video) */
+        .bb-text-only {
+            padding:12px 7px;
+            display:none;
+        }
+        .bb-text-only.show { display:block; }
+        .bb-text-only .bb-title { font-size:10px; }
+        .bb-text-only .bb-sub   { font-size:8px; margin-top:3px; }
+
+        /* progress strip at bottom */
+        .bb-progress {
+            height:2px; width:100%;
+            background:rgba(255,255,255,0.1);
+            display:none;
+        }
+        .bb-progress.show { display:block; }
+        .bb-progress-bar {
+            height:100%;
+            background:linear-gradient(90deg,#ff4757,#ffd700);
+            width:0%; transition:width linear;
+        }
+
+        /* bottom pole */
+        .bb-pole-bottom {
+            width:4px; height:24px;
+            background:linear-gradient(180deg,#555,#888);
+            border-radius:0 0 2px 2px;
+            margin:0 auto;
+        }
+
+        /* ══ Flash Ad */
+        /* ══ Flash Ad — বাঁ দিকে লম্বা, কোনো bg/border নেই ══ */
+        #flashAdOverlay {
+            position:fixed; top:0; left:0;
+            width:120px; height:100vh;
+            z-index:9999; pointer-events:none;
+            display:none;
+        }
+        #flashAdOverlay.show { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; }
+
+        /* ছবি */
+        #flashAdOverlay .fa-img {
+            width:110px; border-radius:6px;
+            object-fit:cover; display:none;
+            animation:faImgIn .5s cubic-bezier(.22,1,.36,1);
+        }
+        #flashAdOverlay .fa-img.show { display:block; }
+        @keyframes faImgIn { from{opacity:0;transform:translateX(-30px) scale(.9);} to{opacity:1;transform:translateX(0) scale(1);} }
+
+        /* ভিডিও */
+        #flashAdOverlay .fa-vid {
+            width:110px; border-radius:6px;
+            object-fit:cover; display:none;
+        }
+        #flashAdOverlay .fa-vid.show { display:block; }
+
+        /* টেক্সট */
+        #flashAdOverlay .fa-title {
+            font-size:11px; font-weight:bold; color:#ffd700;
+            text-align:center; width:110px;
+            text-shadow:0 2px 8px rgba(0,0,0,0.9);
+            display:none;
+            animation:faTitleIn .6s ease .2s both;
+        }
+        #flashAdOverlay .fa-title.show { display:block; }
+        @keyframes faTitleIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+        #flashAdOverlay .fa-sub {
+            font-size:9px; color:#fff;
+            text-align:center; width:110px;
+            text-shadow:0 2px 6px rgba(0,0,0,0.9);
+            display:none;
+            animation:faTitleIn .6s ease .35s both;
+        }
+        #flashAdOverlay .fa-sub.show { display:block; }
+
+        /* progress bar */
+        #flashAdProgress {
+            width:110px; height:2px;
+            background:rgba(255,255,255,0.2);
+            border-radius:2px; display:none; overflow:hidden;
+        }
+        #flashAdProgress.show { display:block; }
+        #flashAdProgressBar {
+            height:100%; width:0%;
+            background:linear-gradient(90deg,#ff4757,#ffd700);
+            transition:width linear;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Player ── -->
+<div class="player-container">
+    <!-- ── Top Bar: উৎসব | Ad1 | Ad2 | Ad3 | Logo ── -->
+    <div class="player-top-bar">
+
+        <!-- বাঁ: উৎসব Widget -->
+        <div class="ptb-fest" id="festWidget" style="display:none;">
+            <img class="ptb-fest-img" id="fw-img" src="" alt="">
+            <div class="ptb-fest-text">
+                <div class="ptb-fest-name" id="fw-name"></div>
+                <div class="ptb-fest-sub">অপেক্ষার মাত্র</div>
+                <div class="ptb-fest-days-row">
+                    <span class="ptb-fest-days" id="fw-days">--</span>
+                    <span class="ptb-fest-unit">দিন</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- মাঝে: ৩টি Ad Box সমান মাপে -->
+        <div class="ptb-ads">
+            <div class="ptb-ad-box" id="ptb-ad-0">
+                <div class="ptb-ad-media-wrap" id="ptb-ad-media-0"></div>
+                <div class="ptb-ad-text">
+                    <div class="ptb-ad-title" id="ptb-ad-title-0"></div>
+                    <div class="ptb-ad-sub"   id="ptb-ad-sub-0"></div>
+                </div>
+            </div>
+            <div class="ptb-ad-box" id="ptb-ad-1">
+                <div class="ptb-ad-media-wrap" id="ptb-ad-media-1"></div>
+                <div class="ptb-ad-text">
+                    <div class="ptb-ad-title" id="ptb-ad-title-1"></div>
+                    <div class="ptb-ad-sub"   id="ptb-ad-sub-1"></div>
+                </div>
+            </div>
+            <div class="ptb-ad-box" id="ptb-ad-2">
+                <div class="ptb-ad-media-wrap" id="ptb-ad-media-2"></div>
+                <div class="ptb-ad-text">
+                    <div class="ptb-ad-title" id="ptb-ad-title-2"></div>
+                    <div class="ptb-ad-sub"   id="ptb-ad-sub-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ডান: Logo -->
+        <div class="ptb-logo">
+            <img id="main-logo-img" src="https://via.placeholder.com/44x32?text=LOGO" class="ptb-logo-img" alt="Logo">
+            <span class="ptb-ch-name" id="channel-name-disp">ENTERTAINMENT</span>
+        </div>
+    </div>
+    <div id="liveBadge" class="live-badge"><span class="dot"></span> LIVE</div>
+
+    <!-- Breaking News Banner — লাইভ চলাকালে দেখাবে -->
+    <div class="breaking-news-bar" id="breakingNewsBar" style="display:none;">
+        <div class="bn-label">BREAKING NEWS</div>
+        <div class="bn-text" id="bn-text">সংবাদ লোড হচ্ছে...</div>
+        <div class="bn-logo" id="bn-logo"></div>
+    </div>
+
+    <!-- News Flash — নিচে চলন্ত খবর -->
+    <div class="news-flash-bar" id="newsFlashBar" style="display:none;">
+        <div class="nf-label">NEWS FLASH</div>
+        <div class="nf-scroll-wrap">
+            <div class="nf-text" id="nf-text">খবর লোড হচ্ছে...</div>
+        </div>
+    </div>
+    <div id="adOverlay" class="ad-overlay">📢 বিজ্ঞাপন চলছে...</div>
+
+    <div class="player-controls">
+        <div class="ctrl-btn" onclick="toggleFullscreen()" title="Full Screen">
+            <span id="fsIcon">⛶</span>
+        </div>
+    </div>
+
+    <!-- Election Overlay — DD/News TV Format -->
+    <div id="electionOverlay">
+        <!-- TOP: Party seats -->
+        <div class="el-top-parties" id="elTopParties"></div>
+
+        <!-- MIDDLE: left | video | right -->
+        <div class="el-mid-row">
+            <div class="el-left-panel">
+                <div class="el-left-title" id="elTitle">আসন</div>
+                <div class="el-left-declared" id="elSeat">—</div>
+                <div class="el-left-parties" id="elLeftParties"></div>
+            </div>
+            <div class="el-center-space"></div>
+            <div class="el-right-panel" id="elRightPanel">
+                <div class="el-right-name" id="elLeadName">—</div>
+                <div id="elLeadPhoto"></div>
+                <div class="el-right-party" id="elLeadParty">—</div>
+                <div class="el-right-seat" id="elLeadSeat"></div>
+                <div class="el-right-status" id="elLeadStatus">এগিয়ে</div>
+            </div>
+        </div>
+
+        <!-- BOTTOM: state totals -->
+        <div class="el-bottom-bar">
+            <div class="el-bt-declared" id="elDeclared"><small>ঘোষিত</small>—</div>
+            <div class="el-bt-parties" id="elBottomParties"></div>
+        </div>
+
+        <!-- Ticker -->
+        <div class="el-ticker">
+            <div class="el-ticker-label">ELECTION</div>
+            <div class="el-ticker-text" id="elHeadline">নির্বাচন ফলাফল</div>
+            <div class="el-ticker-time" id="elUpdateTime"></div>
+        </div>
+    </div>
+
+    <!-- News Broadcast Frame Overlay -->
+        <!-- Professional News Channel -->
+    <div class="news-frame hidden" id="newsFrame">
+        <div class="nf-brand">
+            <div class="nf-fest" id="nfFest">
+                <img class="nf-fest-img" id="nfFestImg" src="" alt="" style="display:none;">
+                <div class="nf-fest-body">
+                    <div class="nf-fest-name" id="nfFestName">উৎসব</div>
+                    <div class="nf-fest-sub">অপেক্ষার মাত্র</div>
+                </div>
+                <div>
+                    <span class="nf-fest-days" id="nfFestDays">--</span>
+                    <span class="nf-fest-unit">দিন</span>
+                </div>
+            </div>
+            <div class="nf-breaking">
+                <span class="live-pip"></span>
+                <span class="nf-breaking-text" id="nfBreakingText">BREAKING</span>
+            </div>
+            <div class="nf-news-label">
+                <span class="nf-news-label-text" id="nfNewsText">NEWS</span>
+            </div>
+            <div class="nf-brand-right">
+                <img id="nfLogoImg" class="nf-logo-img" src="" alt="">
+                <div class="nf-brand-meta">
+                    <span class="nf-logo-name" id="newsTopLogo">NEWS</span>
+                    <span class="nf-clock" id="nfClock">--:--</span>
+                </div>
+            </div>
+        </div>
+        <div class="nf-mid">
+            <div class="nf-left">
+                <div class="nf-left-head" id="nfLeftHead">আমাদের পরিষেবা</div>
+                <div class="nf-left-scroll">
+                    <div class="nf-left-text" id="nfLeftText">
+                        স্থানীয় সংবাদ ও আপডেট এখানে দেখাবে।
+                        <br><br>
+                        স্থানীয় সংবাদ ও আপডেট এখানে দেখাবে।
+                    </div>
+                </div>
+            </div>
+            <div class="nf-center">
+                <div class="nf-live-tag"><span class="dot"></span> LIVE</div>
+            </div>
+            <div class="nf-right-edge"></div>
+        </div>
+        <div class="nf-headline-bar">
+            <div class="nf-hl-badge">শিরোনাম</div>
+            <div class="nf-hl-text" id="newsHeadlineText">সংবাদ চলছে...</div>
+        </div>
+        <div class="nf-ticker">
+            <div class="nf-ticker-label">খবর</div>
+            <div class="nf-ticker-wrap">
+                <span class="nf-ticker-text" id="newsFlashText">ENTERTAINMENT চ্যানেলে আপনাকে স্বাগতম!</span>
+            </div>
+        </div>
+        <div class="nf-ad" id="nfAdStrip">
+            <img class="nf-ad-logo" id="nfAdLogo" src="" alt="" style="display:none;">
+            <div class="nf-ad-body">
+                <div class="nf-ad-title" id="nfAdTitle">বিজ্ঞাপনের স্থান</div>
+                <div class="nf-ad-sub" id="nfAdSub">Admin থেকে নিউজ অ্যাড সেট করুন</div>
+            </div>
+            <div class="nf-ad-phone" id="nfAdPhone"></div>
+        </div>
+    </div>
+
+    <!-- ══ Vote Result Overlay ══ -->
+    <div id="voteOverlay">
+        <div class="vote-header">
+            <div class="vote-header-title" id="voteTitle">নির্বাচন ফলাফল</div>
+            <div class="vote-header-sub" id="voteSubTitle">আসন: —</div>
+            <div class="vote-live-badge" id="voteLiveBadge" style="display:none;">
+                <span class="dot"></span> LIVE COUNT
+            </div>
+        </div>
+        <div id="voteCandidates"></div>
+        <div class="vote-total" id="voteTotal"></div>
+    </div>
+
+    <div id="player-view" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:auto;">
+        <div class="loading-screen">
+            <div class="loading-spinner"></div>
+            <div class="loading-msg">সম্প্রচার লোড হচ্ছে<span class="loading-dots"></span></div>
+        </div>
+    </div>
+    <div class="split-wrap" id="splitWrap"></div>
+
+    <!-- ══ Fullscreen Overlay — player এর ভেতরে ══ -->
+    <div id="fsOverlay">
+        <!-- Schedule -->
+        <div class="fs-schedule">
+            <span class="fs-sch-badge">এখন:</span>
+            <span class="fs-sch-text" id="fs-sch-text">নিয়মিত সম্প্রচার</span>
+            <div class="fs-schedule-dt">
+                <span class="fs-dt-date" id="fs-dt-date"></span>
+                <span class="fs-dt-sep">|</span>
+                <span class="fs-dt-time" id="fs-dt-time"></span>
+            </div>
+        </div>
+        <!-- Ad Banner -->
+        <div class="fs-banner" id="fsBanner">
+            <img   id="fs-ban-left-img" class="fs-banner-media" src="" alt="" style="display:none;">
+            <video id="fs-ban-left-vid" class="fs-banner-media" src="" muted autoplay loop playsinline style="display:none;"></video>
+            <div class="fs-banner-mid">
+                <div class="fs-banner-title" id="fs-ban-title"></div>
+                <div class="fs-banner-desc"  id="fs-ban-desc"></div>
+                <div class="fs-banner-sub"   id="fs-ban-sub"></div>
+            </div>
+            <img   id="fs-ban-right-img" class="fs-banner-media" src="" alt="" style="display:none;">
+            <video id="fs-ban-right-vid" class="fs-banner-media" src="" muted autoplay loop playsinline style="display:none;"></video>
+        </div>
+        <!-- Ticker -->
+        <div class="fs-ticker">
+            <div class="fs-ticker-label">📢</div>
+            <div style="width:100%;overflow:hidden;">
+                <div class="fs-ticker-text" id="fs-ticker-text">ENTERTAINMENT চ্যানেলে আপনাকে স্বাগতম!</div>
+            </div>
+        </div>
+        <!-- DateTime -->
+        <div class="fs-datetime">
+            <span class="fs-dt-date" id="fs-dt-date"></span>
+            <span class="fs-dt-sep">|</span>
+            <span class="fs-dt-time" id="fs-dt-time"></span>
+        </div>
+    </div>
+</div>
+
+<!-- ── View Toggle + Channel Bar ── -->
+<div class="view-toggle" id="viewToggle">
+    <button class="vt-btn active" id="btn-single" onclick="setViewMode('single')">▶ একক</button>
+    <button class="vt-btn" id="btn-split" onclick="setViewMode('split')">⊞ একসাথে</button>
+    <span style="font-size:10px;color:#888;margin-left:auto;" id="chCount"></span>
+</div>
+<div class="channel-bar" id="channelBar"></div>
+
+<!-- ── Schedule Bar ── -->
+<div class="schedule-bar">
+    <span class="schedule-badge">এখন:</span>
+    <img id="schedule-img" class="schedule-thumb" src="" alt="">
+    <div class="schedule-content" id="schedule-text">
+        নিয়মিত সম্প্রচার <span class="schedule-time">(লাইভ)</span>
+    </div>
+    <div class="schedule-dt">
+        <span class="dt-date" id="dt-date"></span>
+        <span class="dt-sep">|</span>
+        <span class="dt-time" id="dt-time"></span>
+    </div>
+</div>
+
+<!-- ── Ticker ── -->
+<div class="ticker-wrap">
+    <div class="ticker-label">📢</div>
+    <div style="width:100%;overflow:hidden;">
+        <div class="ticker-text" id="ad-text">ENTERTAINMENT চ্যানেলে আপনাকে স্বাগতম!</div>
+    </div>
+</div>
+
+<!-- ── Ad Banner Slider ── -->
+<div class="ad-banner-area empty" id="adBannerArea">
+    <div class="ad-banner-slide" id="adBannerSlide">
+        <div class="ad-media-box" id="ab-left-box">
+            <img   id="ab-left-img" src="" alt="" style="display:none;">
+            <video id="ab-left-vid" src="" muted autoplay loop playsinline style="display:none;"></video>
+        </div>
+        <div class="ad-mid">
+            <div class="ad-title" id="ab-title"></div>
+            <div class="ad-desc"  id="ab-desc"></div>
+            <div class="ad-sub"   id="ab-sub"></div>
+        </div>
+        <div class="ad-media-box" id="ab-right-box">
+            <img   id="ab-right-img" src="" alt="" style="display:none;">
+            <video id="ab-right-vid" src="" muted autoplay loop playsinline style="display:none;"></video>
+        </div>
+    </div>
+    <div class="ad-progress">
+        <div class="ad-progress-bar" id="adProgressBar"></div>
+    </div>
+</div>
+
+</div>
+
+
+<!-- ══ Scripts — সব লোড হওয়ার পরে চলবে ══ -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  সব code DOMContentLoaded এর ভেতরে — scripts body
+//  এর শেষে আছে, তাই Firebase নিশ্চিতভাবে লোড হবে
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Date-Time ──────────────────────────────────
+    // ── বাংলা পঞ্জিকা (সৌর বর্ষ) ────────────────────────
+    const BN_DAYS = ['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
+    const BN_DAYS_SHORT = ['রবি','সোম','মঙ্গল','বুধ','বৃহস্পতি','শুক্র','শনি'];
+
+    // বাংলা সৌর মাসের নাম
+    const BN_SOLAR_MONTHS = [
+        'বৈশাখ','জ্যৈষ্ঠ','আষাঢ়','শ্রাবণ',
+        'ভাদ্র','আশ্বিন','কার্তিক','অগ্রহায়ণ',
+        'পৌষ','মাঘ','ফাল্গুন','চৈত্র'
+    ];
+
+    // বাংলা সংখ্যা
+    const BN_NUM = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+    function toBnNum(n) {
+        return String(n).split('').map(c => BN_NUM[parseInt(c)] ?? c).join('');
+    }
+
+    // ইংরেজি তারিখ → বাংলা সৌর তারিখ রূপান্তর
+    // বাংলাদেশ সরকারি পঞ্জিকা অনুযায়ী
+    function toBanglaDate(date) {
+        const month = date.getMonth(); // 0-11
+        const day   = date.getDate();  // 1-31
+        const year  = date.getFullYear();
+
+        // প্রতি ইংরেজি মাসে বাংলা মাসের শুরু
+        // (বাংলাদেশ সরকারি সংশোধিত পঞ্জিকা ১৪২৫ অনুযায়ী)
+        // ইং মাস → [বাংলা মাস index, বাংলা মাসের শুরু দিন]
+        const monthMap = [
+            [9,  14],  // Jan  → পৌষ শেষ / মাঘ শুরু (14)
+            [10, 13],  // Feb  → মাঘ শেষ / ফাল্গুন শুরু (13)
+            [11, 14],  // Mar  → ফাল্গুন শেষ / চৈত্র শুরু (14)
+            [0,  14],  // Apr  → চৈত্র শেষ / বৈশাখ শুরু (14)
+            [1,  15],  // May  → বৈশাখ শেষ / জ্যৈষ্ঠ শুরু (15)
+            [2,  15],  // Jun  → জ্যৈষ্ঠ শেষ / আষাঢ় শুরু (15)
+            [3,  15],  // Jul  → আষাঢ় শেষ / শ্রাবণ শুরু (15)
+            [4,  16],  // Aug  → শ্রাবণ শেষ / ভাদ্র শুরু (16)
+            [5,  16],  // Sep  → ভাদ্র শেষ / আশ্বিন শুরু (16)
+            [6,  16],  // Oct  → আশ্বিন শেষ / কার্তিক শুরু (16)
+            [7,  15],  // Nov  → কার্তিক শেষ / অগ্রহায়ণ শুরু (15)
+            [8,  15],  // Dec  → অগ্রহায়ণ শেষ / পৌষ শুরু (15)
+        ];
+
+        const [bnMonthBase, switchDay] = monthMap[month];
+        let bnMonth, bnDay, bnYear;
+
+        if (day >= switchDay) {
+            // এই মাসের switchDay থেকে পরের বাংলা মাস শুরু
+            bnMonth = bnMonthBase;
+            bnDay   = day - switchDay + 1;
+            // বাংলা বছর
+            bnYear  = (month >= 3 && month <= 11)
+                      ? year - 593
+                      : year - 594;
+        } else {
+            // এখনো আগের বাংলা মাসে আছি
+            bnMonth = (bnMonthBase - 1 + 12) % 12;
+            // আগের মাসের শেষ পর্যন্ত কতদিন
+            const prevSwitchDay = monthMap[(month - 1 + 12) % 12][1];
+            const prevDaysInEng = new Date(year, month, 0).getDate();
+            bnDay   = prevDaysInEng - prevSwitchDay + day + 1;
+            bnYear  = (month > 3 || (month === 3 && day >= switchDay))
+                      ? year - 593
+                      : year - 594;
+        }
+
+        return {
+            day:   bnDay,
+            month: BN_SOLAR_MONTHS[bnMonth],
+            year:  bnYear,
+            monthIdx: bnMonth
+        };
+    }
+
+    // বাংলা সময় (AM/PM বাংলায়)
+    const BN_AMPM = { AM: 'সকাল', PM_before2: 'দুপুর', PM_after2: 'বিকেল', PM_after6: 'সন্ধ্যা', PM_after8: 'রাত' };
+    function getBnAmPm(h24) {
+        if (h24 < 12) return 'সকাল';
+        if (h24 < 14) return 'দুপুর';
+        if (h24 < 18) return 'বিকেল';
+        if (h24 < 20) return 'সন্ধ্যা';
+        return 'রাত';
+    }
+
+    function updateDateTime() {
+        const now   = new Date();
+        const h24   = now.getHours();
+        let h       = h24 % 12 || 12;
+        const m     = String(now.getMinutes()).padStart(2,'0');
+        const ampm  = getBnAmPm(h24);
+
+        // বাংলা তারিখ
+        const bnDate = toBanglaDate(now);
+        const dayShort = BN_DAYS_SHORT[now.getDay()];
+
+        // display text
+        const dateStr = `${dayShort}, ${toBnNum(bnDate.day)} ${bnDate.month} ${toBnNum(bnDate.year)}`;
+        const timeStr = `${ampm} ${toBnNum(h)}:${toBnNum(m)}`;
+
+        document.getElementById('dt-date').textContent = dateStr;
+        document.getElementById('dt-time').textContent = timeStr;
+    }
+    setInterval(updateDateTime, 1000); updateDateTime();
+
+    // ── Sparkle stars ──────────────────────────────
+    // bannerStars এখন নেই — buildStars skip করো
+
+    // ── Festival widget (player ভেতরে ছোট) ─────────
+    let festivals = [], festIdx = 0, festTimer = null;
+
+    function daysUntil(d) {
+        const t = new Date(d); t.setHours(0,0,0,0);
+        const n = new Date();  n.setHours(0,0,0,0);
+        return Math.ceil((t - n) / 86400000);
+    }
+
+    function showFestWidget(f) {
+        const widget = document.getElementById('festWidget');
+        const nfFest = document.getElementById('nfFest');
+
+        if (!f) {
+            if (widget) widget.style.display = 'none';
+            if (nfFest) nfFest.classList.remove('show');
+            return;
+        }
+
+        const days = daysUntil(f.date);
+        const name = f.name || '';
+        const imgUrl = f.imgUrl || '';
+
+        // নরমাল টপ বার
+        if (widget) {
+            widget.style.display = 'flex';
+            const img = document.getElementById('fw-img');
+            if (img) { img.src = imgUrl; img.style.display = imgUrl ? 'block' : 'none'; }
+            const nameEl = document.getElementById('fw-name');
+            const daysEl = document.getElementById('fw-days');
+            if (nameEl) nameEl.textContent = name;
+            if (daysEl) daysEl.textContent = days;
+        }
+
+        // নিউজ মোড ফ্রেম
+        if (nfFest) {
+            nfFest.classList.add('show');
+            const nImg = document.getElementById('nfFestImg');
+            const nName = document.getElementById('nfFestName');
+            const nDays = document.getElementById('nfFestDays');
+            if (nImg) {
+                if (imgUrl) { nImg.src = imgUrl; nImg.style.display = 'block'; }
+                else { nImg.style.display = 'none'; }
+            }
+            if (nName) nName.textContent = name;
+            if (nDays) nDays.textContent = days;
+        }
+    }
+
+    function startFestivalRotation(list) {
+        if (festTimer) clearInterval(festTimer);
+        festivals = list; festIdx = 0;
+        if (festivals.length === 0) {
+            const w = document.getElementById('festWidget');
+            if (w) w.style.display = 'none';
+            return;
+        }
+        showFestWidget(festivals[0]);
+        if (festivals.length > 1) {
+            festTimer = setInterval(() => {
+                festIdx = (festIdx + 1) % festivals.length;
+                showFestWidget(festivals[festIdx]);
+            }, 6000);
+        }
+    }
+
+    // ── Ad Banner ──────────────────────────────────
+
+    // ── Top Bar 3 Ad Boxes rotation ──────────────────
+    // ── Top Bar Ads (শুধু topBarAds — নিচের ব্যানার থেকে আলাদা) ──
+    let topBarAdList = [];
+    let topBarAdIdx = 0;
+    let topBarAdTimer = null;
+
+    function updateTopBarAds(list) {
+        topBarAdList = Array.isArray(list) ? list.filter(function(a) {
+            if (!a || a.active === false) return false;
+            var t = (a.title || a.name || '').toString().trim();
+            var sub = (a.sub || a.desc || '').toString().trim();
+            var img = a.leftImg || a.imgUrl || a.image || '';
+            // খালি / অর্থহীন এন্ট্রি বাদ
+            if (!img && t.length < 2 && sub.length < 2) return false;
+            return true;
+        }) : [];
+        topBarAdIdx = 0;
+        if (topBarAdTimer) { clearInterval(topBarAdTimer); topBarAdTimer = null; }
+        renderTopBarAdsWindow();
+        // ৩টার বেশি হলে রোটেট
+        if (topBarAdList.length > 3) {
+            topBarAdTimer = setInterval(function() {
+                topBarAdIdx = (topBarAdIdx + 1) % topBarAdList.length;
+                renderTopBarAdsWindow();
+            }, 5000);
+        }
+    }
+
+    function renderTopBarAdsWindow() {
+        var items = topBarAdList;
+        var start = topBarAdIdx;
+        for (var i = 0; i < 3; i++) {
+            var box = document.getElementById('ptb-ad-' + i);
+            var mWrap = document.getElementById('ptb-ad-media-' + i);
+            var titleEl = document.getElementById('ptb-ad-title-' + i);
+            var subEl = document.getElementById('ptb-ad-sub-' + i);
+            if (!box) continue;
+
+            var b = items.length ? items[(start + i) % items.length] : null;
+            // ৩টার কম হলে খালি বক্স লুকাও
+            if (!b || i >= items.length && items.length > 0 && items.length < 3 && i >= items.length) {
+                // show only as many boxes as ads
+            }
+            if (!b || (items.length < 3 && i >= items.length)) {
+                box.classList.add('empty-ad');
+                if (titleEl) titleEl.textContent = '';
+                if (subEl) subEl.textContent = '';
+                if (mWrap) mWrap.innerHTML = '';
+                continue;
+            }
+
+            box.classList.remove('empty-ad');
+            var title = (b.title || b.name || b.adTitle || '').toString().replace(/\s+/g, ' ').trim();
+            var sub = (b.sub || b.desc || b.adSub || b.phone || '').toString().replace(/\s+/g, ' ').trim();
+            var mediaUrl = b.leftImg || b.imgUrl || b.image || b.leftVideo || '';
+
+            if (mWrap) {
+                mWrap.innerHTML = '';
+                if (mediaUrl) {
+                    box.classList.remove('no-media');
+                    var isVid = /\.(mp4|webm|ogg)(\?|$)/i.test(mediaUrl);
+                    var el = document.createElement(isVid ? 'video' : 'img');
+                    el.src = mediaUrl;
+                    el.alt = title || 'ad';
+                    if (isVid) {
+                        el.muted = true; el.autoplay = true; el.loop = true;
+                        el.playsInline = true; el.play().catch(function(){});
+                    }
+                    mWrap.appendChild(el);
+                } else {
+                    box.classList.add('no-media');
+                }
+            }
+
+            if (titleEl) {
+                titleEl.textContent = title;
+                titleEl.title = title;
+            }
+            if (subEl) {
+                subEl.textContent = sub;
+                subEl.title = sub;
+            }
+
+            // subtle refresh anim
+            box.style.animation = 'none';
+            void box.offsetHeight;
+            box.style.animation = 'ptbFadeIn .45s ease';
+        }
+    }
+
+
+    let adBannerList = [], adBannerIdx = 0, adBannerTimer = null, adProgressTimer = null;
+
+    function showAdBanner(b) {
+        const area = document.getElementById('adBannerArea');
+        const slide = document.getElementById('adBannerSlide');
+        if (!area || !b) {
+            if (area) area.classList.add('empty');
+            return;
+        }
+        area.classList.remove('empty');
+
+        // slide animation
+        if (slide) {
+            slide.classList.remove('hiding');
+            slide.style.animation = 'none';
+            slide.offsetHeight;
+            slide.style.animation = 'adBannerIn .55s cubic-bezier(.22,1,.36,1)';
+        }
+
+        // helper to set left/right media
+        function setMedia(side, imgUrl, vidUrl) {
+            const img = document.getElementById('ab-' + side + '-img');
+            const vid = document.getElementById('ab-' + side + '-vid');
+            if (!img || !vid) return;
+            img.style.display = 'none'; img.src = '';
+            vid.style.display = 'none'; vid.pause(); vid.src = '';
+            if (vidUrl) {
+                vid.src = vidUrl;
+                vid.style.display = 'block';
+                vid.play().catch(()=>{});
+            } else if (imgUrl) {
+                img.src = imgUrl;
+                img.style.display = 'block';
+            }
+        }
+
+        const leftImg  = b.leftImg  || '';
+        const leftVid  = b.leftVideo || '';
+        const rightImg = b.rightImg || '';
+        const rightVid = b.rightVideo || '';
+        setMedia('left',  leftImg,  leftVid);
+        setMedia('right', rightImg, rightVid);
+
+        const title = document.getElementById('ab-title');
+        const desc  = document.getElementById('ab-desc');
+        const sub   = document.getElementById('ab-sub');
+        if (title) title.textContent = b.title || '';
+        if (desc)  desc.textContent  = b.desc  || '';
+        if (sub)   sub.textContent   = b.sub   || '';
+
+        // ফুলস্ক্রিনেও ব্যানার আপডেট
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            syncFsBanner();
+        }
+
+        // progress bar
+        const bar = document.getElementById('adProgressBar');
+        if (bar) {
+            bar.style.transition = 'none';
+            bar.style.width = '0%';
+            bar.offsetHeight;
+            bar.style.transition = 'width ' + (AD_DURATION / 1000) + 's linear';
+            bar.style.width = '100%';
+        }
+    }
+
+
+    const AD_DURATION = 7000; // ms per banner
+
+
+
+    function startAdBannerRotation(list) {
+        // শুধু নিচের ব্যানার — টপ বার আলাদা (topBarAds)
+        if (adBannerTimer) clearInterval(adBannerTimer);
+        if (adProgressTimer) clearTimeout(adProgressTimer);
+        adBannerList = list; adBannerIdx = 0;
+        if (!list.length) {
+            const area = document.getElementById('adBannerArea');
+            if (area) area.classList.add('empty');
+            return;
+        }
+        showAdBanner(list[0]);
+        if (list.length > 1) {
+            adBannerTimer = setInterval(() => {
+                adBannerIdx = (adBannerIdx + 1) % adBannerList.length;
+                showAdBanner(adBannerList[adBannerIdx]);
+            }, AD_DURATION);
+        }
+    }
+
+    // ── Fullscreen ─────────────────────────────────
+    function toggleFullscreen() {
+        const c    = document.querySelector('.player-container');
+        const isFs = document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement;
+        if (!isFs) {
+            const req = c.requestFullscreen||c.webkitRequestFullscreen||c.mozRequestFullScreen||c.msRequestFullscreen;
+            if (req) req.call(c).catch(()=>{});
+        } else {
+            const exit = document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen||document.msExitFullscreen;
+            if (exit) exit.call(document);
+        }
+    }
+    window.toggleFullscreen = toggleFullscreen;
+
+    function syncFsOverlay(isFs) {
+        const ov  = document.getElementById('fsOverlay');
+        const icon= document.getElementById('fsIcon');
+        if (icon) icon.textContent = isFs ? '⊠' : '⛶';
+        if (isFs) {
+            ov.classList.add('show');
+            // datetime sync
+            const date = document.getElementById('dt-date');
+            const time = document.getElementById('dt-time');
+            if(date) document.getElementById('fs-dt-date').textContent = date.textContent;
+            if(time) document.getElementById('fs-dt-time').textContent = time.textContent;
+            // ticker sync
+            const ticker = document.getElementById('ad-text');
+            if(ticker) document.getElementById('fs-ticker-text').textContent = ticker.textContent;
+            // schedule sync
+            const sch = document.getElementById('schedule-text');
+            if(sch) document.getElementById('fs-sch-text').textContent = sch.innerText;
+            // banner sync
+            syncFsBanner();
+        } else {
+            ov.classList.remove('show');
+        }
+    }
+
+    function syncFsBanner() {
+        // player-container এর ভিতরের ব্যানার (ফুলস্ক্রিনে এটাই দেখায়)
+        const fsBan = document.getElementById('fsBanner') || document.getElementById('fs-banner');
+        if (!fsBan) return;
+
+        const title = (document.getElementById('ab-title') || {}).textContent || '';
+        const desc  = (document.getElementById('ab-desc')  || {}).textContent || '';
+        const sub   = (document.getElementById('ab-sub')   || {}).textContent || '';
+
+        const tEl = document.getElementById('fs-ban-title') || document.getElementById('fs-bn-title');
+        const dEl = document.getElementById('fs-ban-desc')  || document.getElementById('fs-bn-desc');
+        const sEl = document.getElementById('fs-ban-sub')   || document.getElementById('fs-bn-sub');
+        if (tEl) tEl.textContent = title;
+        if (dEl) dEl.textContent = desc;
+        if (sEl) sEl.textContent = sub;
+
+        function copyMedia(abImgId, abVidId, fsImgId, fsVidId) {
+            const abImg = document.getElementById(abImgId);
+            const abVid = document.getElementById(abVidId);
+            const fsImg = document.getElementById(fsImgId);
+            const fsVid = document.getElementById(fsVidId);
+            if (!fsImg && !fsVid) return false;
+            let shown = false;
+            if (fsImg) { fsImg.style.display = 'none'; fsImg.removeAttribute('src'); }
+            if (fsVid) {
+                fsVid.style.display = 'none';
+                try { fsVid.pause(); } catch(e) {}
+                fsVid.removeAttribute('src');
+            }
+            if (abVid && abVid.style.display !== 'none' && abVid.src) {
+                if (fsVid) {
+                    fsVid.src = abVid.currentSrc || abVid.src;
+                    fsVid.style.display = 'block';
+                    fsVid.play().catch(function(){});
+                    shown = true;
+                }
+            } else if (abImg && abImg.style.display !== 'none' && abImg.src) {
+                if (fsImg) {
+                    fsImg.src = abImg.src;
+                    fsImg.style.display = 'block';
+                    shown = true;
+                }
+            }
+            return shown;
+        }
+
+        // নতুন IDs (fsBanner ভিতরে)
+        let hasMedia = false;
+        hasMedia = copyMedia('ab-left-img', 'ab-left-vid', 'fs-ban-left-img', 'fs-ban-left-vid') || hasMedia;
+        hasMedia = copyMedia('ab-right-img', 'ab-right-vid', 'fs-ban-right-img', 'fs-ban-right-vid') || hasMedia;
+        // পুরনো IDs fallback
+        hasMedia = copyMedia('ab-left-img', 'ab-left-vid', 'fs-bl-img', 'fs-bl-vid') || hasMedia;
+        hasMedia = copyMedia('ab-right-img', 'ab-right-vid', 'fs-br-img', 'fs-br-vid') || hasMedia;
+
+        const hasText = !!(title || desc || sub);
+        const area = document.getElementById('adBannerArea');
+        const areaVisible = area && !area.classList.contains('empty');
+
+        if ((hasText || hasMedia) && areaVisible !== false) {
+            fsBan.classList.add('show');
+        } else if (hasText || hasMedia) {
+            fsBan.classList.add('show');
+        } else {
+            fsBan.classList.remove('show');
+        }
+    }
+
+    // Fullscreen datetime sync প্রতি সেকেন্ডে
+    setInterval(() => {
+        const isFs = document.fullscreenElement||document.webkitFullscreenElement;
+        if (!isFs) return;
+        const date = document.getElementById('dt-date');
+        const time = document.getElementById('dt-time');
+        if(date) document.getElementById('fs-dt-date').textContent = date.textContent;
+        if(time) document.getElementById('fs-dt-time').textContent = time.textContent;
+        // ticker sync
+        const ticker = document.getElementById('ad-text');
+        if(ticker) document.getElementById('fs-ticker-text').textContent = ticker.textContent;
+    }, 1000);
+
+    // banner change হলে fs-overlay এও sync করো
+    const bannerObserver = new MutationObserver(() => {
+        if (document.fullscreenElement||document.webkitFullscreenElement) syncFsBanner();
+    });
+    const abTitle = document.getElementById('ab-title');
+    if(abTitle) bannerObserver.observe(abTitle, {childList:true, characterData:true, subtree:true});
+
+    ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(e => {
+        document.addEventListener(e, () => {
+            const isFs = document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement;
+            syncFsOverlay(!!isFs);
+        });
+    });
+
+    // Cast removed — single fullscreen button only
+
+    // ── Firebase ───────────────────────────────────
+    const cfg = {
+        apiKey:"AIzaSyAjCANiMrT8zSF3s2pD0YqNSrnP0bsA4",
+        authDomain:"omkar-tv.firebaseapp.com",
+        databaseURL:"https://omkar-tv-default-rtdb.firebaseio.com",
+        projectId:"omkar-tv",
+        storageBucket:"omkar-tv.firebasestorage.app",
+        messagingSenderId:"925670348274",
+        appId:"1:925670348274:web:23e54c210640c72e59ede6"
+    };
+    firebase.initializeApp(cfg);
+    const db = firebase.database();
+
+    // state
+    let playlist=[], currentIdx=0, adConfig={adUrl:'',interval:20,duration:20};
+    let hlsPlayer=null, adTimer=null, isAdPlaying=false, currentLive=null;
+    let liveChannels={}, activeChId=null, viewMode='single', peerConns={};
+    let firstLoadDone = false;
+
+
+    // ── Letter-by-letter slideshow for channel name ──
+    function startLetterSlideshow(el, str) {
+        if (!el) return;
+        if (el._ltrTimer) clearInterval(el._ltrTimer);
+        const text = (str || 'ENTERTAINMENT').toString();
+        const run = () => {
+            el.innerHTML = '';
+            [...text].forEach((ch, i) => {
+                const s = document.createElement('span');
+                s.className = 'ltr';
+                s.textContent = ch === ' ' ? '\u00A0' : ch;
+                s.style.animationDelay = (i * 0.09) + 's';
+                el.appendChild(s);
+            });
+        };
+        run();
+        el._ltrTimer = setInterval(run, 7000);
+    }
+
+    // ── তাৎক্ষণিক লোড: .once() দিয়ে প্রথম data নাও ──
+    // Priority: liveChannels → liveStream → playlist
+    async function quickStart() {
+        try {
+            // 1. Multi-channel চেক
+            const chSnap = await db.ref('liveChannels').once('value');
+            const chData = chSnap.val();
+            if (chData) {
+                const active = Object.entries(chData).filter(([,ch]) => ch.active);
+                if (active.length > 0) {
+                    const [id, ch] = active[0];
+                    liveChannels = {}; active.forEach(([i,c]) => liveChannels[i]=c);
+                    activeChId = id;
+                    playSingleChannel(id);
+                    firstLoadDone = true;
+                    return;
+                }
+            }
+            // 2. Single liveStream চেক
+            const lsSnap = await db.ref('liveStream').once('value');
+            const lsData = lsSnap.val();
+            if (lsData && lsData.active && lsData.url) {
+                currentLive = lsData;
+                showLegacyLive(lsData);
+                firstLoadDone = true;
+                return;
+            }
+            // 3. Playlist চেক
+            const plSnap = await db.ref('playlist').once('value');
+            const plData = plSnap.val();
+            if (plData) {
+                playlist = Object.values(plData);
+                // broadcastState চেক করো — কোন ভিডিও কোথা থেকে শুরু
+                const bcSnap2 = await db.ref('broadcastState').once('value');
+                const bc2     = bcSnap2.val();
+                const startIdx = (bc2 && bc2.currentIdx !== undefined) ? bc2.currentIdx : 0;
+                playVideo(startIdx);
+                firstLoadDone = true;
+                return;
+            }
+            // কিছু নেই
+            showNoSignal();
+            firstLoadDone = true;
+        } catch(e) {
+            console.log('quickStart error:', e);
+            showNoSignal();
+            firstLoadDone = true;
+        }
+    }
+    quickStart(); // অ্যাপ খুলতেই চলবে
+    startLetterSlideshow(document.getElementById('channel-name-disp'), 'ENTERTAINMENT');
+    const _ntl = document.getElementById('newsTopLogo');
+    if (_ntl) startLetterSlideshow(_ntl, _ntl.textContent || 'ENTERTAINMENT');
+
+
+    // ── Multi-Channel ──────────────────────────────
+    function setViewMode(mode) {
+        viewMode = mode;
+        const btnS = document.getElementById('btn-single');
+        const btnP = document.getElementById('btn-split');
+        const split = document.getElementById('splitWrap');
+        const pv = document.getElementById('player-view');
+        if (btnS) btnS.classList.toggle('active', mode==='single');
+        if (btnP) btnP.classList.toggle('active', mode==='split');
+        if (split) split.classList.toggle('show', mode==='split');
+        if (pv) pv.classList.toggle('split-hidden', mode==='split');
+        if (mode==='single') {
+            if (split) split.innerHTML = '';
+            if (activeChId) playSingleChannel(activeChId);
+        } else {
+            buildSplitScreen();
+        }
+    }
+    window.setViewMode = setViewMode;
+
+    db.ref('liveChannels').on('value', snap => {
+        const d = snap.val();
+        const prev = JSON.stringify(liveChannels);
+        liveChannels = {};
+        if (d) Object.entries(d).forEach(([id,ch]) => { if (ch.active) liveChannels[id] = ch; });
+        buildChannelBar();
+        const ids = Object.keys(liveChannels);
+        const hasChannels = ids.length > 0;
+        document.getElementById('viewToggle').style.display = hasChannels && ids.length>1 ? 'flex' : 'none';
+        document.getElementById('channelBar').classList.toggle('show', hasChannels && ids.length>1);
+        document.getElementById('chCount').textContent = hasChannels ? `${ids.length}টি লাইভ` : '';
+        if (hasChannels) {
+            if (!activeChId || !liveChannels[activeChId]) activeChId = ids[0];
+            // শুধু change হলেই play করো
+            if (JSON.stringify(liveChannels) !== prev) {
+                if (viewMode==='single') playSingleChannel(activeChId);
+                else buildSplitScreen();
+            }
+        }
+    });
+
+    function buildChannelBar() {
+        const bar = document.getElementById('channelBar'); bar.innerHTML='';
+        Object.entries(liveChannels).forEach(([id,ch]) => {
+            const btn = document.createElement('button');
+            btn.className = 'ch-btn'+(id===activeChId?' active':'');
+            btn.innerHTML = `<span class="ch-dot"></span>${ch.name||'চ্যানেল'}`;
+            btn.onclick   = () => { activeChId=id; setViewMode('single'); buildChannelBar(); };
+            bar.appendChild(btn);
+        });
+    }
+
+    function playSingleChannel(id) {
+        const ch = liveChannels[id]; if (!ch) return;
+        const pv = document.getElementById('player-view');
+        if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer=null; }
+        showLiveBadge();
+        if (ch.type==='webrtc') {
+            pv.innerHTML = `<video id="tv-player" autoplay playsinline style="width:100%;height:100%;"></video>`;
+            connectWebRTC(ch.peerId, document.getElementById('tv-player'));
+        } else { renderInEl(ch, pv); }
+    }
+
+    function connectWebRTC(peerId, videoEl) {
+        if (!peerId || !window.Peer) return;
+        const p = new Peer();
+        p.on('open', () => { const call=p.call(peerId,null); if(call) call.on('stream',s=>{ videoEl.srcObject=s; }); });
+        peerConns[peerId] = p;
+    }
+
+    function showPlayerLoading(el, msg) {
+        if (!el) return;
+        el.innerHTML = `<div class="no-signal" style="background:#000;"><div class="spinner"></div><div class="msg">${msg||'লোড হচ্ছে...'}</div></div>`;
+    }
+    function showPlayerError(el, msg) {
+        if (!el) return;
+        el.innerHTML = `<div class="no-signal"><div class="icon">⚠️</div><div class="msg">${msg||'স্ট্রিম চালু নেই'}</div><div style="font-size:10px;color:#888;margin-top:6px;">অন্য চ্যানেল বাছাই করুন</div></div>`;
+    }
+    function forcePlayVideo(v) {
+        if (!v) return;
+        v.muted = true;
+        v.setAttribute('muted', '');
+        v.setAttribute('playsinline', '');
+        const p = v.play();
+        if (p && p.catch) p.catch(() => {
+            setTimeout(() => { v.muted = true; v.play().catch(()=>{}); }, 400);
+        });
+    }
+
+    function renderInEl(ch, el) {
+        if (!ch || !ch.url) {
+            showPlayerError(el, 'URL নেই');
+            return;
+        }
+        showPlayerLoading(el, (ch.name || 'চ্যানেল') + ' লোড হচ্ছে...');
+
+        // Google Drive support — preview + direct fallback
+        if (ch.type === 'drive' || isGoogleDriveUrl(ch.url)) {
+            const id = extractDriveId(ch.url);
+            if (!id) { showPlayerError(el, 'Drive লিংক থেকে ফাইল ID পাওয়া যায়নি'); return; }
+            const prev = drivePreviewUrl(id);
+            const direct = driveDirectUrl(id);
+            // প্রথমে video tag দিয়ে direct চেষ্টা, ফেল করলে preview iframe
+            el.innerHTML =
+                '<div style="position:relative;width:100%;height:100%;background:#000;">' +
+                '<video id="drive-v" playsinline webkit-playsinline controls muted autoplay ' +
+                'style="width:100%;height:100%;object-fit:contain;background:#000;display:none;"></video>' +
+                '<iframe id="drive-f" src="' + prev + '" allow="autoplay; encrypted-media; fullscreen" allowfullscreen ' +
+                'style="position:absolute;inset:0;width:100%;height:100%;border:none;background:#000;"></iframe>' +
+                '</div>';
+            const v = el.querySelector('#drive-v');
+            const f = el.querySelector('#drive-f');
+            if (v) {
+                v.src = direct;
+                v.onloadeddata = function() {
+                    if (f) f.style.display = 'none';
+                    v.style.display = 'block';
+                    forcePlayVideo(v);
+                };
+                v.onerror = function() {
+                    // direct চলল না — iframe preview-ই থাকবে
+                    v.style.display = 'none';
+                    if (f) f.style.display = 'block';
+                };
+            }
+            return;
+        }
+
+        if (ch.type==='youtube' || (!ch.type && ytId(ch.url))) {
+            const vid = ytId(ch.url);
+            if (!vid) { showPlayerError(el, 'YouTube লিংক ভুল'); return; }
+            // Error 153 এড়াতে: nocookie + origin + referrerpolicy
+            // content:// বা file:// এ YouTube embed প্রায়ই ফেল করে — HTTPS হোস্ট জরুরি
+            const origin = encodeURIComponent(location.origin || 'https://localhost');
+            const src = 'https://www.youtube-nocookie.com/embed/' + vid +
+                '?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&origin=' + origin;
+            el.innerHTML = '<iframe src="' + src + '" ' +
+                'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+                'allowfullscreen referrerpolicy="strict-origin-when-cross-origin" ' +
+                'style="width:100%;height:100%;border:none;background:#000;"></iframe>';
+        } else if (ch.type==='facebook') {
+            const enc = encodeURIComponent(ch.url);
+            el.innerHTML = `<iframe src="https://www.facebook.com/plugins/video.php?href=${enc}&show_text=false&autoplay=true&mute=true" allow="autoplay;encrypted-media" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
+        } else if (ch.type==='cloudflare') {
+            el.innerHTML = `<iframe src="${ch.url}" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
+        } else if (ch.type==='m3u8'||(ch.url&&ch.url.includes('.m3u8'))) {
+            el.innerHTML = `<video id="hls-v" autoplay muted playsinline webkit-playsinline style="width:100%;height:100%;object-fit:cover;background:#000;"></video>`;
+            const v = el.querySelector('#hls-v');
+            if (window.Hls && Hls.isSupported()) {
+                if (hlsPlayer) { try { hlsPlayer.destroy(); } catch(e){} hlsPlayer=null; }
+                hlsPlayer = new Hls({ enableWorker: true, lowLatencyMode: true });
+                hlsPlayer.loadSource(ch.url);
+                hlsPlayer.attachMedia(v);
+                hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => forcePlayVideo(v));
+                hlsPlayer.on(Hls.Events.ERROR, (ev, data) => {
+                    if (data && data.fatal) {
+                        showPlayerError(el, 'স্ট্রিম লোড হয়নি');
+                    }
+                });
+            } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
+                v.src = ch.url;
+                forcePlayVideo(v);
+            } else {
+                showPlayerError(el, 'HLS সাপোর্ট নেই');
+            }
+        } else if (isBunnyCDN(ch.url)) {
+            el.innerHTML = `<video id="hls-v" autoplay muted playsinline webkit-playsinline
+                style="width:100%;height:100%;object-fit:cover;background:#000;"
+                disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback"></video>`;
+            const bv = el.querySelector('#hls-v');
+            bv.src = ch.url;
+            bv.onerror = () => showPlayerError(el, 'ভিডিও লোড হয়নি');
+            forcePlayVideo(bv);
+        } else {
+            el.innerHTML = `<video src="${ch.url}" autoplay muted playsinline webkit-playsinline
+                style="width:100%;height:100%;border:none;object-fit:cover;background:#000;"
+                disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback"></video>`;
+            const dv = el.querySelector('video');
+            if (dv) {
+                dv.onerror = () => showPlayerError(el, 'ভিডিও লোড হয়নি');
+                forcePlayVideo(dv);
+            }
+        }
+    }
+
+    
+    // ── Google Drive link support ─────────────────────
+    function extractDriveId(url) {
+        if (!url) return null;
+        const s = String(url).trim();
+        let m = s.match(/\/file\/d\/([^\/\?&]+)/);
+        if (m) return m[1];
+        m = s.match(/[?&]id=([^&\/]+)/);
+        if (m) return m[1];
+        m = s.match(/\/uc\?(?:.*&)?id=([^&]+)/);
+        if (m) return m[1];
+        return null;
+    }
+    function isGoogleDriveUrl(url) {
+        if (!url) return false;
+        const s = String(url).toLowerCase();
+        return s.indexOf('drive.google.com') !== -1 || s.indexOf('docs.google.com') !== -1;
+    }
+    function drivePreviewUrl(id) {
+        return 'https://drive.google.com/file/d/' + encodeURIComponent(id) + '/preview';
+    }
+    function driveDirectUrl(id) {
+        return 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(id);
+    }
+
+function ytId(url) {
+        if (!url) return null;
+        try {
+            // plain ID
+            if (/^[\w-]{11}$/.test(url.trim())) return url.trim();
+            const u = new URL(url);
+            const host = (u.hostname || '').replace(/^www\./, '');
+            if (host === 'youtu.be') {
+                return u.pathname.replace(/^\//, '').split('/')[0].split('?')[0] || null;
+            }
+            if (host.includes('youtube.com') || host.includes('youtube-nocookie.com')) {
+                const v = u.searchParams.get('v');
+                if (v) return v;
+                // /live/ID /embed/ID /shorts/ID
+                const parts = u.pathname.split('/').filter(Boolean);
+                const markers = ['embed', 'live', 'shorts', 'v'];
+                for (let i = 0; i < parts.length; i++) {
+                    if (markers.includes(parts[i]) && parts[i + 1]) {
+                        return parts[i + 1].split('?')[0];
+                    }
+                }
+                return parts[parts.length - 1] || null;
+            }
+            return null;
+        } catch (e) {
+            const m = String(url).match(/[\w-]{11}/);
+            return m ? m[0] : null;
+        }
+    }
+
+    // Bunny CDN — pull zone URL detect
+    function isBunnyCDN(url) {
+        return url && (url.includes('.b-cdn.net') || url.includes('bunnycdn.com') || url.includes('.bunny.net'));
+    }
+
+    function buildSplitScreen() {
+        const wrap = document.getElementById('splitWrap');
+        if (!wrap) return;
+        wrap.innerHTML = '';
+        const entries = Object.entries(liveChannels);
+        // গ্রিড কলাম
+        const n = entries.length;
+        if (n <= 1) wrap.style.gridTemplateColumns = '1fr';
+        else if (n <= 4) wrap.style.gridTemplateColumns = '1fr 1fr';
+        else wrap.style.gridTemplateColumns = '1fr 1fr 1fr';
+        wrap.style.gridTemplateRows = n <= 2 ? '1fr' : (n <= 6 ? '1fr 1fr' : '1fr 1fr 1fr');
+        entries.forEach(([id, ch]) => {
+            const cell = document.createElement('div');
+            cell.className = 'split-cell' + (id === activeChId ? ' sel' : '');
+            cell.onclick = () => {
+                activeChId = id;
+                setViewMode('single');
+                buildChannelBar();
+            };
+            const mw = document.createElement('div');
+            mw.style.cssText = 'position:absolute;inset:0;background:#000;';
+            // স্প্লিটে YouTube iframe একসাথে অনেক সময়ে Error 153 দেয় —
+            // থাম্বনেইল + নাম দেখিয়ে একক মোডে যেতে বলি
+            if (ch.type === 'youtube') {
+                const vid = ytId(ch.url);
+                const thumb = vid
+                    ? ('https://img.youtube.com/vi/' + vid + '/hqdefault.jpg')
+                    : '';
+                mw.innerHTML =
+                    '<div style="width:100%;height:100%;display:flex;flex-direction:column;' +
+                    'align-items:center;justify-content:center;background:#111;gap:6px;padding:8px;">' +
+                    (thumb ? '<img src="' + thumb + '" style="width:100%;max-height:70%;object-fit:cover;border-radius:4px;opacity:0.9;">' : '') +
+                    '<div style="font-size:11px;color:#ffd700;font-weight:700;text-align:center;">' +
+                    (ch.name || 'YouTube') + '</div>' +
+                    '<div style="font-size:9px;color:#aaa;">ট্যাপ করুন · একক মোডে চলবে</div></div>';
+            } else {
+                renderInEl(ch, mw);
+            }
+            cell.appendChild(mw);
+            const lab = document.createElement('div');
+            lab.className = 'split-label';
+            lab.textContent = ch.name || 'চ্যানেল';
+            cell.appendChild(lab);
+            wrap.appendChild(cell);
+        });
+    }
+
+    // ── Legacy liveStream ──────────────────────────
+    db.ref('liveStream').on('value', snap => {
+        const data = snap.val(); currentLive = data;
+        if (Object.keys(liveChannels).length > 0) return; // multi-channel আছে
+        if (data && data.active) showLegacyLive(data);
+        else { hideLiveBadge(); if(playlist.length>0) playVideo(currentIdx); else showNoSignal(); }
+    });
+
+    function showLegacyLive(data) {
+        const pv = document.getElementById('player-view');
+        if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer=null; }
+        showLiveBadge();
+        renderInEl({type:data.type, url:data.url}, pv);
+    }
+
+    function showLiveBadge() { document.getElementById('liveBadge').classList.add('show'); }
+    function hideLiveBadge() { document.getElementById('liveBadge').classList.remove('show'); }
+    function showNoSignal()  { document.getElementById('player-view').innerHTML=`<div class="no-signal"><div class="icon">📡</div><div class="msg">সম্প্রচার বন্ধ আছে</div></div>`; }
+
+    // ── Playlist ───────────────────────────────────
+    db.ref('playlist').on('value', snap => {
+        const data = snap.val();
+        if (data) {
+            const wasEmpty = playlist.length === 0;
+            playlist = Object.values(data);
+            if (wasEmpty && !currentLive?.active && !isAdPlaying && Object.keys(liveChannels).length===0) {
+                playVideo(0);
+            }
+        } else { playlist=[]; }
+    });
+
+    // ── BroadcastState — Admin যখন ভিডিও বদলায় সব দর্শক বদলায় ──
+    db.ref('broadcastState').on('value', snap => {
+        const bc = snap.val();
+        if (!bc || currentLive?.active || Object.keys(liveChannels).length>0) return;
+        if (bc.currentIdx !== undefined && bc.currentIdx !== currentIdx && playlist.length > 0) {
+            // Admin নতুন ভিডিও দিয়েছে — সবাই সেখানে যাও
+            playVideo(bc.currentIdx);
+        }
+    });
+    db.ref('adSettings').on('value', snap => { const d=snap.val(); if(d){adConfig=d; startAdTimer();} });
+
+    // ══════════════════════════════════════════════════
+    // SYNCHRONIZED BROADCAST — TV Channel মোড
+    // Firebase Server Time দিয়ে সব দর্শক একই সিনে থাকবে
+    // কেউ Play/Pause/Seek করতে পারবে না
+    // ══════════════════════════════════════════════════
+
+    let syncInterval   = null;   // sync checker
+    let syncTolerance  = 1.5;    // seconds — এর বেশি drift হলে jump করবে
+
+    // ── Admin Firebase থেকে broadcast শুরুর সময় নেয় ──
+    // প্রতিটা playlist item এর জন্য broadcastStartTime save আছে
+    // সব দর্শক সেই time থেকে কতটুকু চলেছে হিসাব করে সেখানে jump করে
+
+    async function playVideo(idx) {
+        if (currentLive?.active || playlist.length===0 || Object.keys(liveChannels).length>0) return;
+        if (idx >= playlist.length) idx = 0;
+        currentIdx = idx;
+        hideLiveBadge();
+
+        const v  = playlist[idx];
+        const pv = document.getElementById('player-view');
+        if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
+
+        // ── Firebase server offset নাও (client clock correction) ──
+        const offsetSnap = await db.ref('.info/serverTimeOffset').once('value');
+        const offset     = offsetSnap.val() || 0; // ms
+
+        // ── Broadcast start time Firebase থেকে নাও ──
+        const bcSnap  = await db.ref('broadcastState').once('value');
+        const bcData  = bcSnap.val();
+
+        let seekTo = 0;
+
+        if (bcData && bcData.currentIdx === idx && bcData.startedAt) {
+            // Server time এ এখন কতটুকু চলেছে
+            const serverNow    = Date.now() + offset;
+            const elapsedMs    = serverNow - bcData.startedAt;
+            seekTo             = Math.max(0, elapsedMs / 1000);
+        }
+
+        // ── Video তৈরি করো — controls সম্পূর্ণ বন্ধ ──
+        pv.innerHTML = `<video id="tv-player"
+            autoplay muted playsinline
+            style="width:100%;height:100%;object-fit:cover;"
+            disablepictureinpicture
+            controlslist="nodownload nofullscreen noremoteplayback">
+        </video>`;
+
+        const vid = document.getElementById('tv-player');
+
+        // ── Controls block করো ──
+        vid.controls    = false;
+        vid.oncontextmenu = e => e.preventDefault();
+
+        // ── Seek block করো ──
+        let lastTime  = 0;
+        let isSeeking = false;
+        vid.addEventListener('seeking', () => {
+            if (!isSeeking) { isSeeking = true; vid.currentTime = lastTime; isSeeking = false; }
+        });
+        vid.addEventListener('timeupdate', () => {
+            if (!isSeeking) lastTime = vid.currentTime;
+        });
+
+        // ── HLS বা Direct ──
+        if (Hls.isSupported() && v.url && v.url.includes('.m3u8')) {
+            hlsPlayer = new Hls({ startPosition: seekTo });
+            hlsPlayer.loadSource(v.url);
+            hlsPlayer.attachMedia(vid);
+            hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                vid.currentTime = seekTo;
+                vid.play().catch(()=>{});
+            });
+        } else if (v.url) {
+            vid.src = v.url;
+            vid.addEventListener('loadedmetadata', () => {
+                if (seekTo > 0 && seekTo < vid.duration) vid.currentTime = seekTo;
+                vid.play().catch(()=>{});
+            });
+        }
+
+        // ── Sync Checker — প্রতি ৫ সেকেন্ডে drift check ──
+        if (syncInterval) clearInterval(syncInterval);
+        syncInterval = setInterval(async () => {
+            if (!vid || vid.paused || vid.ended) return;
+            const offSnap2  = await db.ref('.info/serverTimeOffset').once('value');
+            const off2      = offSnap2.val() || 0;
+            const bcSnap2   = await db.ref('broadcastState').once('value');
+            const bc2       = bcSnap2.val();
+            if (!bc2 || bc2.currentIdx !== currentIdx) return;
+            const serverNow2 = Date.now() + off2;
+            const expected   = (serverNow2 - bc2.startedAt) / 1000;
+            const drift      = Math.abs(vid.currentTime - expected);
+            if (drift > syncTolerance) {
+                // drift বেশি — সঠিক জায়গায় jump করো
+                isSeeking = true;
+                vid.currentTime = expected;
+                isSeeking = false;
+                console.log('[Sync] Corrected drift:', drift.toFixed(2) + 's → ' + expected.toFixed(2) + 's');
+            }
+            // video pause হয়ে গেলে force play
+            if (vid.paused) vid.play().catch(()=>{});
+        }, 5000);
+
+        // ── Video শেষ হলে পরের ভিডিও ──
+        vid.onended = () => {
+            if (syncInterval) clearInterval(syncInterval);
+            if (!isAdPlaying) {
+                const nextIdx = (currentIdx + 1) % playlist.length;
+                // Admin Firebase এ next video এর broadcastState set করে
+                // Viewer শুধু সেটা follow করে
+                db.ref('broadcastState').once('value').then(snap => {
+                    const bc = snap.val();
+                    // Admin না হলে শুধু wait করো — Firebase update আসবে
+                    playVideo(nextIdx);
+                });
+            }
+        };
+    }
+
+    function startAdTimer() {
+        if (adTimer) clearInterval(adTimer);
+        adTimer = setInterval(()=>{ if(adConfig.adUrl&&!isAdPlaying&&!currentLive?.active) triggerAdBreak(); }, (adConfig.interval||20)*60000);
+    }
+    function triggerAdBreak() {
+        isAdPlaying=true; document.getElementById('adOverlay').style.display='block';
+        const pv=document.getElementById('player-view');
+        if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null;}
+        pv.innerHTML=`<video id="ad-player" autoplay playsinline style="width:100%;height:100%;"></video>`;
+        const ad=document.getElementById('ad-player'); ad.src=adConfig.adUrl; ad.play();
+        setTimeout(()=>{ document.getElementById('adOverlay').style.display='none'; isAdPlaying=false; playVideo(currentIdx); }, (adConfig.duration||20)*1000);
+    }
+
+    // ── Settings ───────────────────────────────────
+    db.ref('settings').on('value', snap => {
+        const d=snap.val(); if(!d) return;
+        const logo = document.getElementById('main-logo-img');
+        const name = document.getElementById('channel-name-disp');
+        if(d.logoUrl && logo) logo.src = d.logoUrl;
+        if(d.channelName && name) startLetterSlideshow(name, d.channelName);
+        // নিউজ ফ্রেম লোগো
+        var nfImg = document.getElementById('nfLogoImg');
+        if (nfImg && d.logoUrl) { nfImg.src = d.logoUrl; nfImg.style.display = 'block'; }
+        var nfName = document.getElementById('newsTopLogo');
+        if (nfName && d.channelName && document.body.classList.contains('news-mode')) {
+            startLetterSlideshow(nfName, d.channelName);
+        }
+    });
+
+    db.ref('tickers').on('value', snap => {
+        const d=snap.val(); if(!d) return;
+        const now=new Date();
+        const active=Object.values(d).filter(t=>{ const s=t.startTime?new Date(t.startTime):null,e=t.endTime?new Date(t.endTime):null; return(!s||now>=s)&&(!e||now<=e); });
+        if(active.length) {
+            const txt = active.map(t=>t.text).join('   ●   ');
+            document.getElementById('ad-text').textContent = txt;
+            const fst = document.getElementById('fs-ticker-text');
+            if (fst) fst.textContent = txt;
+        }
+    });
+
+    // ── Festivals ──────────────────────────────────
+    db.ref('festivals').on('value', snap => {
+        try {
+            const d=snap.val(); const now=new Date(); now.setHours(0,0,0,0);
+            if (!d) { startFestivalRotation([]); return; }
+            const list = Object.values(d).filter(f=>{
+                if(!f.date) return false;
+                const t=new Date(f.date); t.setHours(0,0,0,0); return t>=now;
+            }).sort((a,b)=>new Date(a.date)-new Date(b.date));
+            startFestivalRotation(list);
+        } catch(e) {
+            console.log('Festival listener error:', e);
+            startFestivalRotation([]);
+        }
+    });
+
+    // ── Ad Banners ─────────────────────────────────
+    // ══ 3D Flip Billboard ══════════════════════════════
+    let bbAds        = [];   // Firebase থেকে ads list
+    let bbIdx        = 0;    // বর্তমান ad index
+    let bbFlipTimer  = null; // flip timer
+    let bbShowTimer  = null; // show/hide timer
+    let bbIsFlipped  = false;
+    let bbVisible    = false;
+
+    function setBbFace(facePrefix, ad) {
+        if (!ad) return;
+        const imgWrap = document.getElementById(`${facePrefix}-wrap`);
+        const img     = document.getElementById(`${facePrefix}-img`);
+        const vid     = document.getElementById(`${facePrefix}-vid`);
+        const title   = document.getElementById(`${facePrefix}-title`);
+        const sub     = document.getElementById(`${facePrefix}-sub`);
+
+        const mediaUrl = ad.imgUrl || ad.videoUrl || '';
+        const isVideo  = !!ad.videoUrl && !ad.imgUrl;
+
+        // reset
+        if (imgWrap) imgWrap.classList.remove('show');
+        if (vid)     { vid.classList.remove('show'); vid.src=''; }
+        if (title)   title.classList.remove('show');
+        if (sub)     sub.classList.remove('show');
+
+        if (isVideo && mediaUrl) {
+            if (vid) { vid.src=mediaUrl; vid.classList.add('show'); vid.play().catch(()=>{}); }
+        } else if (mediaUrl) {
+            if (img) img.src = mediaUrl;
+            if (imgWrap) imgWrap.classList.add('show');
+        }
+        if (ad.title && title) { title.textContent=ad.title; title.classList.add('show'); }
+        if (ad.sub   && sub)   { sub.textContent  =ad.sub;   sub.classList.add('show'); }
+    }
+
+    function buildDots(total, active) {
+        const wrap = document.getElementById('bbDots');
+        if (!wrap) return;
+        wrap.innerHTML = '';
+        for (let i=0; i<total; i++) {
+            const d = document.createElement('div');
+            d.className = 'bb-dot' + (i===active ? ' active' : '');
+            wrap.appendChild(d);
+        }
+    }
+
+    function showBillboard() {
+        if (bbAds.length === 0) return;
+        const bb = document.getElementById('billboard');
+        if (!bb) return;
+
+        // সামনে: বর্তমান ad, পিছনে: পরের ad
+        const cur  = bbAds[bbIdx % bbAds.length];
+        const next = bbAds[(bbIdx + 1) % bbAds.length];
+        setBbFace('bb-front', cur);
+        setBbFace('bb-back',  next);
+        buildDots(bbAds.length, bbIdx % bbAds.length);
+
+        // slide in
+        bb.classList.add('show');
+        bb.classList.remove('leaving');
+        bb.classList.add('entering');
+        bbVisible = true;
+        bbIsFlipped = false;
+        document.getElementById('bbCard').classList.remove('flipped');
+
+        // flip timer — প্রতি ৩ সেকেন্ডে flip
+        if (bbFlipTimer) clearInterval(bbFlipTimer);
+        bbFlipTimer = setInterval(() => {
+            const card = document.getElementById('bbCard');
+            if (!card) return;
+            bbIsFlipped = !bbIsFlipped;
+            card.classList.toggle('flipped', bbIsFlipped);
+
+            if (bbIsFlipped) {
+                // পিছনে দেখাচ্ছে = পরের ad
+                bbIdx = (bbIdx + 1) % bbAds.length;
+                buildDots(bbAds.length, bbIdx);
+                // পরবর্তী back face প্রস্তুত করো
+                const nextNext = bbAds[(bbIdx + 1) % bbAds.length];
+                setTimeout(() => setBbFace('bb-front', nextNext), 900);
+            }
+        }, 3000);
+    }
+
+    function hideBillboard() {
+        const bb = document.getElementById('billboard');
+        if (!bb || !bbVisible) return;
+        bb.classList.remove('entering');
+        bb.classList.add('leaving');
+        if (bbFlipTimer) { clearInterval(bbFlipTimer); bbFlipTimer=null; }
+        setTimeout(() => {
+            bb.classList.remove('show','leaving');
+            bbVisible = false;
+        }, 500);
+    }
+
+    function startBillboardCycle(ads, showSec, hideSec) {
+        if (bbShowTimer) clearInterval(bbShowTimer);
+        if (bbFlipTimer) clearInterval(bbFlipTimer);
+        hideBillboard();
+        bbAds = ads; bbIdx = 0;
+        if (!ads.length) return;
+
+        function cycle() {
+            showBillboard();
+            setTimeout(() => {
+                hideBillboard();
+            }, showSec * 1000);
+        }
+        cycle(); // প্রথমবার সাথে সাথে
+        bbShowTimer = setInterval(cycle, (showSec + hideSec) * 1000);
+    }
+
+    // Firebase — billboards collection
+    db.ref('billboards').on('value', snap => {
+        const d = snap.val();
+        if (!d) { hideBillboard(); return; }
+        const now  = new Date();
+        const list = Object.values(d).filter(b => {
+            if (b.active === false) return false;
+            if (b.startTime && new Date(b.startTime) > now) return false;
+            if (b.endTime   && new Date(b.endTime)   < now) return false;
+            return true;
+        });
+        if (!list.length) { hideBillboard(); return; }
+
+        // config থেকে show/hide duration নাও
+        db.ref('billboardConfig').once('value').then(cfg => {
+            const c       = cfg.val() || {};
+            const showSec = c.showSec  || 15;
+            const hideSec = c.hideSec  || 30;
+            startBillboardCycle(list, showSec, hideSec);
+        });
+    });
+
+    // ── Breaking News + News Flash ────────────────────
+    db.ref('breakingNews').on('value', snap => {
+        const d   = snap.val();
+        const bar = document.getElementById('breakingNewsBar');
+        const txt = document.getElementById('bn-text');
+        const logo= document.getElementById('bn-logo');
+        if (!bar) return;
+        if (d && d.active && d.text) {
+            if (txt)  txt.textContent  = d.text  || '';
+            if (logo) logo.textContent = d.channel || '';
+            bar.style.display = 'flex';
+        } else {
+            bar.style.display = 'none';
+        }
+    });
+
+    db.ref('newsFlash').on('value', snap => {
+        const d   = snap.val();
+        const bar = document.getElementById('newsFlashBar');
+        const txt = document.getElementById('nf-text');
+        if (!bar) return;
+        if (d && d.active && d.text) {
+            if (txt) {
+                txt.textContent = d.text;
+                // scroll speed reset
+                txt.style.animation = 'none';
+                txt.offsetHeight;
+                const dur = Math.max(10, d.text.length * 0.2);
+                txt.style.animation = `nfScroll ${dur}s linear infinite`;
+            }
+            bar.style.display = 'flex';
+        } else {
+            bar.style.display = 'none';
+        }
+    });
+
+    // ══ Election Result — Firebase থেকে Live Update ══════
+    let elAnimTimers = {};
+
+    function animateCount(el, target) {
+        const start   = parseInt(el.textContent.replace(/,/g,'')) || 0;
+        const diff    = target - start;
+        const steps   = 30;
+        const stepVal = diff / steps;
+        let cur = start, step = 0;
+        if (elAnimTimers[el.id]) clearInterval(elAnimTimers[el.id]);
+        elAnimTimers[el.id] = setInterval(() => {
+            step++;
+            cur += stepVal;
+            el.textContent = Math.round(cur).toLocaleString('bn-BD');
+            if (step >= steps) {
+                el.textContent = target.toLocaleString('bn-BD');
+                clearInterval(elAnimTimers[el.id]);
+            }
+        }, 30);
+    }
+
+    function renderElection(data) {
+        const overlay = document.getElementById('electionOverlay');
+        if (!overlay) return;
+        if (!data || !data.active) {
+            overlay.classList.remove('show');
+            return;
+        }
+        overlay.classList.add('show');
+
+        // Title / seat
+        const titleEl = document.getElementById('elTitle');
+        const seatEl  = document.getElementById('elSeat');
+        if (titleEl) titleEl.textContent = data.title || 'আসন';
+        if (seatEl)  seatEl.textContent  = data.seat ? ('ঘোষিত ' + data.seat) : '—';
+
+        // Headline + time
+        const hl = document.getElementById('elHeadline');
+        if (hl) hl.textContent = data.headline || data.title || 'নির্বাচন ফলাফল';
+        const ut = document.getElementById('elUpdateTime');
+        if (ut) {
+            const now = new Date();
+            ut.textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+        }
+
+        const candidates = data.candidates ? Object.values(data.candidates) : [];
+        candidates.sort((a,b) => (parseInt(b.votes)||0) - (parseInt(a.votes)||0));
+
+        // Parties — prefer data.parties, else aggregate from candidates
+        let parties = [];
+        if (data.parties) {
+            parties = Object.values(data.parties).map(p => ({
+                name: p.name || '',
+                seats: parseInt(p.seats)||0,
+                change: parseInt(p.change)||0,
+                imgUrl: p.imgUrl || '',
+                symbol: p.symbol || ''
+            }));
+            parties.sort((a,b) => b.seats - a.seats);
+        } else {
+            const map = {};
+            candidates.forEach(c => {
+                const p = (c.party || 'OTH').trim() || 'OTH';
+                if (!map[p]) map[p] = { name: p, seats: 0, change: 0, imgUrl: c.imgUrl||'', symbol: c.symbol||'' };
+                map[p].seats += parseInt(c.seats) || 1;
+                if (c.imgUrl) map[p].imgUrl = c.imgUrl;
+            });
+            parties = Object.values(map).sort((a,b) => b.seats - a.seats);
+        }
+
+        // TOP party strip
+        const top = document.getElementById('elTopParties');
+        if (top) {
+            top.innerHTML = parties.slice(0, 6).map((p, i) => {
+                const ch = p.change || 0;
+                const chHtml = ch > 0 ? `<div class="el-tp-change up">▲ +${ch}</div>`
+                             : ch < 0 ? `<div class="el-tp-change down">▼ ${ch}</div>`
+                             : `<div class="el-tp-change">—</div>`;
+                return `<div class="el-tp-box ${i===0?'lead':''}">
+                    <div class="el-tp-name">${p.name}</div>
+                    <div class="el-tp-seats">${p.seats}</div>
+                    ${chHtml}
+                </div>`;
+            }).join('') || '<div class="el-tp-box"><div class="el-tp-name">—</div><div class="el-tp-seats">0</div></div>';
+        }
+
+        // LEFT panel — constituency party breakdown
+        const left = document.getElementById('elLeftParties');
+        if (left) {
+            // per-party from candidates in this seat
+            const localMap = {};
+            candidates.forEach(c => {
+                const p = (c.party || 'OTH').trim() || 'OTH';
+                if (!localMap[p]) localMap[p] = 0;
+                localMap[p] += parseInt(c.seats) || 1;
+            });
+            // if only vote counts, show candidate-level as party rows
+            if (candidates.length && Object.keys(localMap).length) {
+                left.innerHTML = Object.entries(localMap).map(([name, seats]) =>
+                    `<div class="el-lp-row"><span class="el-lp-name">${name}</span><span class="el-lp-seats">${seats}</span></div>`
+                ).join('');
+            } else {
+                left.innerHTML = parties.slice(0, 6).map(p =>
+                    `<div class="el-lp-row"><span class="el-lp-name">${p.name}</span><span class="el-lp-seats">${p.seats}</span></div>`
+                ).join('');
+            }
+        }
+
+        // RIGHT panel — leading candidate
+        const lead = candidates[0];
+        const nameEl = document.getElementById('elLeadName');
+        const photoEl = document.getElementById('elLeadPhoto');
+        const partyEl = document.getElementById('elLeadParty');
+        const seatInfo = document.getElementById('elLeadSeat');
+        const statusEl = document.getElementById('elLeadStatus');
+        if (lead) {
+            if (nameEl) nameEl.textContent = lead.name || '—';
+            if (partyEl) partyEl.textContent = lead.party || '—';
+            if (seatInfo) seatInfo.textContent = data.title || '';
+            if (statusEl) {
+                statusEl.textContent = 'এগিয়ে';
+                statusEl.className = 'el-right-status';
+            }
+            if (photoEl) {
+                photoEl.innerHTML = lead.imgUrl
+                    ? `<img class="el-right-photo" src="${lead.imgUrl}" alt="">`
+                    : `<div class="el-right-photo-ph">${lead.symbol || '👤'}</div>`;
+            }
+        } else {
+            if (nameEl) nameEl.textContent = '—';
+            if (partyEl) partyEl.textContent = '—';
+            if (photoEl) photoEl.innerHTML = '<div class="el-right-photo-ph">👤</div>';
+        }
+
+        // BOTTOM totals
+        const decl = document.getElementById('elDeclared');
+        if (decl) {
+            const seatStr = data.stateSeat || data.seat || '—';
+            decl.innerHTML = `<small>ঘোষিত</small>${seatStr}`;
+        }
+        const bot = document.getElementById('elBottomParties');
+        if (bot) {
+            bot.innerHTML = parties.slice(0, 5).map(p =>
+                `<div class="el-bt-party">
+                    <div class="bp-name">${p.name}</div>
+                    <div class="bp-seats">${p.seats}</div>
+                </div>`
+            ).join('');
+        }
+    }
+
+    db.ref('election').on('value', snap => {
+        renderElection(snap.val());
+    });
+
+    // ══ News Frame — Firebase থেকে control ══════════════
+    function updateNfClock() {
+        var el = document.getElementById('nfClock');
+        if (!el) return;
+        var n = new Date();
+        var h = n.getHours() % 12 || 12;
+        var m = String(n.getMinutes()).padStart(2, '0');
+        el.textContent = h + ':' + m;
+    }
+    setInterval(updateNfClock, 1000);
+
+    function setNewsModeUI(on) {
+        document.body.classList.toggle('news-mode', !!on);
+        var ids = ['viewToggle', 'channelBar', 'adBannerArea'];
+        ids.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            if (on) {
+                el.dataset.prevDisplay = el.style.display || '';
+                el.style.setProperty('display', 'none', 'important');
+            } else {
+                el.style.removeProperty('display');
+                if (el.dataset.prevDisplay) el.style.display = el.dataset.prevDisplay;
+            }
+        });
+        document.querySelectorAll('.schedule-bar, .ticker-wrap, .datetime-bar, .player-top-bar').forEach(function(el) {
+            if (on) {
+                el.dataset.prevDisplay = el.style.display || '';
+                el.style.setProperty('display', 'none', 'important');
+            } else {
+                el.style.removeProperty('display');
+            }
+        });
+    }
+
+    // ══ News Frame — multi headline / ticker / ad rotation ══
+    let nfHeadlineTimer = null, nfTickerTimer = null, nfAdTimer = null;
+    let nfHeadlineIdx = 0, nfTickerIdx = 0, nfAdIdx = 0;
+    let nfHeadlines = [], nfTickers = [], nfAds = [];
+
+    function nfClearTimers() {
+        if (nfHeadlineTimer) { clearInterval(nfHeadlineTimer); nfHeadlineTimer = null; }
+        if (nfTickerTimer) { clearInterval(nfTickerTimer); nfTickerTimer = null; }
+        if (nfAdTimer) { clearInterval(nfAdTimer); nfAdTimer = null; }
+    }
+
+    function nfShowHeadline(i) {
+        if (!nfHeadlines.length) return;
+        const el = document.getElementById('newsHeadlineText');
+        if (!el) return;
+        const t = nfHeadlines[i % nfHeadlines.length];
+        el.textContent = t;
+        el.style.animation = 'none';
+        void el.offsetHeight;
+        el.style.animation = '';
+    }
+
+    function nfShowTicker(i) {
+        if (!nfTickers.length) return;
+        const el = document.getElementById('newsFlashText');
+        if (!el) return;
+        el.textContent = nfTickers[i % nfTickers.length];
+        el.style.animation = 'none';
+        void el.offsetHeight;
+        el.style.animation = '';
+    }
+
+    function nfShowAd(i) {
+        const strip = document.getElementById('nfAdStrip');
+        if (!strip) return;
+        if (!nfAds.length) {
+            strip.classList.add('hidden-ad');
+            return;
+        }
+        const a = nfAds[i % nfAds.length] || {};
+        strip.classList.remove('hidden-ad');
+        const at = document.getElementById('nfAdTitle');
+        const as = document.getElementById('nfAdSub');
+        const ap = document.getElementById('nfAdPhone');
+        const al = document.getElementById('nfAdLogo');
+        if (at) at.textContent = a.title || a.adTitle || '';
+        if (as) as.textContent = a.sub || a.adSub || '';
+        if (ap) ap.textContent = (a.phone || a.adPhone) ? ('☎ ' + (a.phone || a.adPhone)) : '';
+        if (al) {
+            if (a.logo || a.adLogo) {
+                al.src = a.logo || a.adLogo;
+                al.style.display = 'block';
+            } else {
+                al.style.display = 'none';
+            }
+        }
+    }
+
+    function nfStartRotation(d) {
+        nfClearTimers();
+        // build arrays (new + legacy)
+        nfHeadlines = Array.isArray(d.headlines) && d.headlines.length
+            ? d.headlines.filter(Boolean)
+            : (d.headline ? [d.headline] : []);
+        nfTickers = Array.isArray(d.tickers) && d.tickers.length
+            ? d.tickers.filter(Boolean)
+            : (d.flashText ? [d.flashText] : (nfHeadlines.slice()));
+        if (Array.isArray(d.ads) && d.ads.length) {
+            nfAds = d.ads;
+        } else if (d.adTitle) {
+            nfAds = [{ title: d.adTitle, sub: d.adSub || '', phone: d.adPhone || '', logo: d.adLogo || '' }];
+        } else {
+            nfAds = [];
+        }
+
+        nfHeadlineIdx = 0; nfTickerIdx = 0; nfAdIdx = 0;
+        nfShowHeadline(0);
+        nfShowTicker(0);
+        nfShowAd(0);
+
+        const hInt = Math.max(3, parseInt(d.headlineInterval, 10) || 6) * 1000;
+        const tInt = Math.max(3, parseInt(d.tickerInterval, 10) || 8) * 1000;
+        const aInt = Math.max(3, parseInt(d.adInterval, 10) || 7) * 1000;
+
+        if (nfHeadlines.length > 1) {
+            nfHeadlineTimer = setInterval(function() {
+                nfHeadlineIdx = (nfHeadlineIdx + 1) % nfHeadlines.length;
+                nfShowHeadline(nfHeadlineIdx);
+            }, hInt);
+        }
+        if (nfTickers.length > 1) {
+            nfTickerTimer = setInterval(function() {
+                nfTickerIdx = (nfTickerIdx + 1) % nfTickers.length;
+                nfShowTicker(nfTickerIdx);
+            }, tInt);
+        }
+        if (nfAds.length > 1) {
+            nfAdTimer = setInterval(function() {
+                nfAdIdx = (nfAdIdx + 1) % nfAds.length;
+                nfShowAd(nfAdIdx);
+            }, aInt);
+        }
+    }
+
+    db.ref('newsFrame').on('value', snap => {
+        const d = snap.val();
+        const frame = document.getElementById('newsFrame');
+        if (!frame) return;
+
+        if (d && d.active) {
+            frame.classList.remove('hidden');
+            setNewsModeUI(true);
+            if (typeof festivals !== 'undefined' && festivals.length) {
+                showFestWidget(festivals[festIdx] || festivals[0]);
+            }
+            updateNfClock();
+            if (typeof startLetterSlideshow === 'function') {
+                var bt = document.getElementById('nfBreakingText');
+                var nt = document.getElementById('nfNewsText');
+                if (bt) startLetterSlideshow(bt, 'BREAKING');
+                if (nt) startLetterSlideshow(nt, 'NEWS');
+            }
+            const tl = document.getElementById('newsTopLogo');
+            const label = d.channelLabel || d.channelName || 'NEWS';
+            if (tl) {
+                if (typeof startLetterSlideshow === 'function') {
+                    startLetterSlideshow(tl, label);
+                } else {
+                    tl.textContent = label;
+                }
+            }
+            const nfImg = document.getElementById('nfLogoImg');
+            const mainLogo = document.getElementById('main-logo-img');
+            if (nfImg) {
+                var src = d.logoUrl || (mainLogo && mainLogo.src) || '';
+                if (src && src.indexOf('placeholder') === -1) {
+                    nfImg.src = src;
+                    nfImg.style.display = 'block';
+                } else if (mainLogo && mainLogo.src && mainLogo.src.indexOf('placeholder') === -1) {
+                    nfImg.src = mainLogo.src;
+                    nfImg.style.display = 'block';
+                }
+            }
+            const leftHead = document.getElementById('nfLeftHead');
+            if (leftHead && d.leftTitle) leftHead.innerHTML = d.leftTitle;
+            const leftText = document.getElementById('nfLeftText');
+            if (leftText && d.leftText) {
+                leftText.innerHTML = d.leftText + '<br><br>' + d.leftText;
+            }
+            nfStartRotation(d);
+        } else {
+            frame.classList.add('hidden');
+            setNewsModeUI(false);
+            nfClearTimers();
+        }
+    });
+
+
+
+    // ══ Screen Mode: live | news | election ══════════
+    db.ref('screenMode').on('value', snap => {
+        const mode = snap.val() || 'live';
+        const frame = document.getElementById('newsFrame');
+        const elOverlay = document.getElementById('electionOverlay');
+
+        if (mode === 'news') {
+            if (frame) frame.classList.remove('hidden');
+            if (typeof setNewsModeUI === 'function') setNewsModeUI(true);
+            if (elOverlay) elOverlay.classList.remove('show');
+            document.body.classList.remove('election-mode');
+        } else if (mode === 'election') {
+            if (frame) frame.classList.add('hidden');
+            if (typeof setNewsModeUI === 'function') setNewsModeUI(false);
+            if (typeof nfClearTimers === 'function') nfClearTimers();
+            if (elOverlay) elOverlay.classList.add('show');
+            document.body.classList.add('election-mode');
+            document.body.classList.remove('news-mode');
+        } else {
+            // live
+            if (frame) frame.classList.add('hidden');
+            if (typeof setNewsModeUI === 'function') setNewsModeUI(false);
+            if (typeof nfClearTimers === 'function') nfClearTimers();
+            if (elOverlay) elOverlay.classList.remove('show');
+            document.body.classList.remove('news-mode');
+            document.body.classList.remove('election-mode');
+        }
+    });
+
+
+    // ══ Vote Result — Firebase থেকে ══════════════════════
+    function renderVoteResults(data) {
+        if (!data || !data.candidates) return;
+
+        const overlay   = document.getElementById('voteOverlay');
+        const container = document.getElementById('voteCandidates');
+        const titleEl   = document.getElementById('voteTitle');
+        const subEl     = document.getElementById('voteSubTitle');
+        const liveEl    = document.getElementById('voteLiveBadge');
+        const totalEl   = document.getElementById('voteTotal');
+        if (!overlay) return;
+
+        titleEl.textContent = data.title      || 'নির্বাচন ফলাফল';
+        subEl.textContent   = data.constituency ? ('আসন: ' + data.constituency) : '';
+        liveEl.style.display= data.isLive ? 'inline-flex' : 'none';
+
+        const candidates = Object.values(data.candidates);
+        if (!candidates.length) {
+            container.innerHTML = '<p style="text-align:center;color:#888;font-size:11px;padding:12px;">কোনো প্রার্থী নেই</p>';
+            overlay.classList.add('show');
+            return;
+        }
+        const totalVotes = candidates.reduce((s,c) => s + (parseInt(c.votes)||0), 0);
+        const maxVotes   = Math.max(...candidates.map(c => parseInt(c.votes)||0), 0);
+
+        // sort by votes descending
+        candidates.sort((a,b) => (parseInt(b.votes)||0) - (parseInt(a.votes)||0));
+
+        container.innerHTML = '';
+        candidates.forEach((c, idx) => {
+            const votes   = parseInt(c.votes) || 0;
+            const pct     = totalVotes > 0 ? ((votes/totalVotes)*100).toFixed(1) : 0;
+            const isWinner= votes === maxVotes && votes > 0;
+            const delay   = idx * 0.1;
+
+            const card = document.createElement('div');
+            card.className = 'vote-card' + (isWinner ? ' winner' : '');
+            card.style.animationDelay = delay + 's';
+
+            const imgHtml = c.imgUrl
+                ? `<img src="${c.imgUrl}" class="vote-candidate-img ${isWinner?'winner-img':''}" alt="${c.name||''}">`
+                : `<div class="vote-img-placeholder">${c.symbol||'👤'}</div>`;
+
+            card.innerHTML = `
+                <div class="vote-card-top">
+                    ${imgHtml}
+                    <div class="vote-info">
+                        <div class="vote-name">
+                            ${c.name||'—'}
+                            ${isWinner ? '<span class="vote-winner-label">LEADING</span>' : ''}
+                        </div>
+                        <div class="vote-party">${c.party||''}</div>
+                    </div>
+                    <div>
+                        <div class="vote-count ${isWinner?'winner-count':''}">${votes.toLocaleString('bn-BD')}</div>
+                        <div class="vote-pct">${pct}%</div>
+                    </div>
+                </div>
+                <div class="vote-bar-bg">
+                    <div class="vote-bar-fill ${isWinner?'winner-bar':''}"
+                         style="width:0%" data-width="${pct}%"></div>
+                </div>`;
+            container.appendChild(card);
+
+            // Progress bar animate
+            setTimeout(() => {
+                const bar = card.querySelector('.vote-bar-fill');
+                if (bar) bar.style.width = pct + '%';
+            }, 100 + idx * 150);
+        });
+
+        if (totalVotes > 0) {
+            totalEl.textContent = 'মোট ভোট: ' + totalVotes.toLocaleString('bn-BD');
+        }
+
+        overlay.classList.add('show');
+    }
+
+    db.ref('voteResult').on('value', snap => {
+        const data = snap.val();
+        const overlay = document.getElementById('voteOverlay');
+        if (!overlay) return;
+        if (data && data.active) {
+            renderVoteResults(data);
+        } else {
+            overlay.classList.remove('show');
+        }
+    });
+
+    // ══ Flash Ad — Firebase থেকে trigger ══════════════
+    let flashAdTimer = null;
+
+    function showFlashAd(data) {
+        if (!data || !data.active) return;
+        const overlay   = document.getElementById('flashAdOverlay');
+        const imgEl     = document.getElementById('fa-img');
+        const vidEl     = document.getElementById('fa-vid');
+        const titleEl   = document.getElementById('fa-title');
+        const subEl     = document.getElementById('fa-sub');
+        const prog      = document.getElementById('flashAdProgress');
+        const progBar   = document.getElementById('flashAdProgressBar');
+        if (!overlay) return;
+
+        // Reset
+        [imgEl, vidEl, titleEl, subEl].forEach(el => el && el.classList.remove('show'));
+        overlay.classList.remove('show');
+
+        // Media set করো
+        const mediaUrl = data.imgUrl || data.videoUrl || '';
+        const isVideo  = data.videoUrl && !data.imgUrl;
+
+        if (isVideo && mediaUrl) {
+            vidEl.src = mediaUrl;
+            vidEl.load(); vidEl.play().catch(()=>{});
+            vidEl.classList.add('show');
+        } else if (mediaUrl) {
+            imgEl.src = mediaUrl;
+            imgEl.classList.add('show');
+        }
+
+        // টেক্সট
+        if (data.title) { titleEl.textContent = data.title; titleEl.classList.add('show'); }
+        if (data.sub)   { subEl.textContent   = data.sub;   subEl.classList.add('show'); }
+
+        // Progress bar
+        const duration = (data.duration || 10) * 1000;
+        prog.classList.add('show');
+        progBar.style.transition = 'none';
+        progBar.style.width = '0%';
+        progBar.offsetHeight;
+        progBar.style.transition = `width ${duration}ms linear`;
+        progBar.style.width = '100%';
+
+        // দেখাও
+        overlay.classList.add('show');
+
+        // duration পরে লুকাও
+        if (flashAdTimer) clearTimeout(flashAdTimer);
+        flashAdTimer = setTimeout(() => {
+            overlay.classList.remove('show');
+            progBar.style.width = '0%';
+            prog.classList.remove('show');
+            if (isVideo) { vidEl.pause(); vidEl.src=''; }
+            // Firebase এ active false করো — একবারই দেখাবে
+            db.ref('flashAd').update({ active: false });
+        }, duration);
+    }
+
+    // Firebase realtime — Admin trigger করলে সাথে সাথে দেখাবে
+    db.ref('flashAd').on('value', snap => {
+        const data = snap.val();
+        if (data && data.active) {
+            showFlashAd(data);
+        } else {
+            const overlay = document.getElementById('flashAdOverlay');
+            if (overlay) overlay.classList.remove('show');
+            if (flashAdTimer) { clearTimeout(flashAdTimer); flashAdTimer=null; }
+        }
+    });
+
+    // ── Top Bar Ads Firebase listener ──────────────────
+    db.ref('topBarAds').on('value', snap => {
+        const d = snap.val();
+        if (!d) { updateTopBarAds([]); return; }
+        const list = Object.values(d).filter(a => a.active !== false);
+        updateTopBarAds(list);
+    });
+
+    // ── Flash Ad Timer listener ────────────────────────
+    let viewerFaTimer = null;
+    db.ref('flashAdTimer').on('value', snap => {
+        const d = snap.val();
+        if (viewerFaTimer) clearInterval(viewerFaTimer);
+        if (!d || !d.interval || d.interval <= 0) return;
+        // viewer side: timer শুধু Admin trigger করলে চলবে
+        // (Admin Firebase update করবে, viewer সেটা শুনবে)
+    });
+
+    db.ref('banners').on('value', snap => {
+        const d=snap.val(); const now=new Date();
+        if (!d) { startAdBannerRotation([]); return; }
+        const list=Object.values(d).filter(b=>{
+            if(!b.startTime&&!b.endTime) return true;
+            const s=b.startTime?new Date(b.startTime):null, e=b.endTime?new Date(b.endTime):null;
+            return(!s||now>=s)&&(!e||now<=e);
+        });
+        startAdBannerRotation(list);
+    });
+
+    db.ref('schedules').on('value', snap => {
+        const d=snap.val(); if(!d) return;
+        const now=new Date();
+        const cur=Object.values(d).find(s=>{ const st=s.startTime?new Date(s.startTime):null,en=s.endTime?new Date(s.endTime):null; return(!st||now>=st)&&(!en||now<=en); });
+        if(cur){
+            document.getElementById('schedule-text').innerHTML=`${cur.name} <span class="schedule-time">${cur.timeDisplay||''}</span>`;
+            const img=document.getElementById('schedule-img'); if(cur.imgUrl){img.src=cur.imgUrl;img.style.display='block';}
+            const fsSch = document.getElementById('fs-sch-text');
+            if (fsSch) fsSch.textContent = cur.name + (cur.timeDisplay ? ' '+cur.timeDisplay : '');
+        }
+    });
+
+}); // DOMContentLoaded শেষ
+</script>
+<!-- ══ Fullscreen Overlay ══ -->
+<div class="fs-overlay" id="fsOverlay">
+    <!-- Schedule -->
+    <div class="fs-schedule" id="fs-schedule">
+        <span class="fs-sch-badge">এখন:</span>
+        <span class="fs-sch-text" id="fs-sch-text">নিয়মিত সম্প্রচার চলমান</span>
+    </div>
+    <!-- Ticker -->
+    <div class="fs-ticker">
+        <div class="fs-ticker-label">📢</div>
+        <div style="width:100%;overflow:hidden;">
+            <div class="fs-ticker-text" id="fs-ticker-text">ENTERTAINMENT চ্যানেলে আপনাকে স্বাগতম!</div>
+        </div>
+    </div>
+    <!-- DateTime -->
+    <div class="fs-datetime">
+        <span class="fs-dt-date" id="fs-dt-date"></span>
+        <span class="fs-dt-sep">|</span>
+        <span class="fs-dt-time" id="fs-dt-time"></span>
+    </div>
+    <!-- Ad Banner -->
+    <div class="fs-banner" id="fs-banner">
+        <img   id="fs-bl-img" class="fs-banner-img" src="" alt="" style="display:none;">
+        <video id="fs-bl-vid" class="fs-banner-vid" src="" muted autoplay loop playsinline style="display:none;"></video>
+        <div class="fs-banner-mid">
+            <div class="fs-banner-title" id="fs-bn-title"></div>
+            <div class="fs-banner-desc"  id="fs-bn-desc"></div>
+            <div class="fs-banner-sub"   id="fs-bn-sub"></div>
+        </div>
+        <img   id="fs-br-img" class="fs-banner-img" src="" alt="" style="display:none;">
+        <video id="fs-br-vid" class="fs-banner-vid" src="" muted autoplay loop playsinline style="display:none;"></video>
+    </div>
+</div>
+
+<!-- ══ 3D Billboard Overlay ══ -->
+<div id="billboardOverlay">
+    <div class="bb-inner">
+        <div class="bb-pole-top"></div>
+        <div class="bb-board">
+            <img   class="bb-img" id="bb-img" src="" alt="">
+            <video class="bb-vid" id="bb-vid" src="" muted playsinline loop></video>
+            <div class="bb-text" id="bb-text">
+                <div class="bb-title" id="bb-title"></div>
+                <div class="bb-sub"   id="bb-sub"></div>
+            </div>
+            <div class="bb-text-only" id="bb-text-only">
+                <div class="bb-title" id="bb-title2"></div>
+                <div class="bb-sub"   id="bb-sub2"></div>
+            </div>
+            <div class="bb-progress" id="bb-progress">
+                <div class="bb-progress-bar" id="bb-progress-bar"></div>
+            </div>
+        </div>
+        <div class="bb-pole-bottom"></div>
+    </div>
+</div>
+
+<!-- ══ Flash Ad Overlay ══ -->
+<div id="flashAdOverlay">
+    <img   class="fa-img" id="fa-img" src="" alt="">
+    <video class="fa-vid" id="fa-vid" src="" muted playsinline loop></video>
+    <div   class="fa-title" id="fa-title"></div>
+    <div   class="fa-sub"   id="fa-sub"></div>
+    <div id="flashAdProgress"><div id="flashAdProgressBar"></div></div>
+</div>
+
+<!-- ══ PWA Install Banner ══ -->
+<div id="pwaInstallBanner" style="
+    display:none; position:fixed; bottom:0; left:0; right:0; z-index:99999;
+    background:linear-gradient(135deg,#1a0d2e,#0d0e15);
+    border-top:2px solid #ff4757;
+    padding:12px 16px; align-items:center; gap:12px;
+    animation:pwaSlideUp .4s ease;
+">
+    <div style="flex:1;">
+        <div style="font-size:13px;font-weight:bold;color:#ffd700;">📺 Omkar TV App Install করুন</div>
+        <div style="font-size:10px;color:#aaa;margin-top:2px;">Home Screen এ App হিসেবে রাখুন — সহজে খুলুন</div>
+    </div>
+    <button id="pwaInstallBtn"
+        style="background:#ff4757;color:#fff;border:none;padding:8px 16px;
+               border-radius:6px;font-weight:bold;font-size:12px;cursor:pointer;flex-shrink:0;">
+        Install
+    </button>
+    <button onclick="document.getElementById('pwaInstallBanner').style.display='none'"
+        style="background:transparent;color:#aaa;border:none;font-size:18px;cursor:pointer;padding:4px;flex-shrink:0;">
+        ✕
+    </button>
+</div>
+
+<!-- ══ 3D Flip Billboard ══ -->
+<div id="billboard">
+    <div class="bb-card" id="bbCard">
+        <!-- সামনে -->
+        <div class="bb-face bb-front" id="bbFront">
+            <div class="bb-img-wrap" id="bb-front-wrap">
+                <img id="bb-front-img" src="" alt="">
+            </div>
+            <video id="bb-front-vid" class="bb-media" muted playsinline loop></video>
+            <div class="bb-title" id="bb-front-title"></div>
+            <div class="bb-sub"   id="bb-front-sub"></div>
+        </div>
+        <!-- পিছনে -->
+        <div class="bb-face bb-back" id="bbBack">
+            <div class="bb-img-wrap" id="bb-back-wrap">
+                <img id="bb-back-img" src="" alt="">
+            </div>
+            <video id="bb-back-vid" class="bb-media" muted playsinline loop></video>
+            <div class="bb-title" id="bb-back-title"></div>
+            <div class="bb-sub"   id="bb-back-sub"></div>
+        </div>
+    </div>
+    <div class="bb-dots" id="bbDots"></div>
+</div>
+
+<!-- PWA Service Worker + Install -->
+<script>
+    // ── Service Worker Register ──
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('[PWA] SW registered:', reg.scope))
+                .catch(err => console.log('[PWA] SW failed:', err));
+        });
+    }
+
+    // ── Install Banner ──
+    let deferredPrompt = null;
+    const banner    = document.getElementById('pwaInstallBanner');
+    const installBtn= document.getElementById('pwaInstallBtn');
+
+    window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // ৩ সেকেন্ড পরে banner দেখাও
+        setTimeout(() => {
+            if (banner) banner.style.display = 'flex';
+        }, 3000);
+    });
+
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            if (banner) banner.style.display = 'none';
+            console.log('[PWA] Install outcome:', outcome);
+        });
+    }
+
+    // Install হলে banner লুকাও
+    window.addEventListener('appinstalled', () => {
+        if (banner) banner.style.display = 'none';
+        deferredPrompt = null;
+        console.log('[PWA] App installed!');
+    });
+
+    // iOS এর জন্য আলাদা message
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode:standalone)').matches;
+    if (isIOS && !isStandalone && banner) {
+        banner.style.display = 'flex';
+        const btn = document.getElementById('pwaInstallBtn');
+        if (btn) {
+            btn.textContent = 'কীভাবে?';
+            btn.onclick = () => alert(
+                "iOS এ Install করতে:\n\n" +
+                "১. নিচে Share বাটন চাপুন\n" +
+                "২. Add to Home Screen বেছে নিন\n" +
+                "৩. Add চাপুন\n\n" +
+                "App হিসেবে চলবে!"
+            );
+        }
+    }
+</script>
+
+</body>
+</html>
