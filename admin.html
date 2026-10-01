@@ -153,21 +153,21 @@
     </div>
 
     <div class="icon-nav" id="iconNav">
-        <div class="icon-btn" data-sec="sec-password" onclick="showAdminSection('sec-password')"><span class="ico">🔐</span><span class="lbl">পাসওয়ার্ড</span></div>
-        <div class="icon-btn" data-sec="sec-festival" onclick="showAdminSection('sec-festival')"><span class="ico">🎉</span><span class="lbl">উৎসব</span></div>
         <div class="icon-btn" data-sec="sec-live" onclick="showAdminSection('sec-live')"><span class="ico">🔴</span><span class="lbl">লাইভ</span></div>
         <div class="icon-btn" data-sec="sec-news" onclick="showAdminSection('sec-news')"><span class="ico">📰</span><span class="lbl">নিউজ ফ্রেম</span></div>
+        <div class="icon-btn" data-sec="sec-election" onclick="showAdminSection('sec-election')"><span class="ico">🗳️</span><span class="lbl">নির্বাচন</span></div>
         <div class="icon-btn" data-sec="sec-broadcast" onclick="showAdminSection('sec-broadcast')"><span class="ico">📡</span><span class="lbl">ব্রডকাস্ট</span></div>
         <div class="icon-btn" data-sec="sec-playlist" onclick="showAdminSection('sec-playlist')"><span class="ico">🎥</span><span class="lbl">প্লেলিস্ট</span></div>
-        <div class="icon-btn" data-sec="sec-adbreak" onclick="showAdminSection('sec-adbreak')"><span class="ico">⏸️</span><span class="lbl">অ্যাড ব্রেক</span></div>
+        <div class="icon-btn" data-sec="sec-topbar" onclick="showAdminSection('sec-topbar')"><span class="ico">📊</span><span class="lbl">টপ বার</span></div>
+        <div class="icon-btn" data-sec="sec-billboard" onclick="showAdminSection('sec-billboard')"><span class="ico">🪧</span><span class="lbl">বিলবোর্ড</span></div>
+        <div class="icon-btn" data-sec="sec-banner" onclick="showAdminSection('sec-banner')"><span class="ico">🎠</span><span class="lbl">ব্যানার</span></div>
+        <div class="icon-btn" data-sec="sec-flash" onclick="showAdminSection('sec-flash')"><span class="ico">⚡</span><span class="lbl">ফ্ল্যাশ অ্যাড</span></div>
+        <div class="icon-btn" data-sec="sec-ticker" onclick="showAdminSection('sec-ticker')"><span class="ico">📢</span><span class="lbl">টিকর</span></div>
+        <div class="icon-btn" data-sec="sec-festival" onclick="showAdminSection('sec-festival')"><span class="ico">🎉</span><span class="lbl">উৎসব</span></div>
         <div class="icon-btn" data-sec="sec-schedule" onclick="showAdminSection('sec-schedule')"><span class="ico">📅</span><span class="lbl">সূচি</span></div>
         <div class="icon-btn" data-sec="sec-logo" onclick="showAdminSection('sec-logo')"><span class="ico">🖼️</span><span class="lbl">লোগো</span></div>
-        <div class="icon-btn" data-sec="sec-ticker" onclick="showAdminSection('sec-ticker')"><span class="ico">📢</span><span class="lbl">টিকর</span></div>
-        <div class="icon-btn" data-sec="sec-billboard" onclick="showAdminSection('sec-billboard')"><span class="ico">🪧</span><span class="lbl">বিলবোর্ড</span></div>
-        <div class="icon-btn" data-sec="sec-election" onclick="showAdminSection('sec-election')"><span class="ico">🗳️</span><span class="lbl">নির্বাচন</span></div>
-        <div class="icon-btn" data-sec="sec-flash" onclick="showAdminSection('sec-flash')"><span class="ico">⚡</span><span class="lbl">ফ্ল্যাশ অ্যাড</span></div>
-        <div class="icon-btn" data-sec="sec-topbar" onclick="showAdminSection('sec-topbar')"><span class="ico">📊</span><span class="lbl">টপ বার</span></div>
-        <div class="icon-btn" data-sec="sec-banner" onclick="showAdminSection('sec-banner')"><span class="ico">🎠</span><span class="lbl">ব্যানার</span></div>
+        <div class="icon-btn" data-sec="sec-adbreak" onclick="showAdminSection('sec-adbreak')"><span class="ico">⏸️</span><span class="lbl">অ্যাড ব্রেক</span></div>
+        <div class="icon-btn" data-sec="sec-password" onclick="showAdminSection('sec-password')"><span class="ico">🔐</span><span class="lbl">পাসওয়ার্ড</span></div>
     </div>
     <!-- Password Change -->
     <div class="card admin-section" id="sec-password" style="border-color:#00f2fe;">
@@ -295,6 +295,163 @@
             একাধিক শিরোনাম, খবর ও বিজ্ঞাপন যোগ করুন — প্লেয়ারে ঘুরে ঘুরে দেখাবে।
         </div>
 
+        <!-- Breaking event — top bar flip text -->
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:12px;border:1px solid #ffd54a;">
+            <div style="font-size:12px;color:#ffd54a;font-weight:bold;margin-bottom:8px;">⚡ Breaking News (টপ বার ফ্লিপ)</div>
+            <div style="font-size:10px;color:#888;margin-bottom:8px;">
+                চালু করলে হলুদ বারে <b>BREAKING</b> ↔ <b>ঘটনার টেক্সট</b> ঘুরবে।
+            </div>
+            <div class="form-group">
+                <label>🔴 উপরের শিরোনাম (কার্ডের লাল স্ট্রিপে):</label>
+                <input type="text" id="bnHeadline" placeholder="প্রয়োজন হলে তবেই ডাক ERO অফিসে" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>ঘটনার টেক্সট (কার্ডের বাঁ পাশে + টপ বার ফ্লিপে):</label>
+                <textarea id="bnText" rows="3" placeholder="বাড়ি থেকেই নথি সংগ্রহ করবেন বিএলওরা" autocomplete="off" style="width:100%;padding:10px;background:#181a24;border:1px solid #333;color:#fff;border-radius:6px;font-size:13px;box-sizing:border-box;"></textarea>
+            </div>
+            <div class="form-group">
+                <label>ডান পাশের স্ক্রিনে কী দেখাবে:</label>
+                <select id="bnRightMode">
+                    <option value="live">📺 লাইভ ভিডিও (ছোট হয়ে বসবে)</option>
+                    <option value="media">🖼 নিচের ছবি/ভিডিও URL</option>
+                    <option value="none">কিছু না (লেখা পুরো প্রস্থে)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>🖼 ডান পাশের ছবি/ভিডিও URL (শুধু "ছবি/ভিডিও" বাছলে):</label>
+                <input type="text" id="bnMediaUrl" placeholder="https://..." autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>অথবা গ্যালারি থেকে ছবি:</label>
+                <input type="file" id="bnMediaFile" accept="image/*">
+                <div id="bnImgStatus" style="font-size:11px;margin-top:4px;min-height:14px;"></div>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <div class="form-group" style="flex:1;">
+                    <label>কার্ড দেখাবে (সেকেন্ড):</label>
+                    <input type="number" id="bnCardSecs" value="12" min="3" max="600">
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>লাইভ দেখাবে (সেকেন্ড):</label>
+                    <input type="number" id="bnLiveSecs" value="8" min="0" max="600">
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <div class="form-group" style="flex:1;">
+                    <label>বাঁ স্লাইড বদলাবে (সেকেন্ড):</label>
+                    <input type="number" id="bnSlideSecs" value="6" min="2" max="120">
+                </div>
+                <div class="form-group" style="flex:2;">
+                    <label>কার্ড লোগো (ডিজাইন/ছবি):</label>
+                    <select id="bnLogoMode" style="margin-bottom:6px;">
+                        <option value="brand">🪔 আমার লোগো দিয়ে ব্র্যান্ড স্লাইড (AP + OMKAR NETWORK)</option>
+                        <option value="designed">🎨 ডিজাইন করা লোগো (অ্যানিমেটেড)</option>
+                        <option value="image">চ্যানেল লোগো ছবি</option>
+                    </select>
+                    <label>কার্ড লোগো URL (ঐচ্ছিক — দিলে এটাই ব্যবহার হবে):</label>
+                    <input type="text" id="bnLogoUrl" placeholder="খালি রাখলে চ্যানেল লোগো" autocomplete="off">
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <div class="form-group" style="flex:1;">
+                    <label>ব্র্যান্ড নাম:</label>
+                    <input type="text" id="bnBrandNameIn" placeholder="OMKAR NETWORK" autocomplete="off">
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>ট্যাগলাইন:</label>
+                    <input type="text" id="bnTagline" placeholder="সরাসরি সম্প্রচার" autocomplete="off">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>🔊 ব্যাকগ্রাউন্ড সাউন্ড (কার্ড চলাকালে):</label>
+                <select id="bnSoundMode">
+                    <option value="default">ডিফল্ট নিউজ টোন (নিজে তৈরি)</option>
+                    <option value="custom">নিজের অডিও লিংক (MP3)</option>
+                    <option value="none">সাউন্ড বন্ধ</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>অডিও URL (শুধু "নিজের অডিও" বাছলে):</label>
+                <div style="display:flex;gap:6px;">
+                    <input type="text" id="bnSoundUrl" placeholder="https://.../breaking.mp3" autocomplete="off" style="flex:1;">
+                    <button type="button" onclick="testBnSound()" style="background:#333;color:#fff;border:none;border-radius:6px;padding:0 12px;cursor:pointer;font-size:12px;">▶ টেস্ট</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>সাউন্ডের ভলিউম: <span id="bnSoundVolLbl">70</span>%</label>
+                <input type="range" id="bnSoundVol" min="5" max="100" value="70" oninput="document.getElementById('bnSoundVolLbl').textContent=this.value">
+            </div>
+            <div style="font-size:10px;color:#888;margin:-4px 0 8px;">💡 লাইভ ০ দিলে কার্ড সবসময় থাকবে। নাহলে কার্ড ↔ লাইভ ভিডিও পালা করে দেখাবে।</div>
+            <div class="form-group">
+                <label>চ্যানেল লেবেল (ঐচ্ছিক):</label>
+                <input type="text" id="bnChannel" placeholder="Omkar TV" autocomplete="off">
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button type="button" onclick="showBreakingNews()"
+                    style="flex:1;background:#ffd54a;color:#111;border:none;padding:9px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:12px;">
+                    ⚡ Breaking চালু
+                </button>
+                <button type="button" onclick="hideBreakingNews()"
+                    style="flex:1;background:#333;color:#fff;border:none;padding:9px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:12px;">
+                    ✕ বন্ধ
+                </button>
+            </div>
+            <div style="margin-top:10px;padding:8px;background:#0d0e15;border:1px solid #c80000;border-radius:8px;">
+                <div style="font-size:12px;color:#ff6b6b;font-weight:bold;margin-bottom:6px;">🟥 কার্ড Show / Hide (লাইভ নিয়ন্ত্রণ)</div>
+                <div style="display:flex;gap:6px;">
+                    <button type="button" id="bnCmShow" onclick="setBnCardMode('show')" style="flex:1;background:#c80000;color:#fff;border:2px solid transparent;padding:8px 4px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:11px;">👁 কার্ড Show</button>
+                    <button type="button" id="bnCmHide" onclick="setBnCardMode('hide')" style="flex:1;background:#333;color:#fff;border:2px solid transparent;padding:8px 4px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:11px;">🙈 কার্ড Hide</button>
+                    <button type="button" id="bnCmAuto" onclick="setBnCardMode('auto')" style="flex:1;background:#1e6fff;color:#fff;border:2px solid transparent;padding:8px 4px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:11px;">🔄 অটো</button>
+                </div>
+                <div id="bnCmStatus" style="font-size:10px;color:#aaa;margin-top:6px;min-height:14px;">Show = কার্ড সবসময় থাকবে · Hide = শুধু লাইভ + উপরের বার · অটো = কার্ড ↔ লাইভ পালা করে</div>
+            </div>
+            <div id="newsStatus" style="font-size:11px;margin-top:6px;min-height:18px;color:#aaa;"></div>
+        </div>
+        <script>
+            // পেজ লোডে আগের Breaking টেক্সট ফিল্ডে বসাও
+            (function(){
+                function bindBn() {
+                    if (typeof db === 'undefined' || !db) { setTimeout(bindBn, 500); return; }
+                    db.ref('breakingNews').on('value', function(snap) {
+                        var d = snap.val();
+                        var t = document.getElementById('bnText');
+                        var c = document.getElementById('bnChannel');
+                        var s = document.getElementById('newsStatus');
+                        if (d && d.text && t && !t.matches(':focus')) t.value = d.text;
+                        var hh = document.getElementById('bnHeadline');
+                        if (d && d.headline && hh && !hh.matches(':focus')) hh.value = d.headline;
+                        var mu = document.getElementById('bnMediaUrl');
+                        if (d && d.mediaUrl && mu && !mu.matches(':focus')) mu.value = d.mediaUrl;
+                        var sm = document.getElementById('bnSoundMode'), su = document.getElementById('bnSoundUrl'), sv = document.getElementById('bnSoundVol');
+                        if (d && d.soundMode && sm && !sm.matches(':focus')) sm.value = d.soundMode;
+                        if (d && d.soundUrl && su && !su.matches(':focus')) su.value = d.soundUrl;
+                        if (d && d.soundVol && sv && !sv.matches(':focus')) { sv.value = d.soundVol; var sl = document.getElementById('bnSoundVolLbl'); if (sl) sl.textContent = d.soundVol; }
+                        markBnCardMode((d && d.cardMode) || 'auto');
+                        var bn1 = document.getElementById('bnBrandNameIn'), tg1 = document.getElementById('bnTagline');
+                        if (d && d.brandName && bn1 && !bn1.matches(':focus')) bn1.value = d.brandName;
+                        if (d && d.tagline && tg1 && !tg1.matches(':focus')) tg1.value = d.tagline;
+                        var lm = document.getElementById('bnLogoMode');
+                        if (d && d.logoMode && lm && !lm.matches(':focus')) lm.value = d.logoMode;
+                        var ss = document.getElementById('bnSlideSecs'), lu = document.getElementById('bnLogoUrl');
+                        if (d && d.slideSecs && ss && !ss.matches(':focus')) ss.value = d.slideSecs;
+                        if (d && d.logoUrl && lu && !lu.matches(':focus')) lu.value = d.logoUrl;
+                        var rm = document.getElementById('bnRightMode');
+                        if (d && d.rightMode && rm && !rm.matches(':focus')) rm.value = d.rightMode;
+                        var cs = document.getElementById('bnCardSecs'), ls = document.getElementById('bnLiveSecs');
+                        if (d && d.cardSecs && cs && !cs.matches(':focus')) cs.value = d.cardSecs;
+                        if (d && d.liveSecs !== undefined && ls && !ls.matches(':focus')) ls.value = d.liveSecs;
+                        if (d && d.channel && c && !c.matches(':focus')) c.value = d.channel;
+                        if (s && d && d.active) {
+                            s.style.color = '#2ed573';
+                            s.textContent = '✅ Breaking News চলছে!';
+                        }
+                    });
+                }
+                if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindBn);
+                else bindBn();
+            })();
+        </script>
+
         <div class="form-group">
             <label>ডান লোগো লেবেল:</label>
             <input type="text" id="nfLabel" placeholder="NEWS" value="NEWS">
@@ -307,6 +464,11 @@
             <label>বাঁ প্যানেল টেক্সট:</label>
             <textarea id="nfLeftText" rows="2" placeholder="ICU বেড, ভেন্টিলেটর..."
                 style="width:100%;padding:8px;background:#0d0e15;border:1px solid #333;color:#fff;border-radius:6px;font-size:12px;"></textarea>
+            <div style="font-size:10px;color:#888;margin-top:4px;">
+                💡 দুটো ফিল্ডই খালি রাখলে বাঁ প্যানেল সম্পূর্ণ লুকিয়ে থাকবে
+            </div>
+            <button type="button" onclick="updateNfLeftPanel()" class="btn-cyan" style="margin-top:8px;">💾 বাঁ প্যানেল আপডেট (লাইভ)</button>
+            <div id="nfLeftStatus" style="font-size:11px;margin-top:6px;min-height:16px;color:#aaa;"></div>
         </div>
 
         <!-- Multiple Headlines -->
@@ -337,25 +499,38 @@
             </div>
         </div>
 
-        <!-- Multiple Ads -->
+        <!-- Multiple Ads — শুধু ছবি/ভিডিও -->
         <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid #ffd700;">
-            <div style="font-size:12px;color:#ffd700;font-weight:bold;margin-bottom:8px;">📢 বিজ্ঞাপন (একাধিক)</div>
+            <div style="font-size:12px;color:#ffd700;font-weight:bold;margin-bottom:8px;">📢 নিউজ বিজ্ঞাপন (শুধু ছবি / ভিডিও)</div>
+            <div style="font-size:11px;color:#888;margin-bottom:8px;">আলাদা লেখা নেই — নাম/ফোন ছবির ভিতরে ডিজাইন করুন।</div>
             <div class="form-group">
-                <label>নাম:</label>
-                <input type="text" id="nfAdTitle" placeholder="হাসি খুশি নার্সিং হোম">
+                <label>মিডিয়া টাইপ:</label>
+                <select id="nfAdMediaType" onchange="(function(){var t=document.getElementById('nfAdMediaType').value;document.getElementById('nfAdImgRow').style.display=t==='image'?'block':'none';document.getElementById('nfAdVidRow').style.display=t==='video'?'block':'none';})()">
+                    <option value="image">🖼️ ছবি</option>
+                    <option value="video">🎬 ভিডিও</option>
+                </select>
+            </div>
+            <div class="form-group" id="nfAdImgRow">
+                <label>ছবি URL:</label>
+                <input type="text" id="nfAdLogo" placeholder="https://i.ibb.co/ad.jpg">
+                <label style="margin-top:8px;display:block;">অথবা গ্যালারি থেকে ছবি:</label>
+                <input type="file" id="nfAdImgFile" accept="image/*">
+                <div id="nfAdImgStatus" class="upload-status" style="color:#00f2fe;"></div>
+            </div>
+            <div class="form-group" id="nfAdVidRow" style="display:none;">
+                <label>ভিডিও URL (.mp4):</label>
+                <input type="text" id="nfAdVideo" placeholder="https://example.com/ad.mp4">
+                <label style="margin-top:8px;display:block;">অথবা গ্যালারি থেকে ভিডিও:</label>
+                <input type="file" id="nfAdVidFile" accept="video/*">
+                <div id="nfAdVidStatus" class="upload-status" style="color:#00f2fe;"></div>
+                <div class="progress-bar-wrap" id="nfAdVidProgressWrap"><div class="progress-bar" id="nfAdVidProgressBar"></div></div>
             </div>
             <div class="form-group">
-                <label>বিবরণ:</label>
-                <input type="text" id="nfAdSub" placeholder="২৪ ঘণ্টা পরিষেবা">
+                <label>নাম (ঐচ্ছিক — শুধু তালিকায় দেখাবে):</label>
+                <input type="text" id="nfAdTitle" placeholder="কাস্টমার নাম">
             </div>
-            <div class="form-group">
-                <label>ফোন:</label>
-                <input type="text" id="nfAdPhone" placeholder="9732842058">
-            </div>
-            <div class="form-group">
-                <label>লোগো URL:</label>
-                <input type="text" id="nfAdLogo" placeholder="https://i.ibb.co/logo.jpg">
-            </div>
+            <input type="hidden" id="nfAdSub" value="">
+            <input type="hidden" id="nfAdPhone" value="">
             <button type="button" onclick="nfAddAd()" class="btn-gold" style="margin-bottom:8px;">+ বিজ্ঞাপন যোগ</button>
             <div id="nfAdList" style="font-size:12px;"></div>
             <div class="form-group" style="margin-top:8px;">
@@ -400,14 +575,19 @@
 
         <!-- Live update inputs -->
         <script>
-            document.getElementById('nfHeadline').addEventListener('input', function() {
-                const el = document.getElementById('nfHeadlinePreview');
-                if (el) el.textContent = this.value || 'Headline এখানে দেখাবে';
-            });
-            document.getElementById('nfLabel').addEventListener('input', function() {
-                const el = document.getElementById('nfLabelPreview');
-                if (el) el.textContent = this.value || 'ENTERTAINMENT';
-            });
+            // এলিমেন্ট না থাকলে এরর না দিয়ে বাদ দাও
+            (function() {
+                var h = document.getElementById('nfHeadline');
+                if (h) h.addEventListener('input', function() {
+                    const el = document.getElementById('nfHeadlinePreview');
+                    if (el) el.textContent = this.value || 'Headline এখানে দেখাবে';
+                });
+                var l = document.getElementById('nfLabel');
+                if (l) l.addEventListener('input', function() {
+                    const el = document.getElementById('nfLabelPreview');
+                    if (el) el.textContent = this.value || 'ENTERTAINMENT';
+                });
+            })();
         </script>
     </div>
 
@@ -595,9 +775,9 @@
     <div class="card admin-section" id="sec-billboard" style="border-color:#a55eea;">
         <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
 
-        <h2>🪧 3D Flip Billboard</h2>
+        <h2>🪧 3D Flip Billboard (বাঁ সাইড)</h2>
         <div style="font-size:11px;color:#888;margin-bottom:10px;">
-            বাঁ দিকে Flip হয়ে বিজ্ঞাপন দেখাবে। একাধিক Ad যোগ করুন — পালা করে দেখাবে।
+            প্লেয়ারের <b>বাঁ পাশে</b> 3D ফ্লিপ — <b>শুধু ছবি/ভিডিও</b> (আলাদা লেখা নেই)। নাম/ফোন ছবির ভিতরে ডিজাইন করুন।
         </div>
 
         <!-- Config -->
@@ -633,7 +813,18 @@
             <select id="bbMediaType" onchange="toggleBbMedia()">
                 <option value="image">ছবি</option>
                 <option value="video">ভিডিও (mute)</option>
+                <option value="3d">🧊 3D মডেল (Sketchfab)</option>
             </select>
+        </div>
+
+        <div id="bb3dSection" style="display:none;">
+            <div class="form-group">
+                <label>Sketchfab মডেলের পুরো লিংক (বা ৩২ অক্ষরের ID):</label>
+                <input type="text" id="bb3dUrl" placeholder="https://sketchfab.com/3d-models/নাম-0123456789abcdef0123456789abcdef">
+            </div>
+            <div style="font-size:10px;color:#888;margin-bottom:8px;">
+                💡 skfb.ly শর্ট লিংক এখানে কাজ করে না। শর্ট লিংকটা ব্রাউজারে খুলুন, তারপর ঠিকানা বার থেকে পুরো লিংক কপি করে দিন (শেষে ৩২ অক্ষরের ID থাকবে)।
+            </div>
         </div>
 
         <div id="bbImgSection">
@@ -866,6 +1057,43 @@
             ৩টার বেশি হলে প্লেয়ারে ঘুরে ঘুরে দেখাবে।
         </div>
 
+        <!-- Top Bar Trigger -->
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:12px;border:1px solid #00f2fe;">
+            <div style="font-size:12px;color:#00f2fe;font-weight:bold;margin-bottom:8px;">⚡ টপ বার ট্রিগার</div>
+            <div class="form-group">
+                <label>টপ বারের বিজ্ঞাপন কখন দেখাবে:</label>
+                <select id="tbTrigMode" onchange="saveTopBarMode()">
+                    <option value="always">সবসময় দেখাও</option>
+                    <option value="trigger">শুধু ট্রিগার করলে দেখাও</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ট্রিগারে কতক্ষণ দেখাবে (সেকেন্ড):</label>
+                <input type="number" id="tbTrigDuration" value="15" min="3" max="600">
+            </div>
+            <div style="display:flex;gap:6px;">
+                <button type="button" onclick="triggerTopBar()" style="flex:1;background:#ffd700;color:#000;border:none;padding:9px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:12px;">⚡ এখনই ট্রিগার</button>
+                <button type="button" onclick="stopTopBarTrigger()" style="flex:1;background:#444;color:#fff;border:none;padding:9px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:12px;">✕ লুকাও</button>
+            </div>
+            <div style="margin-top:8px;">
+                <label style="font-size:12px;color:#aaa;display:block;margin-bottom:4px;">⏱ নির্দিষ্ট সময় পরপর অটো ট্রিগার:</label>
+                <div style="display:flex;gap:6px;">
+                    <input type="number" id="tbTrigInterval" value="5" min="1" style="flex:1;padding:8px;background:#181a24;border:1px solid #333;color:#fff;border-radius:6px;font-size:13px;">
+                    <select id="tbTrigUnit" style="flex:1;padding:8px;background:#181a24;border:1px solid #333;color:#fff;border-radius:6px;font-size:13px;">
+                        <option value="60">মিনিট</option>
+                        <option value="1">সেকেন্ড</option>
+                        <option value="3600">ঘণ্টা</option>
+                    </select>
+                </div>
+                <div style="display:flex;gap:6px;margin-top:6px;">
+                    <button type="button" onclick="startTopBarAuto()" style="flex:1;background:#2ed573;color:#000;border:none;padding:7px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:bold;">▶ অটো চালু</button>
+                    <button type="button" onclick="stopTopBarAuto()" style="flex:1;background:#555;color:#fff;border:none;padding:7px;border-radius:6px;cursor:pointer;font-size:11px;">⏹ অটো বন্ধ</button>
+                </div>
+            </div>
+            <div id="tbTrigStatus" style="font-size:11px;margin-top:8px;min-height:16px;color:#aaa;"></div>
+            <div style="font-size:10px;color:#888;margin-top:4px;">💡 অটো ট্রিগার চলতে অ্যাডমিন পেজ খোলা রাখতে হবে।</div>
+        </div>
+
         <div class="form-group">
             <label>বিজ্ঞাপনের নাম / টাইটেল:</label>
             <input type="text" id="tbTitle" placeholder="দোকান বা প্রতিষ্ঠানের নাম">
@@ -873,6 +1101,15 @@
         <div class="form-group">
             <label>Subtitle / নম্বর:</label>
             <input type="text" id="tbSub" placeholder="01XXXXXXXXX / ঠিকানা">
+        </div>
+        <div class="form-group">
+            <label>কোন বক্সে দেখাবে (বাঁ থেকে ১, ২, ৩):</label>
+            <select id="tbSlot">
+                <option value="1">১ নম্বর বক্স (বাঁ)</option>
+                <option value="2">২ নম্বর বক্স (মাঝ)</option>
+                <option value="3">৩ নম্বর বক্স (ডান)</option>
+                <option value="0">অটো (ফাঁকা বক্সে বসবে)</option>
+            </select>
         </div>
         <div class="form-group">
             <label>ছবি URL:</label>
@@ -896,6 +1133,43 @@
         <button type="button" class="section-back" onclick="showAdminSection(null)">← সব মেনু</button>
 
         <h2>📺 স্লাইডার ব্যানার ম্যানেজমেন্ট</h2>
+
+        <!-- Banner Trigger -->
+        <div style="background:#0d0e15;border-radius:8px;padding:10px;margin-bottom:12px;border:1px solid #00f2fe;">
+            <div style="font-size:12px;color:#00f2fe;font-weight:bold;margin-bottom:8px;">⚡ নিচের ব্যানার ট্রিগার</div>
+            <div class="form-group">
+                <label>ব্যানার কখন দেখাবে:</label>
+                <select id="abTrigMode" onchange="saveBannerMode()">
+                    <option value="always">সবসময় দেখাও</option>
+                    <option value="trigger">শুধু ট্রিগার করলে দেখাও</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ট্রিগারে কতক্ষণ দেখাবে (সেকেন্ড):</label>
+                <input type="number" id="abTrigDuration" value="20" min="3" max="3600">
+            </div>
+            <div style="display:flex;gap:6px;">
+                <button type="button" onclick="triggerBanner()" style="flex:1;background:#ffd700;color:#000;border:none;padding:9px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:12px;">⚡ এখনই ট্রিগার</button>
+                <button type="button" onclick="stopBannerTrigger()" style="flex:1;background:#444;color:#fff;border:none;padding:9px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:12px;">✕ লুকাও</button>
+            </div>
+            <div style="margin-top:8px;">
+                <label style="font-size:12px;color:#aaa;display:block;margin-bottom:4px;">⏱ নির্দিষ্ট সময় পরপর অটো ট্রিগার:</label>
+                <div style="display:flex;gap:6px;">
+                    <input type="number" id="abTrigInterval" value="5" min="1" style="flex:1;padding:8px;background:#181a24;border:1px solid #333;color:#fff;border-radius:6px;font-size:13px;">
+                    <select id="abTrigUnit" style="flex:1;padding:8px;background:#181a24;border:1px solid #333;color:#fff;border-radius:6px;font-size:13px;">
+                        <option value="60">মিনিট</option>
+                        <option value="1">সেকেন্ড</option>
+                        <option value="3600">ঘণ্টা</option>
+                    </select>
+                </div>
+                <div style="display:flex;gap:6px;margin-top:6px;">
+                    <button type="button" onclick="startBannerAuto()" style="flex:1;background:#2ed573;color:#000;border:none;padding:7px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:bold;">▶ অটো চালু</button>
+                    <button type="button" onclick="stopBannerAuto()" style="flex:1;background:#555;color:#fff;border:none;padding:7px;border-radius:6px;cursor:pointer;font-size:11px;">⏹ অটো বন্ধ</button>
+                </div>
+            </div>
+            <div id="abTrigStatus" style="font-size:11px;margin-top:8px;min-height:16px;color:#aaa;"></div>
+            <div style="font-size:10px;color:#888;margin-top:4px;">💡 অটো ট্রিগার চলতে অ্যাডমিন পেজ খোলা রাখতে হবে।</div>
+        </div>
         <div class="form-group">
             <label>বাম পাশের মিডিয়া টাইপ:</label>
             <select id="bannerLeftType">
@@ -1270,22 +1544,20 @@
         });
     }
 
-    // ── Media Upload: ImgBB (ছবি) + Bunny CDN (ভিডিও) ──
-    // ভিডিও: Bunny CDN Storage API দিয়ে আপলোড
-    // ছবি:   ImgBB (free, no account needed for URL)
-    // YouTube URL দিলে সরাসরি embed করা হবে — আপলোড লাগবে না
+    // ── Media Upload: ImgBB (ছবি) + free fallback / Bunny (ভিডিও) ──
+    // ছবি  → ImgBB
+    // ভিডিও → Bunny CDN (কনফিগ থাকলে) অথবা catbox.moe (ফ্রি fallback)
 
-    // ImgBB API Key (https://api.imgbb.com থেকে free নিন)
-    const IMGBB_API_KEY = 'YOUR_IMGBB_KEY'; // এখানে আপনার key দিন
+    // ImgBB API Key
+    const IMGBB_API_KEY = '48bf3402b26d84cc2dcf21562cb16309';
 
-    // Bunny CDN Storage (https://bunny.net থেকে Storage Zone বানান)
+    // Bunny CDN Storage (ঐচ্ছিক — খালি রাখলে ভিডিও catbox দিয়ে আপলোড হবে)
     const BUNNY_STORAGE_HOST   = 'storage.bunnycdn.com';
-    const BUNNY_STORAGE_ZONE   = 'YOUR_ZONE_NAME';   // Storage Zone Name
-    const BUNNY_STORAGE_KEY    = 'YOUR_STORAGE_KEY'; // FTP Password / API Key
-    const BUNNY_PULL_ZONE_URL  = 'https://YOUR_PULLZONE.b-cdn.net'; // Pull Zone URL
+    const BUNNY_STORAGE_ZONE   = 'YOUR_ZONE_NAME';
+    const BUNNY_STORAGE_KEY    = 'YOUR_STORAGE_KEY';
+    const BUNNY_PULL_ZONE_URL  = 'https://YOUR_PULLZONE.b-cdn.net';
 
     function uploadToCloudinary(file, statusId, progressBarWrapId, progressBarId) {
-        // Cloudinary এর বদলে ImgBB/Bunny ব্যবহার করছি
         return uploadMedia(file, statusId, progressBarWrapId, progressBarId);
     }
 
@@ -1315,8 +1587,13 @@
                     setStatus('❌ ছবি 32MB এর বেশি।', '#ff4757');
                     return reject(new Error('Image too large'));
                 }
+                if (!IMGBB_API_KEY || IMGBB_API_KEY === 'YOUR_IMGBB_KEY') {
+                    setStatus('❌ ImgBB API key সেট করা নেই।', '#ff4757');
+                    return reject(new Error('ImgBB key missing'));
+                }
                 setStatus('🚀 ছবি আপলোড হচ্ছে (ImgBB)...', '#ffd700');
                 if (wrapEl) wrapEl.style.display = 'block';
+                if (barEl) barEl.style.width = '30%';
 
                 const reader = new FileReader();
                 reader.onload = async () => {
@@ -1325,71 +1602,116 @@
                     fd.append('key', IMGBB_API_KEY);
                     fd.append('image', base64);
                     try {
+                        if (barEl) barEl.style.width = '60%';
                         const res = await fetch('https://api.imgbb.com/1/upload', { method:'POST', body:fd });
                         const json = await res.json();
-                        if (json.success) {
+                        if (json.success && json.data && json.data.url) {
                             setStatus('✅ ছবি আপলোড সম্পন্ন!', '#2ed573');
                             if (barEl) barEl.style.width = '100%';
                             resolve(json.data.url);
                         } else {
-                            setStatus('❌ ImgBB সমস্যা: ' + (json.error?.message||''), '#ff4757');
-                            reject(new Error('ImgBB failed'));
+                            const errMsg = (json.error && json.error.message) ? json.error.message : 'আপলোড ব্যর্থ';
+                            setStatus('❌ ImgBB সমস্যা: ' + errMsg, '#ff4757');
+                            if (wrapEl) wrapEl.style.display = 'none';
+                            reject(new Error('ImgBB failed: ' + errMsg));
                         }
                     } catch(e) {
                         setStatus('❌ নেটওয়ার্ক সমস্যা।', '#ff4757');
+                        if (wrapEl) wrapEl.style.display = 'none';
                         reject(e);
                     }
+                };
+                reader.onerror = () => {
+                    setStatus('❌ ফাইল পড়া যায়নি।', '#ff4757');
+                    reject(new Error('FileReader error'));
                 };
                 reader.readAsDataURL(file);
 
             } else {
-                // ── ভিডিও → Bunny CDN Storage ──
-                const maxBytes = 2 * 1024 * 1024 * 1024; // 2GB
+                // ── ভিডিও ──
+                const maxBytes = 200 * 1024 * 1024; // 200MB (free hosts limit)
                 if (file.size > maxBytes) {
-                    setStatus('❌ ভিডিও 2GB এর বেশি।', '#ff4757');
+                    setStatus('❌ ভিডিও 200MB এর বেশি — URL দিয়ে যোগ করুন।', '#ff4757');
                     return reject(new Error('Video too large'));
                 }
-                if (!BUNNY_STORAGE_KEY || BUNNY_STORAGE_KEY === 'YOUR_STORAGE_KEY') {
-                    setStatus('⚠️ Bunny CDN key সেট করুন। এখন URL দিয়ে যোগ করুন।', '#ffa502');
-                    return reject(new Error('Bunny not configured'));
-                }
 
-                const safeName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-                const uploadUrl = `https://${BUNNY_STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${safeName}`;
+                const hasBunny = BUNNY_STORAGE_KEY && BUNNY_STORAGE_KEY !== 'YOUR_STORAGE_KEY'
+                    && BUNNY_STORAGE_ZONE && BUNNY_STORAGE_ZONE !== 'YOUR_ZONE_NAME'
+                    && BUNNY_PULL_ZONE_URL && !BUNNY_PULL_ZONE_URL.includes('YOUR_PULLZONE');
 
-                setStatus('🚀 ভিডিও আপলোড হচ্ছে (Bunny CDN)...', '#ffd700');
-                if (wrapEl) wrapEl.style.display = 'block';
+                if (hasBunny) {
+                    // Bunny CDN
+                    const safeName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+                    const uploadUrl = `https://${BUNNY_STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${safeName}`;
+                    setStatus('🚀 ভিডিও আপলোড হচ্ছে (Bunny CDN)...', '#ffd700');
+                    if (wrapEl) wrapEl.style.display = 'block';
 
-                const xhr = new XMLHttpRequest();
-                xhr.open('PUT', uploadUrl, true);
-                xhr.setRequestHeader('AccessKey', BUNNY_STORAGE_KEY);
-                xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-
-                xhr.upload.onprogress = (e) => {
-                    if (e.lengthComputable) {
-                        const pct = Math.round((e.loaded/e.total)*100);
-                        setStatus(`📤 আপলোড হচ্ছে... ${pct}% (${formatBytes(e.loaded)}/${formatBytes(e.total)})`, '#00f2fe');
-                        if (barEl) barEl.style.width = pct + '%';
-                    }
-                };
-                xhr.onload = () => {
-                    if (xhr.status === 201 || xhr.status === 200) {
-                        const cdnUrl = `${BUNNY_PULL_ZONE_URL}/${safeName}`;
-                        setStatus('✅ ভিডিও আপলোড সম্পন্ন!', '#2ed573');
-                        if (barEl) barEl.style.width = '100%';
-                        resolve(cdnUrl);
-                    } else {
-                        setStatus('❌ Bunny CDN সমস্যা: ' + xhr.status, '#ff4757');
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('PUT', uploadUrl, true);
+                    xhr.setRequestHeader('AccessKey', BUNNY_STORAGE_KEY);
+                    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            const pct = Math.round((e.loaded/e.total)*100);
+                            setStatus(`📤 আপলোড... ${pct}%`, '#00f2fe');
+                            if (barEl) barEl.style.width = pct + '%';
+                        }
+                    };
+                    xhr.onload = () => {
+                        if (xhr.status === 201 || xhr.status === 200) {
+                            setStatus('✅ ভিডিও আপলোড সম্পন্ন!', '#2ed573');
+                            if (barEl) barEl.style.width = '100%';
+                            resolve(`${BUNNY_PULL_ZONE_URL}/${safeName}`);
+                        } else {
+                            setStatus('❌ Bunny সমস্যা: ' + xhr.status, '#ff4757');
+                            if (wrapEl) wrapEl.style.display = 'none';
+                            reject(new Error('Bunny upload failed'));
+                        }
+                    };
+                    xhr.onerror = () => {
+                        setStatus('❌ নেটওয়ার্ক সমস্যা।', '#ff4757');
                         if (wrapEl) wrapEl.style.display = 'none';
-                        reject(new Error('Bunny upload failed: ' + xhr.status));
-                    }
-                };
-                xhr.onerror = () => {
-                    setStatus('❌ নেটওয়ার্ক সমস্যা।', '#ff4757');
-                    if (wrapEl) wrapEl.style.display = 'none';
-                    reject(new Error('Network error'));
-                };
-                xhr.send(file);
+                        reject(new Error('Network error'));
+                    };
+                    xhr.send(file);
+                } else {
+                    // ── ফ্রি fallback: catbox.moe (API key লাগে না) ──
+                    setStatus('🚀 ভিডিও আপলোড হচ্ছে...', '#ffd700');
+                    if (wrapEl) wrapEl.style.display = 'block';
+                    if (barEl) barEl.style.width = '20%';
+
+                    const fd = new FormData();
+                    fd.append('reqtype', 'fileupload');
+                    fd.append('fileToUpload', file);
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'https://catbox.moe/user/api.php', true);
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            const pct = Math.round((e.loaded/e.total)*100);
+                            setStatus(`📤 আপলোড... ${pct}%`, '#00f2fe');
+                            if (barEl) barEl.style.width = pct + '%';
+                        }
+                    };
+                    xhr.onload = () => {
+                        const url = (xhr.responseText || '').trim();
+                        if (xhr.status === 200 && url.indexOf('http') === 0) {
+                            setStatus('✅ ভিডিও আপলোড সম্পন্ন!', '#2ed573');
+                            if (barEl) barEl.style.width = '100%';
+                            resolve(url);
+                        } else {
+                            setStatus('❌ ভিডিও আপলোড ব্যর্থ — URL দিয়ে যোগ করুন।', '#ff4757');
+                            if (wrapEl) wrapEl.style.display = 'none';
+                            reject(new Error('Video upload failed'));
+                        }
+                    };
+                    xhr.onerror = () => {
+                        setStatus('❌ নেটওয়ার্ক সমস্যা।', '#ff4757');
+                        if (wrapEl) wrapEl.style.display = 'none';
+                        reject(new Error('Network error'));
+                    };
+                    xhr.send(fd);
+                }
             }
         });
     }
@@ -1525,7 +1847,9 @@
         if (rightFile) {
             try {
                 rightUrl = await uploadMedia(rightFile, 'bannerRightUploadStatus', 'bannerRightProgressWrap', 'bannerRightProgressBar');
-            } catch(e) {}
+            } catch(e) {
+                setGlobalStatus('⚠️ ডান পাশের ফাইল আপলোড হয়নি, URL দিলে সেটা ব্যবহার হবে।', '#ffa502');
+            }
         }
 
         const data = {
@@ -1699,16 +2023,22 @@
 
         let imgUrl = '', videoUrl = '';
 
-        if (type === 'image') {
-            imgUrl = document.getElementById('faImgUrl').value.trim();
-            const file = document.getElementById('faImgFile').files[0];
-            if (file) imgUrl = await uploadMedia(file, 'faImgStatus', null, null);
-            if (!imgUrl && !title) { status.style.color='#ff4757'; status.textContent='❌ ছবি URL বা টাইটেল দিন'; return; }
-        } else {
-            videoUrl = document.getElementById('faVidUrl').value.trim();
-            const file = document.getElementById('faVidFile').files[0];
-            if (file) videoUrl = await uploadMedia(file, 'faVidStatus', 'faVidProgressWrap', 'faVidProgressBar');
-            if (!videoUrl) { status.style.color='#ff4757'; status.textContent='❌ ভিডিও URL দিন'; return; }
+        try {
+            if (type === 'image') {
+                imgUrl = document.getElementById('faImgUrl').value.trim();
+                const file = document.getElementById('faImgFile').files[0];
+                if (file) imgUrl = await uploadMedia(file, 'faImgStatus', null, null);
+                if (!imgUrl && !title) { status.style.color='#ff4757'; status.textContent='❌ ছবি URL বা টাইটেল দিন'; return; }
+            } else {
+                videoUrl = document.getElementById('faVidUrl').value.trim();
+                const file = document.getElementById('faVidFile').files[0];
+                if (file) videoUrl = await uploadMedia(file, 'faVidStatus', 'faVidProgressWrap', 'faVidProgressBar');
+                if (!videoUrl) { status.style.color='#ff4757'; status.textContent='❌ ভিডিও URL দিন'; return; }
+            }
+        } catch (e) {
+            status.style.color = '#ff4757';
+            status.textContent = '❌ আপলোড হয়নি: ' + (e && e.message ? e.message : e);
+            return;
         }
 
         db.ref('flashAd').set({
@@ -1769,21 +2099,117 @@
 
 
     // ── Breaking News Functions ──────────────────────
-    function showBreakingNews() {
-        const text    = document.getElementById('bnText').value.trim();
-        const channel = document.getElementById('bnChannel').value.trim();
+    async function showBreakingNews() {
+        let text = (document.getElementById('bnText').value || '').trim();
+        // লেবেল/placeholder ভুল করে সেভ না হয়
+        text = text
+            .replace(/^ঘটনার\s*টেক্সট[^:]*:\s*/i, '')
+            .replace(/^টেক্সট\s*\([^)]*\)\s*:?\s*/i, '')
+            .replace(/^টেক্সট[^:]*:\s*/i, '')
+            .replace(/^যেমন\s*:\s*/i, '')
+            .trim();
+        const channel = (document.getElementById('bnChannel').value || '').trim();
         const status  = document.getElementById('newsStatus');
-        if (!text) { status.style.color='#ff4757'; status.textContent='❌ টেক্সট লিখুন'; return; }
+        if (!text || text.length < 3) {
+            status.style.color='#ff4757';
+            status.textContent='❌ আসল ঘটনার টেক্সট লিখুন (খালি রাখবেন না)';
+            return;
+        }
+        if (/উল্টো\s*পিঠ|দেখাবে/i.test(text)) {
+            status.style.color='#ff4757';
+            status.textContent='❌ ভুল টেক্সট — শুধু খবরের বাক্য লিখুন';
+            return;
+        }
+        document.getElementById('bnText').value = text;
+        const headline = (document.getElementById('bnHeadline').value || '').trim();
+        let mediaUrl = (document.getElementById('bnMediaUrl').value || '').trim();
+        const cardSecs = Math.max(3, parseInt(document.getElementById('bnCardSecs').value, 10) || 12);
+        let liveSecs = parseInt(document.getElementById('bnLiveSecs').value, 10);
+        if (isNaN(liveSecs) || liveSecs < 0) liveSecs = 8;
+        status.style.color='#ffd700';
+        status.textContent='সেভ হচ্ছে...';
+        try {
+            const f = document.getElementById('bnMediaFile').files[0];
+            if (f) mediaUrl = await uploadMedia(f, 'bnImgStatus', null, null);
+        } catch (e) {
+            status.style.color='#ff4757';
+            status.textContent='❌ ছবি আপলোড হয়নি: ' + (e && e.message ? e.message : e);
+            return;
+        }
+        if (mediaUrl) document.getElementById('bnMediaUrl').value = mediaUrl;
         db.ref('breakingNews').set({
-            active: true, text, channel,
+            active: true,
+            text: text,
+            headline: headline,
+            mediaUrl: mediaUrl,
+            cardMode: window._bnCardModeCur || 'auto',
+            rightMode: (document.getElementById('bnRightMode') || {}).value || 'live',
+            soundMode: (document.getElementById('bnSoundMode') || {}).value || 'default',
+            soundUrl: ((document.getElementById('bnSoundUrl') || {}).value || '').trim(),
+            soundVol: Math.min(100, Math.max(5, parseInt((document.getElementById('bnSoundVol') || {}).value, 10) || 70)),
+            logoMode: (document.getElementById('bnLogoMode') || {}).value || 'brand',
+            brandName: ((document.getElementById('bnBrandNameIn') || {}).value || '').trim(),
+            tagline: ((document.getElementById('bnTagline') || {}).value || '').trim(),
+            slideSecs: Math.max(2, parseInt((document.getElementById('bnSlideSecs') || {}).value, 10) || 6),
+            logoUrl: ((document.getElementById('bnLogoUrl') || {}).value || '').trim(),
+            cardSecs: cardSecs,
+            liveSecs: liveSecs,
+            channel: channel || 'Omkar TV',
             updatedAt: firebase.database.ServerValue.TIMESTAMP
-        }).then(() => { status.style.color='#2ed573'; status.textContent='✅ Breaking News চলছে!'; })
-          .catch(e => { status.style.color='#ff4757'; status.textContent='❌ '+e.message; });
+        }).then(() => {
+            status.style.color='#2ed573';
+            status.textContent='✅ Breaking চলছে: ' + text.substring(0, 40) + (text.length>40?'…':'');
+        }).catch(e => { status.style.color='#ff4757'; status.textContent='❌ '+e.message; });
+    }
+
+    function setBnCardMode(mode) {
+        if (['show','hide','auto'].indexOf(mode) < 0) mode = 'auto';
+        const st = document.getElementById('bnCmStatus');
+        db.ref('breakingNews').update({ cardMode: mode }).then(() => {
+            if (st) { st.style.color = '#2ed573'; st.textContent = mode === 'show' ? '✅ কার্ড এখন সবসময় দেখাবে' : mode === 'hide' ? '✅ কার্ড লুকানো — শুধু লাইভ ভিডিও' : '✅ অটো — কার্ড ↔ লাইভ পালা করে'; }
+        }).catch(e => { if (st) { st.style.color = '#ff4757'; st.textContent = '❌ ' + e.message; } });
+    }
+    function markBnCardMode(mode) {
+        window._bnCardModeCur = mode;
+        [['show','bnCmShow'],['hide','bnCmHide'],['auto','bnCmAuto']].forEach(function(p) {
+            var b = document.getElementById(p[1]); if (b) b.style.borderColor = (p[0] === mode) ? '#ffd54a' : 'transparent';
+        });
+    }
+
+    function testBnSound() {
+        const u = ((document.getElementById('bnSoundUrl') || {}).value || '').trim();
+        const st = document.getElementById('newsStatus');
+        if (!u) { if (st) { st.style.color = '#ff4757'; st.textContent = '❌ আগে অডিও URL দিন'; } return; }
+        try {
+            const a = new Audio(u);
+            a.volume = (parseInt(document.getElementById('bnSoundVol').value, 10) || 70) / 100;
+            a.play().then(() => { if (st) { st.style.color = '#2ed573'; st.textContent = '▶ টেস্ট বাজছে (৫ সেকেন্ড)'; } setTimeout(() => a.pause(), 5000); })
+                .catch(e => { if (st) { st.style.color = '#ff4757'; st.textContent = '❌ অডিও চলেনি: ' + e.message; } });
+        } catch (e) { if (st) { st.style.color = '#ff4757'; st.textContent = '❌ ' + e.message; } }
     }
 
     function hideBreakingNews() {
-        db.ref('breakingNews').update({ active: false }).then(() => {
-            document.getElementById('newsStatus').textContent = 'Breaking News বন্ধ।';
+        const status = document.getElementById('newsStatus');
+        if (status) { status.style.color='#ffd700'; status.textContent='বন্ধ হচ্ছে...'; }
+        // active + text দুটোই মুছুন — বন্ধের পর আর যেন না দেখায়
+        db.ref('breakingNews').set({
+            active: false,
+            text: '',
+            headline: '',
+            mediaUrl: '',
+            channel: '',
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            const t = document.getElementById('bnText');
+            if (t) t.value = '';
+            ['bnHeadline','bnMediaUrl','bnLogoUrl'].forEach(function(id){ var e = document.getElementById(id); if (e) e.value = ''; });
+            var bf = document.getElementById('bnMediaFile'); if (bf) bf.value = '';
+            if (status) {
+                status.style.color='#aaa';
+                status.textContent='⏹ Breaking News সম্পূর্ণ বন্ধ';
+            }
+        }).catch(e => {
+            if (status) { status.style.color='#ff4757'; status.textContent='❌ '+e.message; }
         });
     }
 
@@ -1821,58 +2247,189 @@
         nfRenderLists();
     }
 
-    function nfAddAd() {
+    async function nfAddAd() {
         const title = (document.getElementById('nfAdTitle')||{}).value || '';
         const sub = (document.getElementById('nfAdSub')||{}).value || '';
         const phone = (document.getElementById('nfAdPhone')||{}).value || '';
         const logo = (document.getElementById('nfAdLogo')||{}).value || '';
-        if (!title.trim()) return alert('বিজ্ঞাপনের নাম লিখুন');
-        window._nfAds.push({ title: title.trim(), sub: sub.trim(), phone: phone.trim(), logo: logo.trim() });
-        ['nfAdTitle','nfAdSub','nfAdPhone','nfAdLogo'].forEach(id => {
+        const video = (document.getElementById('nfAdVideo')||{}).value || '';
+        const mediaType = (document.getElementById('nfAdMediaType')||{}).value || 'image';
+        let media = mediaType === 'video' ? video.trim() : logo.trim();
+        // গ্যালারি থেকে বাছা ফাইল থাকলে আগে আপলোড
+        const addBtn = document.querySelector('button[onclick="nfAddAd()"]');
+        const oldLabel = addBtn ? addBtn.textContent : '';
+        try {
+            if (mediaType === 'video') {
+                const f = (document.getElementById('nfAdVidFile') || {}).files && document.getElementById('nfAdVidFile').files[0];
+                if (f) {
+                    if (addBtn) { addBtn.disabled = true; addBtn.textContent = '⏳ ভিডিও আপলোড হচ্ছে...'; }
+                    media = await uploadMedia(f, 'nfAdVidStatus', 'nfAdVidProgressWrap', 'nfAdVidProgressBar');
+                }
+            } else {
+                const f = (document.getElementById('nfAdImgFile') || {}).files && document.getElementById('nfAdImgFile').files[0];
+                if (f) {
+                    if (addBtn) { addBtn.disabled = true; addBtn.textContent = '⏳ ছবি আপলোড হচ্ছে...'; }
+                    media = await uploadMedia(f, 'nfAdImgStatus', null, null);
+                }
+            }
+        } catch (e) {
+            if (addBtn) { addBtn.disabled = false; addBtn.textContent = oldLabel; }
+            return alert('আপলোড হয়নি: ' + (e && e.message ? e.message : e) + '\n(URL দিয়েও যোগ করতে পারেন)');
+        }
+        if (addBtn) { addBtn.disabled = false; addBtn.textContent = oldLabel; }
+        if (!media) return alert('ছবি/ভিডিও URL দিন বা গ্যালারি থেকে ফাইল বাছুন');
+        const item = {
+            title: title.trim() || 'Ad',
+            sub: sub.trim(),
+            phone: phone.trim(),
+            logo: mediaType === 'image' ? media : '',
+            imgUrl: mediaType === 'image' ? media : '',
+            videoUrl: mediaType === 'video' ? media : '',
+            mediaType: mediaType
+        };
+        if (window._nfEditAdIdx >= 0 && window._nfEditAdIdx < window._nfAds.length) {
+            window._nfAds[window._nfEditAdIdx] = item;
+            window._nfEditAdIdx = -1;
+            const btn = document.querySelector('button[onclick="nfAddAd()"]');
+            if (btn) { btn.textContent = '+ বিজ্ঞাপন যোগ'; btn.style.background = ''; }
+        } else {
+            window._nfAds.push(item);
+        }
+        ['nfAdTitle','nfAdSub','nfAdPhone','nfAdLogo','nfAdVideo','nfAdImgFile','nfAdVidFile'].forEach(id => {
             const el = document.getElementById(id); if (el) el.value = '';
         });
+        ['nfAdImgStatus','nfAdVidStatus'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ''; });
+        const pw = document.getElementById('nfAdVidProgressWrap'); if (pw) pw.style.display = 'none';
         nfRenderLists();
+        nfSyncAdsToFirebase();
     }
 
     function nfRemoveItem(kind, idx) {
+        if (!confirm('ডিলিট করবেন?')) return;
         if (kind === 'headlines') window._nfHeadlines.splice(idx, 1);
         else if (kind === 'tickers') window._nfTickers.splice(idx, 1);
-        else if (kind === 'ads') window._nfAds.splice(idx, 1);
+        else if (kind === 'ads') {
+            window._nfAds.splice(idx, 1);
+            if (window._nfEditAdIdx === idx) window._nfEditAdIdx = -1;
+        }
         nfRenderLists();
+        nfSyncAdsToFirebase();
     }
 
     function nfRenderLists() {
         const hl = document.getElementById('nfHeadlineList');
         const tl = document.getElementById('nfTickerList');
         const al = document.getElementById('nfAdList');
+        const btnStyle = 'border:none;color:#fff;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;';
         if (hl) {
             hl.innerHTML = window._nfHeadlines.length
                 ? window._nfHeadlines.map((t,i) =>
-                    `<div style="display:flex;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid #222;">
+                    `<div style="display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #222;">
                         <span style="flex:1;color:#fff;">${i+1}. ${t}</span>
-                        <button type="button" onclick="nfRemoveItem('headlines',${i})" style="background:#c00;border:none;color:#fff;padding:2px 8px;border-radius:4px;cursor:pointer;">×</button>
+                        <button type="button" onclick="nfEditHeadline(${i})" style="background:#0984e3;${btnStyle}">✏️</button>
+                        <button type="button" onclick="nfRemoveItem('headlines',${i})" style="background:#c00;${btnStyle}">🗑</button>
                     </div>`).join('')
                 : '<p style="color:#666;font-size:11px;">এখনো কোনো শিরোনাম নেই</p>';
         }
         if (tl) {
             tl.innerHTML = window._nfTickers.length
                 ? window._nfTickers.map((t,i) =>
-                    `<div style="display:flex;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid #222;">
+                    `<div style="display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #222;">
                         <span style="flex:1;color:#fff;">${i+1}. ${t}</span>
-                        <button type="button" onclick="nfRemoveItem('tickers',${i})" style="background:#c00;border:none;color:#fff;padding:2px 8px;border-radius:4px;cursor:pointer;">×</button>
+                        <button type="button" onclick="nfEditTicker(${i})" style="background:#0984e3;${btnStyle}">✏️</button>
+                        <button type="button" onclick="nfRemoveItem('tickers',${i})" style="background:#c00;${btnStyle}">🗑</button>
                     </div>`).join('')
                 : '<p style="color:#666;font-size:11px;">এখনো কোনো খবর নেই</p>';
         }
         if (al) {
             al.innerHTML = window._nfAds.length
-                ? window._nfAds.map((a,i) =>
-                    `<div style="display:flex;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid #222;">
-                        <span style="flex:1;color:#ffd700;">${i+1}. ${a.title}${a.phone ? ' · '+a.phone : ''}</span>
-                        <button type="button" onclick="nfRemoveItem('ads',${i})" style="background:#c00;border:none;color:#fff;padding:2px 8px;border-radius:4px;cursor:pointer;">×</button>
-                    </div>`).join('')
+                ? window._nfAds.map((a,i) => {
+                    const media = a.logo || a.imgUrl || a.image || a.videoUrl || '';
+                    const thumb = media
+                        ? `<img src="${media}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;border:1px solid #ffd700;" onerror="this.style.display='none'">`
+                        : '<div style="width:36px;height:36px;background:#333;border-radius:4px;"></div>';
+                    return `<div style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #222;">
+                        ${thumb}
+                        <span style="flex:1;color:#ffd700;font-size:12px;">${i+1}. ${a.title || 'বিজ্ঞাপন'}${a.phone ? '<br><span style="color:#aaa;font-size:10px;">'+a.phone+'</span>' : ''}${media ? '<br><span style="color:#666;font-size:9px;word-break:break-all;">'+media.substring(0,40)+'...</span>' : ''}</span>
+                        <button type="button" onclick="nfEditAd(${i})" style="background:#0984e3;${btnStyle}">✏️ এডিট</button>
+                        <button type="button" onclick="nfRemoveItem('ads',${i})" style="background:#c00;${btnStyle}">🗑 ডিলিট</button>
+                    </div>`;
+                }).join('')
                 : '<p style="color:#666;font-size:11px;">এখনো কোনো বিজ্ঞাপন নেই</p>';
         }
     }
+
+    window._nfEditAdIdx = -1;
+
+    function nfEditAd(idx) {
+        const a = window._nfAds[idx];
+        if (!a) return;
+        window._nfEditAdIdx = idx;
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+        set('nfAdTitle', a.title);
+        set('nfAdSub', a.sub);
+        set('nfAdPhone', a.phone);
+        const isVid = a.mediaType === 'video' || a.videoUrl;
+        const mt = document.getElementById('nfAdMediaType');
+        if (mt) mt.value = isVid ? 'video' : 'image';
+        const imgRow = document.getElementById('nfAdImgRow');
+        const vidRow = document.getElementById('nfAdVidRow');
+        if (imgRow) imgRow.style.display = isVid ? 'none' : 'block';
+        if (vidRow) vidRow.style.display = isVid ? 'block' : 'none';
+        set('nfAdLogo', a.logo || a.imgUrl || a.image || '');
+        set('nfAdVideo', a.videoUrl || '');
+        const btn = document.querySelector('button[onclick="nfAddAd()"]');
+        if (btn) { btn.textContent = '💾 বিজ্ঞাপন আপডেট'; btn.style.background = '#0984e3'; }
+        const st = document.getElementById('nfStatus');
+        if (st) { st.style.color = '#ffd700'; st.textContent = '✏️ বিজ্ঞাপন #' + (idx+1) + ' এডিট মোড'; }
+    }
+
+    function nfEditHeadline(idx) {
+        const t = window._nfHeadlines[idx];
+        if (t === undefined) return;
+        const v = prompt('শিরোনাম এডিট করুন:', t);
+        if (v === null) return;
+        if (!v.trim()) { alert('খালি রাখা যাবে না'); return; }
+        window._nfHeadlines[idx] = v.trim();
+        nfRenderLists();
+        nfSyncAdsToFirebase();
+    }
+
+    function nfEditTicker(idx) {
+        const t = window._nfTickers[idx];
+        if (t === undefined) return;
+        const v = prompt('খবর এডিট করুন:', t);
+        if (v === null) return;
+        if (!v.trim()) { alert('খালি রাখা যাবে না'); return; }
+        window._nfTickers[idx] = v.trim();
+        nfRenderLists();
+        nfSyncAdsToFirebase();
+    }
+
+    function nfSyncAdsToFirebase() {
+        // লাইভ ফ্রেম চালু থাকলে Firebase আপডেট
+        db.ref('newsFrame').once('value').then(snap => {
+            const d = snap.val();
+            if (!d || !d.active) return;
+            db.ref('newsFrame').update({
+                headlines: window._nfHeadlines.slice(),
+                tickers: window._nfTickers.slice(),
+                ads: window._nfAds.slice(),
+                leftTitle: ((document.getElementById('nfLeftTitle')||{}).value || '').trim(),
+                leftText: ((document.getElementById('nfLeftText')||{}).value || '').trim(),
+                headline: window._nfHeadlines[0] || '',
+                flashText: window._nfTickers[0] || '',
+                adTitle: (window._nfAds[0] && window._nfAds[0].title) || '',
+                adSub: (window._nfAds[0] && window._nfAds[0].sub) || '',
+                adPhone: (window._nfAds[0] && window._nfAds[0].phone) || '',
+                adLogo: (window._nfAds[0] && (window._nfAds[0].logo || window._nfAds[0].imgUrl)) || ''
+            }).then(() => {
+                const st = document.getElementById('nfStatus');
+                if (st) { st.style.color = '#2ed573'; st.textContent = '✅ লাইভ আপডেট হয়েছে'; }
+            });
+        });
+    }
+
 
     function startNewsFrame() {
         const label = (document.getElementById('nfLabel')||{}).value || 'NEWS';
@@ -1899,8 +2456,9 @@
         const payload = {
             active: true,
             channelLabel: (label||'').trim() || 'NEWS',
-            leftTitle: leftTitle || 'আমাদের পরিষেবা',
-            leftText: leftText || '',
+            // খালি রাখলে বাঁ প্যানেল লুকিয়ে থাকবে (কোনো ডিফল্ট টাইটেল ফোর্স করব না)
+            leftTitle: (leftTitle || '').trim(),
+            leftText: (leftText || '').trim(),
             headlines: headlines,
             tickers: tickers,
             ads: ads,
@@ -1939,8 +2497,27 @@
         if (Array.isArray(d.ads)) window._nfAds = d.ads.slice();
         else if (d.adTitle) window._nfAds = [{ title:d.adTitle, sub:d.adSub||'', phone:d.adPhone||'', logo:d.adLogo||'' }];
         if (typeof nfRenderLists === 'function') nfRenderLists();
+        // বাঁ প্যানেলের সেভ করা মান ফিল্ডে বসাও (টাইপ করার সময় ওভাররাইট করবে না)
+        var lt = document.getElementById('nfLeftTitle');
+        var lx = document.getElementById('nfLeftText');
+        if (lt && !lt.matches(':focus')) lt.value = d.leftTitle || '';
+        if (lx && !lx.matches(':focus')) lx.value = d.leftText || '';
     });
 
+
+    // বাঁ প্যানেল — ফ্রেম চলা অবস্থাতেও সরাসরি আপডেট
+    function updateNfLeftPanel() {
+        const st = document.getElementById('nfLeftStatus');
+        const title = ((document.getElementById('nfLeftTitle')||{}).value || '').trim();
+        const text  = ((document.getElementById('nfLeftText')||{}).value  || '').trim();
+        if (st) { st.style.color='#ffd700'; st.textContent='সেভ হচ্ছে...'; }
+        db.ref('newsFrame').update({ leftTitle: title, leftText: text }).then(() => {
+            if (st) {
+                st.style.color = '#2ed573';
+                st.textContent = (title || text) ? '✅ বাঁ প্যানেল আপডেট হয়েছে' : '✅ বাঁ প্যানেল লুকানো হয়েছে';
+            }
+        }).catch(e => { if (st) { st.style.color='#ff4757'; st.textContent='❌ '+e.message; } });
+    }
 
     function stopNewsFrame() {
         db.ref('newsFrame').update({ active: false }).then(() => {
@@ -2052,6 +2629,13 @@
         const t = document.getElementById('bbMediaType').value;
         document.getElementById('bbImgSection').style.display = t==='image' ? '' : 'none';
         document.getElementById('bbVidSection').style.display = t==='video' ? '' : 'none';
+        document.getElementById('bb3dSection').style.display  = t==='3d' ? '' : 'none';
+    }
+
+    // Sketchfab লিংক/ID থেকে ৩২ অক্ষরের মডেল ID বের করো
+    function parseSketchfabUid(s) {
+        const m = String(s || '').match(/[0-9a-f]{32}/i);
+        return m ? m[0].toLowerCase() : '';
     }
 
     function saveBillboardConfig() {
@@ -2068,9 +2652,15 @@
         const sub   = document.getElementById('bbSub').value.trim();
         const type  = document.getElementById('bbMediaType').value;
 
-        let imgUrl='', videoUrl='';
+        let imgUrl='', videoUrl='', modelUid='', modelUrl='';
 
-        if (type==='image') {
+        if (type==='3d') {
+            modelUrl = document.getElementById('bb3dUrl').value.trim();
+            modelUid = parseSketchfabUid(modelUrl);
+            if (!modelUid) {
+                return alert('Sketchfab মডেলের ID পাওয়া যায়নি।\nskfb.ly শর্ট লিংক ব্রাউজারে খুলে ঠিকানা বার থেকে পুরো লিংক (sketchfab.com/3d-models/...) কপি করে দিন।');
+            }
+        } else if (type==='image') {
             imgUrl = document.getElementById('bbImgUrl').value.trim();
             const f = document.getElementById('bbImgFile').files[0];
             if (f) imgUrl = await uploadMedia(f, 'bbImgStatus', null, null);
@@ -2080,17 +2670,17 @@
             if (f) videoUrl = await uploadMedia(f, 'bbVidStatus', 'bbVidProgressWrap', 'bbVidProgressBar');
         }
 
-        if (!title && !imgUrl && !videoUrl) return alert('টাইটেল বা ছবি/ভিডিও দিন');
+        if (!title && !imgUrl && !videoUrl && !modelUid) return alert('টাইটেল বা ছবি/ভিডিও/3D মডেল দিন');
 
         db.ref('billboards').push({
-            title, sub, imgUrl, videoUrl,
+            title, sub, imgUrl, videoUrl, modelUid, modelUrl,
             active:    true,
             startTime: document.getElementById('bbStart').value || null,
             endTime:   document.getElementById('bbEnd').value   || null,
             createdAt: firebase.database.ServerValue.TIMESTAMP
         }).then(() => {
             alert('Billboard যোগ হয়েছে!');
-            ['bbTitle','bbSub','bbImgUrl','bbVidUrl'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+            ['bbTitle','bbSub','bbImgUrl','bbVidUrl','bb3dUrl'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
             ['bbImgFile','bbVidFile'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
             ['bbImgStatus','bbVidStatus','bbConfigStatus'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=''; });
             document.getElementById('bbStart').value='';
@@ -2264,18 +2854,152 @@
         });
     }
 
+    // ── Bottom Banner Trigger ────────────────────────
+    let abAutoTimer = null, abHideTimer = null;
+
+    function abTrigStatus(msg, color) {
+        const s = document.getElementById('abTrigStatus');
+        if (s) { s.style.color = color || '#aaa'; s.textContent = msg; }
+    }
+
+    function saveBannerMode() {
+        const mode = document.getElementById('abTrigMode').value === 'trigger' ? 'trigger' : 'always';
+        db.ref('bannerTrigger').update({ mode: mode }).then(() => {
+            abTrigStatus(mode === 'trigger' ? '✅ এখন শুধু ট্রিগার করলে দেখাবে' : '✅ এখন সবসময় দেখাবে', '#2ed573');
+        }).catch(e => abTrigStatus('❌ ' + e.message, '#ff4757'));
+    }
+
+    function triggerBanner() {
+        if (document.getElementById('abTrigMode').value !== 'trigger') {
+            abTrigStatus('❌ আগে "শুধু ট্রিগার করলে দেখাও" বেছে নিন', '#ff4757');
+            return;
+        }
+        const duration = parseInt(document.getElementById('abTrigDuration').value, 10) || 20;
+        db.ref('bannerTrigger').update({
+            mode: 'trigger',
+            active: true,
+            duration: duration,
+            triggeredAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            abTrigStatus('✅ ব্যানার ট্রিগার হয়েছে — ' + duration + ' সেকেন্ড', '#2ed573');
+            if (abHideTimer) clearTimeout(abHideTimer);
+            abHideTimer = setTimeout(() => db.ref('bannerTrigger').update({ active: false }), duration * 1000 + 500);
+        }).catch(e => abTrigStatus('❌ ' + e.message, '#ff4757'));
+    }
+
+    function stopBannerTrigger() {
+        if (abHideTimer) { clearTimeout(abHideTimer); abHideTimer = null; }
+        db.ref('bannerTrigger').update({ active: false }).then(() => abTrigStatus('⏹ ব্যানার লুকানো হয়েছে', '#aaa'));
+    }
+
+    function startBannerAuto() {
+        if (document.getElementById('abTrigMode').value !== 'trigger') {
+            abTrigStatus('❌ আগে "শুধু ট্রিগার করলে দেখাও" বেছে নিন', '#ff4757');
+            return;
+        }
+        if (abAutoTimer) clearInterval(abAutoTimer);
+        const n = parseInt(document.getElementById('abTrigInterval').value, 10) || 5;
+        const u = parseInt(document.getElementById('abTrigUnit').value, 10) || 60;
+        triggerBanner();
+        abAutoTimer = setInterval(triggerBanner, n * u * 1000);
+        abTrigStatus('✅ অটো চালু — প্রতি ' + n + ' ' + (u === 60 ? 'মিনিট' : u === 1 ? 'সেকেন্ড' : 'ঘণ্টা') + ' পরপর', '#2ed573');
+    }
+
+    function stopBannerAuto() {
+        if (abAutoTimer) { clearInterval(abAutoTimer); abAutoTimer = null; }
+        abTrigStatus('⏹ অটো ট্রিগার বন্ধ', '#aaa');
+    }
+
+    (function bindAbTrig() {
+        if (typeof db === 'undefined' || !db) { setTimeout(bindAbTrig, 500); return; }
+        db.ref('bannerTrigger').on('value', function(snap) {
+            const d = snap.val() || {};
+            const sel = document.getElementById('abTrigMode');
+            if (sel && !sel.matches(':focus')) sel.value = d.mode === 'trigger' ? 'trigger' : 'always';
+            const du = document.getElementById('abTrigDuration');
+            if (du && d.duration && !du.matches(':focus')) du.value = d.duration;
+        });
+    })();
+
+    // ── Top Bar Trigger ──────────────────────────────
+    let tbAutoTimer = null, tbHideTimer = null;
+
+    function tbTrigStatus(msg, color) {
+        const s = document.getElementById('tbTrigStatus');
+        if (s) { s.style.color = color || '#aaa'; s.textContent = msg; }
+    }
+
+    function saveTopBarMode() {
+        const mode = document.getElementById('tbTrigMode').value === 'trigger' ? 'trigger' : 'always';
+        db.ref('topBarTrigger').update({ mode: mode }).then(() => {
+            tbTrigStatus(mode === 'trigger' ? '✅ এখন শুধু ট্রিগার করলে দেখাবে' : '✅ এখন সবসময় দেখাবে', '#2ed573');
+        }).catch(e => tbTrigStatus('❌ ' + e.message, '#ff4757'));
+    }
+
+    function triggerTopBar() {
+        if (document.getElementById('tbTrigMode').value !== 'trigger') {
+            tbTrigStatus('❌ আগে "শুধু ট্রিগার করলে দেখাও" বেছে নিন', '#ff4757');
+            return;
+        }
+        const duration = parseInt(document.getElementById('tbTrigDuration').value, 10) || 15;
+        db.ref('topBarTrigger').update({
+            mode: 'trigger',
+            active: true,
+            duration: duration,
+            triggeredAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            tbTrigStatus('✅ টপ বার ট্রিগার হয়েছে — ' + duration + ' সেকেন্ড', '#2ed573');
+            if (tbHideTimer) clearTimeout(tbHideTimer);
+            tbHideTimer = setTimeout(() => db.ref('topBarTrigger').update({ active: false }), duration * 1000 + 500);
+        }).catch(e => tbTrigStatus('❌ ' + e.message, '#ff4757'));
+    }
+
+    function stopTopBarTrigger() {
+        if (tbHideTimer) { clearTimeout(tbHideTimer); tbHideTimer = null; }
+        db.ref('topBarTrigger').update({ active: false }).then(() => tbTrigStatus('⏹ টপ বার লুকানো হয়েছে', '#aaa'));
+    }
+
+    function startTopBarAuto() {
+        if (document.getElementById('tbTrigMode').value !== 'trigger') {
+            tbTrigStatus('❌ আগে "শুধু ট্রিগার করলে দেখাও" বেছে নিন', '#ff4757');
+            return;
+        }
+        if (tbAutoTimer) clearInterval(tbAutoTimer);
+        const n = parseInt(document.getElementById('tbTrigInterval').value, 10) || 5;
+        const u = parseInt(document.getElementById('tbTrigUnit').value, 10) || 60;
+        triggerTopBar();
+        tbAutoTimer = setInterval(triggerTopBar, n * u * 1000);
+        tbTrigStatus('✅ অটো চালু — প্রতি ' + n + ' ' + (u === 60 ? 'মিনিট' : u === 1 ? 'সেকেন্ড' : 'ঘণ্টা') + ' পরপর', '#2ed573');
+    }
+
+    function stopTopBarAuto() {
+        if (tbAutoTimer) { clearInterval(tbAutoTimer); tbAutoTimer = null; }
+        tbTrigStatus('⏹ অটো ট্রিগার বন্ধ', '#aaa');
+    }
+
+    (function bindTbTrig() {
+        if (typeof db === 'undefined' || !db) { setTimeout(bindTbTrig, 500); return; }
+        db.ref('topBarTrigger').on('value', function(snap) {
+            const d = snap.val() || {};
+            const sel = document.getElementById('tbTrigMode');
+            if (sel && !sel.matches(':focus')) sel.value = d.mode === 'trigger' ? 'trigger' : 'always';
+            const du = document.getElementById('tbTrigDuration');
+            if (du && d.duration && !du.matches(':focus')) du.value = d.duration;
+        });
+    })();
+
     // ── Top Bar Ad Functions ─────────────────────────
     async function addTopBarAd() {
-        const title = document.getElementById('tbTitle').value.trim();
+        const title = document.getElementById('tbTitle').value.trim() || 'Ad';
         const sub   = document.getElementById('tbSub').value.trim();
-        if (!title) return alert('টাইটেল দিন');
-
         let imgUrl = document.getElementById('tbImgUrl').value.trim();
         const file = document.getElementById('tbImgFile').files[0];
         if (file) imgUrl = await uploadMedia(file, 'tbImgStatus', null, null);
+        if (!imgUrl) return alert('ছবি বা ভিডিও URL দিন (টপ বারে শুধু মিডিয়া দেখায়)');
 
         db.ref('topBarAds').push({
             title, sub, leftImg: imgUrl,
+            slot: parseInt((document.getElementById('tbSlot')||{}).value, 10) || 0,
             active: true,
             createdAt: firebase.database.ServerValue.TIMESTAMP
         }).then(() => {
@@ -2464,7 +3188,8 @@
                 const b = d[id];
                 c.innerHTML += `<div class="item-card">
                     <div class="item-info">
-                        <strong>${b.title||'Billboard'}</strong>
+                        <strong>${b.title||(b.modelUid?'3D মডেল':'Billboard')}</strong>
+                        ${b.modelUid ? '<span style="font-size:9px;background:#a55eea;color:#fff;padding:1px 6px;border-radius:8px;margin-left:4px;">🧊 3D</span>' : ''}
                         ${b.sub ? `<br><span style="font-size:10px;color:#aaa;">${b.sub}</span>` : ''}
                         <br><span style="font-size:9px;color:${b.active!==false?'#2ed573':'#888'};">
                             ${b.active!==false?'🟢 সক্রিয়':'⚫ বন্ধ'}
@@ -2498,11 +3223,21 @@
             c.innerHTML = '';
             const d = snap.val();
             if (!d) { c.innerHTML = '<p style="font-size:11px;color:#888;">কোনো Ad নেই</p>'; return; }
-            for (let id in d) {
+            const tbIds = Object.keys(d).sort((x, y) => ((d[x].slot || 9) - (d[y].slot || 9)));
+            for (let id of tbIds) {
                 const ad = d[id];
+                const sl = parseInt(ad.slot, 10) || 0;
                 c.innerHTML += `<div class="item-card">
                     <div class="item-info">
+                        <span style="background:#00f2fe;color:#000;font-size:10px;font-weight:bold;padding:1px 6px;border-radius:8px;margin-right:4px;">${sl ? 'বক্স ' + sl : 'অটো'}</span>
                         <strong>${ad.title||''}</strong>
+                        <br><select onchange="db.ref('topBarAds/${id}').update({slot:parseInt(this.value,10)})"
+                            style="margin-top:4px;padding:3px;font-size:10px;width:auto;background:#0d0e15;color:#fff;border:1px solid #333;border-radius:4px;">
+                            <option value="1" ${sl===1?'selected':''}>বক্স ১</option>
+                            <option value="2" ${sl===2?'selected':''}>বক্স ২</option>
+                            <option value="3" ${sl===3?'selected':''}>বক্স ৩</option>
+                            <option value="0" ${sl===0?'selected':''}>অটো</option>
+                        </select>
                         ${ad.sub ? `<br><span style="font-size:10px;color:#aaa;">${ad.sub}</span>` : ''}
                     </div>
                     <div style="display:flex;gap:5px;">
